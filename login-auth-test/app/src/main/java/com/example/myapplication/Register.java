@@ -4,7 +4,6 @@ package com.example.myapplication;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.arch.core.executor.ArchTaskExecutor;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -25,7 +24,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class Register extends AppCompatActivity {
-    TextInputEditText editTextEmail, editTextPassword, editTextName, editTextLastname, editTextPhoneNr,editTextPassword2;
+    TextInputEditText editTextEmail, editTextPassword, editTextName, editTextLastname, editTextPhoneNr,editTextPassword2, editTextPersonNummer;
     Button registerBtn;
     FirebaseAuth mAuth;
     ProgressBar progressBar;
@@ -53,9 +52,10 @@ public class Register extends AppCompatActivity {
         editTextEmail = findViewById(R.id.email);
         editTextPassword = findViewById(R.id.password);
         editTextPassword2 = findViewById(R.id.password2);
-        editTextName = findViewById(R.id.fornamn);
-        editTextLastname = findViewById(R.id.efternamn);
-        editTextPhoneNr = findViewById(R.id.tlfnummer);
+        editTextName = findViewById(R.id.firstName);
+        editTextLastname = findViewById(R.id.lastName);
+        editTextPhoneNr = findViewById(R.id.phoneNumber);
+        editTextPersonNummer = findViewById(R.id.idNumber);
 
         registerBtn = findViewById(R.id.registerButton);
         mAuth = FirebaseAuth.getInstance();
@@ -77,31 +77,41 @@ public class Register extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 progressBar.setVisibility(View.VISIBLE);
-                String email, password, password2, name, lastname, phoneNr;
+                String email, password, password2, name, lastname, phoneNr, personNummer;
                 email = String.valueOf(editTextEmail.getText());
                 password = String.valueOf(editTextPassword.getText());
                 password2 = String.valueOf(editTextPassword2.getText());
                 name = String.valueOf(editTextName.getText());
                 lastname = String.valueOf(editTextLastname.getText());
                 phoneNr = String.valueOf(editTextPhoneNr.getText());
+                personNummer = String.valueOf(editTextPersonNummer.getText());
 
-                if(TextUtils.isEmpty(email)) {
+                if (TextUtils.isEmpty(email) || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     Toast.makeText(Register.this, "Ange epostadress", Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
                     return;
-                } else if(TextUtils.isEmpty(password)){
-                    Toast.makeText(Register.this, "Ange lösenord", Toast.LENGTH_SHORT).show();
+                } else if (TextUtils.isEmpty(password) || password.length() < 6) {
+                    Toast.makeText(Register.this, "Lösenordet måste vara minst 6 siffror", Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
                     return;
-                } else if(!password.equals(password2)){
+                } else if (!password.equals(password2)) {
                     Toast.makeText(Register.this, "Lösenorden matchar inte!", Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
                     return;
                 } else if(TextUtils.isEmpty(name)){
                     Toast.makeText(Register.this, "Ange förnamn", Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
                     return;
                 } else if(TextUtils.isEmpty(lastname)){
                     Toast.makeText(Register.this, "Ange efternamn", Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
                     return;
                 } else if(TextUtils.isEmpty(phoneNr) || !TextUtils.isDigitsOnly(phoneNr)){
                     Toast.makeText(Register.this, "Ange telefonnummer", Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
+                    return;
+                } else if (TextUtils.isEmpty(personNummer) || personNummer.length() < 12) {
+                    Toast.makeText(Register.this, "Ange personnummret i 12 siffror", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -111,18 +121,28 @@ public class Register extends AppCompatActivity {
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 progressBar.setVisibility(View.GONE);
                                 if (task.isSuccessful()) {
-                                    // User registration successful
                                     FirebaseUser user = mAuth.getCurrentUser();
-                                    // Create a User object to store additional information
-                                    User newUser = new User(name, lastname, phoneNr, email);
-                                    // Store user information in the Firebase Realtime Database
-                                    databaseReference.child(user.getUid()).setValue(newUser);
-                                    // Sign in success, update UI with the signed-in user's information
-                                    Toast.makeText(Register.this, "Konto skapat!",
-                                            Toast.LENGTH_SHORT).show();
+                                    User newUser = new User(name, lastname, phoneNr, email, personNummer);
+
+                                    databaseReference.child(user.getUid()).setValue(newUser)
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (task.isSuccessful()) {
+                                                        Toast.makeText(Register.this, "Konto skapat!",
+                                                                Toast.LENGTH_SHORT).show();
+                                                        // Skicka användaren till MainAcitivity sidan.
+                                                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                                        startActivity(intent);
+                                                        finish();
+                                                    } else {
+                                                        Toast.makeText(Register.this, "Fel vid skapande av användarprofil",
+                                                                Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }
+                                            });
                                 } else {
-                                    // If sign in fails, display a message to the user.
-                                    Toast.makeText(Register.this, "Autentiseringen misslyckades.",
+                                    Toast.makeText(Register.this, "Autentiseringen misslyckades: " + task.getException().getMessage(),
                                             Toast.LENGTH_SHORT).show();
                                 }
                             }
