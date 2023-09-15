@@ -1,11 +1,16 @@
 <resources>
-    <string name="app_name">Firebase Auth</string>
-    <string name="login">Login</string>
-    <string name="register">Register</string>
-    <string name="email">Email</string>
-    <string name="password">password</string>
+    <string name="app_name">ElderCare</string>
+    <string name="login">Logga in</string>
+    <string name="register">Skapa konto</string>
+    <string name="email">Epostadress</string>
+    <string name="password">Lösenord</string>
     <string name="click_to_login">Click to login!</string>
     <string name="click_to_register">Click HERE to register!</string>
     <string name="user_details"></string>
     <string name="logout">Click to logout</string>
+    <string name="lastName">Efternamn</string>
+    <string name="phoneNumber">Telefonnummer</string>
+    <string name="firstName">Förnamn</string>
+    <string name="password2">Bekräfta lösenord</string>
+    <string name="idNumber">Personnummer (12 siffror)</string>
 </resources>
