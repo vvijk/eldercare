@@ -122,9 +122,9 @@ public class Register extends AppCompatActivity {
                                 progressBar.setVisibility(View.GONE);
                                 if (task.isSuccessful()) {
                                     FirebaseUser user = mAuth.getCurrentUser();
+                                    String uid = user.getUid();
                                     User newUser = new User(name, lastname, phoneNr, email, personNummer);
-
-                                    databaseReference.child(user.getUid()).setValue(newUser)
+                                    databaseReference.child(uid).setValue(newUser)
                                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task) {
