@@ -1,7 +1,10 @@
 package com.example.myapplication;
 
+
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.arch.core.executor.ArchTaskExecutor;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,13 +21,18 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class Register extends AppCompatActivity {
-    TextInputEditText editTextEmail, editTextPassword;
-    Button buttonReg;
+    TextInputEditText editTextEmail, editTextPassword, editTextName, editTextLastname, editTextPhoneNr,editTextPassword2;
+    Button registerBtn;
     FirebaseAuth mAuth;
     ProgressBar progressBar;
-    TextView textView;
+    TextView loginBtn;
+    //FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference databaseReference;
+
 
     @Override
     public void onStart() {
@@ -44,12 +52,19 @@ public class Register extends AppCompatActivity {
         setContentView(R.layout.activity_register);
         editTextEmail = findViewById(R.id.email);
         editTextPassword = findViewById(R.id.password);
-        buttonReg = findViewById(R.id.registerButton);
+        editTextPassword2 = findViewById(R.id.password2);
+        editTextName = findViewById(R.id.fornamn);
+        editTextLastname = findViewById(R.id.efternamn);
+        editTextPhoneNr = findViewById(R.id.tlfnummer);
+
+        registerBtn = findViewById(R.id.registerButton);
         mAuth = FirebaseAuth.getInstance();
         progressBar = findViewById(R.id.progressBar);
-        textView = findViewById(R.id.loginNow);
+        loginBtn = findViewById(R.id.loginNow);
 
-        textView.setOnClickListener(new View.OnClickListener() {
+        databaseReference = FirebaseDatabase.getInstance().getReference("users");
+
+        loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), Login.class);
@@ -58,34 +73,56 @@ public class Register extends AppCompatActivity {
             }
         });
 
-        buttonReg.setOnClickListener(new View.OnClickListener() {
+        registerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 progressBar.setVisibility(View.VISIBLE);
-                String email, password;
+                String email, password, password2, name, lastname, phoneNr;
                 email = String.valueOf(editTextEmail.getText());
                 password = String.valueOf(editTextPassword.getText());
+                password2 = String.valueOf(editTextPassword2.getText());
+                name = String.valueOf(editTextName.getText());
+                lastname = String.valueOf(editTextLastname.getText());
+                phoneNr = String.valueOf(editTextPhoneNr.getText());
 
-                if(TextUtils.isEmpty(email)){
-                    Toast.makeText(Register.this, "Enter Email", Toast.LENGTH_SHORT).show();
+                if(TextUtils.isEmpty(email)) {
+                    Toast.makeText(Register.this, "Ange epostadress", Toast.LENGTH_SHORT).show();
+                    return;
+                } else if(TextUtils.isEmpty(password)){
+                    Toast.makeText(Register.this, "Ange lösenord", Toast.LENGTH_SHORT).show();
+                    return;
+                } else if(!password.equals(password2)){
+                    Toast.makeText(Register.this, "Lösenorden matchar inte!", Toast.LENGTH_SHORT).show();
+                    return;
+                } else if(TextUtils.isEmpty(name)){
+                    Toast.makeText(Register.this, "Ange förnamn", Toast.LENGTH_SHORT).show();
+                    return;
+                } else if(TextUtils.isEmpty(lastname)){
+                    Toast.makeText(Register.this, "Ange efternamn", Toast.LENGTH_SHORT).show();
+                    return;
+                } else if(TextUtils.isEmpty(phoneNr) || !TextUtils.isDigitsOnly(phoneNr)){
+                    Toast.makeText(Register.this, "Ange telefonnummer", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if(TextUtils.isEmpty(password)){
-                    Toast.makeText(Register.this, "Enter Password", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+
                 mAuth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 progressBar.setVisibility(View.GONE);
                                 if (task.isSuccessful()) {
+                                    // User registration successful
+                                    FirebaseUser user = mAuth.getCurrentUser();
+                                    // Create a User object to store additional information
+                                    User newUser = new User(name, lastname, phoneNr, email);
+                                    // Store user information in the Firebase Realtime Database
+                                    databaseReference.child(user.getUid()).setValue(newUser);
                                     // Sign in success, update UI with the signed-in user's information
-                                    Toast.makeText(Register.this, "Account created.",
+                                    Toast.makeText(Register.this, "Konto skapat!",
                                             Toast.LENGTH_SHORT).show();
                                 } else {
                                     // If sign in fails, display a message to the user.
-                                    Toast.makeText(Register.this, "Authentication failed.",
+                                    Toast.makeText(Register.this, "Autentiseringen misslyckades.",
                                             Toast.LENGTH_SHORT).show();
                                 }
                             }
