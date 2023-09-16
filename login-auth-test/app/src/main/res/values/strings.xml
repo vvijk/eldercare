@@ -13,4 +13,5 @@
     <string name="firstName">Förnamn</string>
     <string name="password2">Bekräfta lösenord</string>
     <string name="idNumber">Personnummer (12 siffror)</string>
+    <string name="forgotPassword">Glömt lösenord</string>
 </resources>
