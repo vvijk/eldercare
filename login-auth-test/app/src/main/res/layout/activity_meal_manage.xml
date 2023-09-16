@@ -2,42 +2,63 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/meal_main"
     android:layout_width="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
     android:layout_height="match_parent"
-    tools:context=".MealManagement"
-    android:padding="30dp">
+    android:background="#1C1B1F"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="10dp"
+    tools:context=".MealManagementActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_meal_plans"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:textSize="25sp"
+            android:backgroundTint="@color/purple_dark"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/str_meal_plans"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            app:cornerRadius="0dp"/>
+
+        <Button
+            android:id="@+id/btn_patients"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:textSize="25sp"
+            android:backgroundTint="@color/almost_black"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/str_patients"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            app:cornerRadius="0dp"/>
+    </LinearLayout>
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:id="@+id/meal_scroll">
+        android:layout_height="match_parent"
+        android:padding="12dp"
+        android:background="@color/purple_dark">
 
         <LinearLayout
+            android:id="@+id/meal_scroll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/app_name"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Super long name i think this is very neat holy you see how far we go here very long text and it wraps wow!"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/app_name"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/app_name"
-                />
+
         </LinearLayout>
     </ScrollView>
 

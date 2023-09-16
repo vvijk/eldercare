@@ -8,4 +8,8 @@
     <string name="click_to_register">Click HERE to register!</string>
     <string name="user_details"></string>
     <string name="logout">Click to logout</string>
+    <string name="patient_meals_edit">Edit</string>
+    <string name="str_meal_plans">Meal plans</string>
+    <string name="str_patients">Patients</string>
+    <string name="str_back">Back</string> <!-- &lt; is converted to the character '<' -->
 </resources>
