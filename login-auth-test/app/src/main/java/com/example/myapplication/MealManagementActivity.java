@@ -41,7 +41,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
 
     boolean showingPatients = false;
 
-    int currentCaregiverId = 1; // TODO: Should come from somewhere else.
+    int currentCaregiverId = 1; // TODO(Emarioo): Should come from somewhere else.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +95,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
         } else {
             // Colors won't work
         }
-        // TODO: Optimize by reusing view instead of removing them?
+        // TODO(Emarioo): Optimize by reusing view instead of removing them?
         //   Another optimization would be to hide the list instead of removing and recreating them.
         scrolledLayout.removeAllViews();
         int patientCount = mealStorage.patientCountOfCaregiver(currentCaregiverId);
@@ -109,7 +109,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
 
             TextView textview = new TextView(this);
             textview.setText(name);
-            textview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30); // TODO: Don't hardcode text size
+            textview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30); // TODO(Emarioo): Don't hardcode text size
             textview.setLayoutParams(new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -128,7 +128,8 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
 
             Button button = new Button(this);
             button.setText(R.string.patient_meals_edit);
-            button.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20); // TODO: Don't hardcode text size
+            button.setAllCaps(false);
+            button.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20); // TODO(Emarioo): Don't hardcode text size
             button.setLayoutParams(new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -146,7 +147,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
         } else {
             // Colors won't work
         }
-        // TODO: Optimize by reusing view instead of removing them?
+        // TODO(Emarioo): Optimize by reusing view instead of removing them?
         //   Another optimization would be to hide the list instead of removing and recreating them.
         scrolledLayout.removeAllViews();
         int mealPlanCount = mealStorage.countOfMealPlans();
@@ -160,7 +161,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
 
             TextView textview = new TextView(this);
             textview.setText(name);
-            textview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30); // TODO: Don't hardcode text size
+            textview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30); // TODO(Emarioo): Don't hardcode text size
             textview.setLayoutParams(new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -179,7 +180,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
 
             Button button = new Button(this);
             button.setText(R.string.patient_meals_edit);
-            button.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20); // TODO: Don't hardcode text size
+            button.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20); // TODO(Emarioo): Don't hardcode text size
             button.setLayoutParams(new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT));

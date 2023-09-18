@@ -5,4 +5,7 @@
     <color name="purple">#d0bcff</color>
     <color name="purple_dark">#200020</color>
     <color name="almost_black">#1C1B1F</color>
+    <color name="dry_green_brigher">#1B320F</color>
+    <color name="dry_green">#18280A</color>
+    <color name="delete_button">#BC3050</color>
 </resources>

@@ -17,6 +17,7 @@ class Meal {
     String name="<missing-name>"; // lunch, breakfast...
     int hour=12;
     int minute=0;
+    String description="";
 }
 class MealDay {
     ArrayList<Meal> meals = new ArrayList<>();
@@ -150,5 +151,29 @@ public class PatientMealStorage {
     }
     public int minuteOfMeal(int mealPlanId, int mealDayIndex, int mealIndex) {
         return mealPlans.get(mealPlanId).days.get(mealDayIndex).meals.get(mealIndex).minute;
+    }
+    public String descriptionOfMeal(int mealPlanId, int mealDayIndex, int mealIndex) {
+        return mealPlans.get(mealPlanId).days.get(mealDayIndex).meals.get(mealIndex).description;
+    }
+    public void addMeal(int mealPlanId, int mealDayIndex, String name) {
+        Meal meal = new Meal();
+        meal.description = "";
+        meal.name = name;
+        mealPlans.get(mealPlanId).days.get(mealDayIndex).meals.add(meal);
+    }
+    public void deleteMeal(int mealPlanId, int mealDayIndex, int mealIndex){
+        mealPlans.get(mealPlanId).days.get(mealDayIndex).meals.remove(mealIndex);
+    }
+    public void setNameOfMeal(int mealPlanId, int mealDayIndex, int mealIndex, String name) {
+        mealPlans.get(mealPlanId).days.get(mealDayIndex).meals.get(mealIndex).name = name;
+    }
+    public void setHourOfMeal(int mealPlanId, int mealDayIndex, int mealIndex, int hour) {
+        mealPlans.get(mealPlanId).days.get(mealDayIndex).meals.get(mealIndex).hour = hour;
+    }
+    public void setMinuteOfMeal(int mealPlanId, int mealDayIndex, int mealIndex, int minute){
+        mealPlans.get(mealPlanId).days.get(mealDayIndex).meals.get(mealIndex).minute = minute;
+    }
+    public void setDescriptionOfMeal(int mealPlanId, int mealDayIndex, int mealIndex, String description){
+        mealPlans.get(mealPlanId).days.get(mealDayIndex).meals.get(mealIndex).description = description;
     }
 }

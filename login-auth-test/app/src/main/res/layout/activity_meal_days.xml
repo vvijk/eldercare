@@ -63,6 +63,10 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <tag android:id="@+id/clicked_weekday"/>
+            <tag android:id="@+id/clicked_week"/>
+
+
         </LinearLayout>
     </ScrollView>
 

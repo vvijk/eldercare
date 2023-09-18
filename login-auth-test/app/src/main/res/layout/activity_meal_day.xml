@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MealDayActivity"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/btn_meal_day_back"
+            android:layout_width="wrap_content"
+            android:textSize="25dp"
+            android:text="@string/str_back"
+            android:layout_height="wrap_content"
+            app:cornerRadius="5dp">
+        </Button>
+        <TextView
+            android:id="@+id/meal_patient_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:textSize="30dp"
+            android:text="patient or meal name">
+        </TextView>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:paddingLeft="20dp"
+        android:orientation="horizontal"
+        android:paddingRight="20dp"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/meal_day_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:layout_gravity="center"
+            android:layout_weight="100"
+            android:textSize="30dp"
+            android:text="meal day name">
+        </TextView>
+        <TextView
+            android:id="@+id/meal_day_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:textSize="30dp"
+            android:text="4/12">
+        </TextView>
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_weight="100"
+        android:background="@color/purple_dark">
+
+        <LinearLayout
+            android:padding="10dp"
+            android:id="@+id/meal_scroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+            <tag android:id="@+id/clicked_mealIndex"/>
+            <tag android:id="@+id/clicked_deleteMeal"/>
+        </LinearLayout>
+    </ScrollView>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Add meal"
+        android:textSize="30dp"
+        android:id="@+id/btn_add_meal"
+        app:cornerRadius="15dp">
+    </Button>
+
+</LinearLayout>

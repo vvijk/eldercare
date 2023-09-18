@@ -70,16 +70,16 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
             int patientActiveMealPlanId = mealStorage.mealPlanIdOfPatient(patientId);
             String mealPlanName = null;
             if(patientActiveMealPlanId==0) {
-                mealPlanName = "No plan";  // TODO: Don't hardcode text
+                mealPlanName = "No plan";  // TODO(Emarioo): Don't hardcode text
             } else {
                 mealPlanName = mealStorage.nameOfMealPlan(patientActiveMealPlanId);
-                layout_description.setPadding(20,20,20, 20); // TODO: Don't hardcode padding
+                layout_description.setPadding(20,20,20, 20); // TODO(Emarioo): Don't hardcode padding
             }
             TextView textView = new TextView(this);
-            textView.setText("Meal plan: " + mealPlanName); // TODO: Don't hardcode text
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25); // TODO: Don't hardcode text size
+            textView.setText("Meal plan: " + mealPlanName); // TODO(Emarioo): Don't hardcode text
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25); // TODO(Emarioo): Don't hardcode text size
             textView.setGravity(Gravity.CENTER);
-            textView.setTextColor(Color.BLACK); // TODO: Pick a better color and move it into colors.xml
+            textView.setTextColor(Color.BLACK); // TODO(Emarioo): Pick a better color and move it into colors.xml
             textView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
             textView.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -104,13 +104,27 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
 
     @Override
     public void onClick(View view) {
+        Integer clickedWeek = (Integer)view.getTag(R.id.clicked_week);
+        Integer clickedWeekDay = (Integer)view.getTag(R.id.clicked_weekday);
 
         if(view == btn_back) {
             Button button = (Button)view;
             System.out.println("BACK");
             finish();
-        } else {
-            int dayIndex = (Integer) view.getTag();
+        } else if(clickedWeekDay!=null) {
+            int dayIndex = clickedWeekDay;
+            if(showPatientDay) {
+                Intent intent = new Intent(getApplicationContext(), MealDayActivity.class);
+                intent.putExtra("patientId", curPatientId);
+                intent.putExtra("dayIndex", dayIndex);
+                startActivity(intent);
+            } else {
+                Intent intent = new Intent(getApplicationContext(), MealDayActivity.class);
+                intent.putExtra("mealPlanId", curMealPlanId);
+                intent.putExtra("dayIndex", dayIndex);
+                startActivity(intent);
+            }
+        } else if(clickedWeek!=null) {
             int mealPlanId = 0;
             if(showPatientDay){
                 mealPlanId = mealStorage.mealPlanIdOfPatient(curPatientId);
@@ -121,7 +135,8 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
                 return;
             int mealDayCount = mealStorage.countOfMealDays(mealPlanId);
 
-            System.out.println("I "+dayIndex +", C "+mealDayCount);
+            int dayIndex = clickedWeek;
+//            System.out.println("I "+dayIndex +", C "+mealDayCount);
 
             LinearLayout subLayout = (LinearLayout) view;
 
@@ -133,26 +148,27 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
                 lastOpenedWeek = null;
             } else {
                 lastOpenedWeek = subLayout;
-                subLayout.setBackgroundColor(Color.rgb(27,50,15)); // TODO: don't hardcode color (dry dark green)
-                String[] weekDays = {"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
+                subLayout.setBackgroundColor(getResources().getColor(R.color.dry_green_brigher));
+                String[] weekDays = {"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"}; // TODO(Emarioo): Don't hardcode text
                 int len = 0;
                 while(len < 7 && dayIndex < mealDayCount) {
-                    int weekNumber = 1 + dayIndex / 7; // TODO: This is flawed because of leap years.
+                    int weekNumber = 1 + dayIndex / 7; // TODO(Emarioo): This is flawed because of leap years.
                     int monthNumber = 1 + dayIndex / 30;
                     int dayNumber = 1 + dayIndex % 30;
                     int weekDayIndex = dayIndex % 7;
-                    dayIndex++;
                     len++;
                     LinearLayout itemLayout = new LinearLayout(subLayout.getContext());
                     itemLayout.setOrientation(LinearLayout.HORIZONTAL);
-                    itemLayout.setBackgroundColor(Color.rgb(24,40,10)); // TODO: don't hardcode color (dry dark green)
-                    itemLayout.setPadding(25,8,25,8); // TODO: don't hardcode padding
+                    itemLayout.setBackgroundColor(getResources().getColor(R.color.dry_green));
+                    itemLayout.setPadding(25,8,25,8); // TODO(Emarioo): don't hardcode padding
                     itemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                    itemLayout.setTag(R.id.clicked_weekday, dayIndex);
+                    itemLayout.setOnClickListener(this);
                     subLayout.addView(itemLayout);
                     {
                         TextView textview = new TextView(subLayout.getContext());
-                        textview.setText(weekDays[weekDayIndex]); // TODO: Fix hardcoded string "Weak"
-                        textview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25); // TODO: Don't hardcode text size
+                        textview.setText(weekDays[weekDayIndex]);
+                        textview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25); // TODO(Emarioo): Don't hardcode text size
                         textview.setLayoutParams(new ViewGroup.LayoutParams(
                                 ViewGroup.LayoutParams.WRAP_CONTENT,
                                 ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -161,7 +177,7 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
                     {
                         TextView textview = new TextView(itemLayout.getContext());
                         textview.setText(monthNumber + "/" + dayNumber);
-                        textview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25); // TODO: Don't hardcode text size
+                        textview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25); // TODO(Emarioo): Don't hardcode text size
                         textview.setGravity(Gravity.RIGHT);
                         textview.setTextAlignment(TextView.TEXT_ALIGNMENT_TEXT_END);
                         textview.setLayoutParams(new ViewGroup.LayoutParams(
@@ -171,13 +187,14 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
                             textview.setBackgroundColor(Color.GREEN);
                         itemLayout.addView(textview);
                     }
+                    dayIndex++;
                 }
             }
         }
     }
 
     void refreshDays(){
-        // TODO: Optimize by reusing view instead of removing them?
+        // TODO(Emarioo): Optimize by reusing view instead of removing them?
         //   Another optimization would be to hide the list instead of removing and recreating them.
         scrolledLayout.removeAllViews();
         int mealPlanId = 0;
@@ -191,7 +208,7 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
         int dayCount = mealStorage.countOfMealDays(mealPlanId);
         int lastWeek = -1;
         for(int dayIndex=0;dayIndex<dayCount;dayIndex++) {
-            int weekNumber = 1 + dayIndex / 7; // TODO: This is flawed because of leap years.
+            int weekNumber = 1 + dayIndex / 7; // TODO(Emarioo): This is flawed because of leap years.
             int monthNumber = 1 + dayIndex / 30;
             int dayNumber = 1 + dayIndex % 30;
 
@@ -201,15 +218,15 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
             lastWeek = weekNumber;
 
             LinearLayout itemLayout = new LinearLayout(this);
-            itemLayout.setTag(dayIndex);
+            itemLayout.setTag(R.id.clicked_week, dayIndex);
             itemLayout.setOrientation(LinearLayout.VERTICAL);
             itemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             itemLayout.setOnClickListener(this);
             scrolledLayout.addView(itemLayout);
             {
                 TextView textview = new TextView(itemLayout.getContext());
-                textview.setText("Weak " + weekNumber); // TODO: Fix hardcoded string "Weak"
-                textview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25); // TODO: Don't hardcode text size
+                textview.setText("Weak " + weekNumber); // TODO(Emarioo): Fix hardcoded string "Weak"
+                textview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25); // TODO(Emarioo): Don't hardcode text size
                 textview.setGravity(Gravity.CENTER);
                 textview.setLayoutParams(new ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,

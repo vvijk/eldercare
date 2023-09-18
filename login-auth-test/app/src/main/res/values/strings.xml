@@ -12,4 +12,6 @@
     <string name="str_meal_plans">Meal plans</string>
     <string name="str_patients">Patients</string>
     <string name="str_back">Back</string> <!-- &lt; is converted to the character '<' -->
+    <string name="default_meal_name">Unnamed</string>
+    <string name="str_delete">Delete</string>
 </resources>
