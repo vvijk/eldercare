@@ -27,20 +27,28 @@
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="23sp"
-            app:cornerRadius="0dp"/>
+            app:cornerRadius="2dp"/>
 
         <TextView
             android:id="@+id/text_patient_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1"
             android:backgroundTint="@color/almost_black"
             android:text="patient-name"
+            android:layout_gravity="center"
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="25sp"
             app:cornerRadius="0dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/meal_patient_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background = "@color/purple"
+        android:orientation="vertical">
+
     </LinearLayout>
 
     <ScrollView

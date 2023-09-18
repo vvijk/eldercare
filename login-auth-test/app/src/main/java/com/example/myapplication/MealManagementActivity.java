@@ -81,10 +81,10 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
             startActivity(intent);
         } else {
             int mealPlanId = (Integer) button.getTag();
-            System.out.println(mealStorage.nameOfMealPlan(mealPlanId));
-//            Intent intent = new Intent(getApplicationContext(), MealPlanActivity.class);
-//            startActivity(intent);
-//            intent.putExtra("mealPlanId", mealPlanId);
+//            System.out.println("Press " + mealStorage.nameOfMealPlan(mealPlanId));
+            Intent intent = new Intent(getApplicationContext(), PatientMealActivity.class);
+            intent.putExtra("mealPlanId", mealPlanId);
+            startActivity(intent);
         }
     }
     void refreshPatients() {
