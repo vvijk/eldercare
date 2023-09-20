@@ -14,4 +14,30 @@
     <string name="password2">Bekräfta lösenord</string>
     <string name="idNumber">Personnummer (12 siffror)</string>
     <string name="forgotPassword">Glömt lösenord</string>
+
+    <string name="address">Adress</string>
+    <string name="city">Ort</string>
+    <string name="county">Län</string>
+    <string name="preferences">Preferenser</string>
+    <string name="restrictions">Allergier</string>
+    <string name="PIN">PIN Kod</string>
+    <string name="confirmPIN">Bekräfta PIN Kod</string>
+    <string name="createPatient">Skapa patient</string>
+
+
+    <!--ERROR MESSAGES, CREATE PATIENT-->
+    <string name="createPatientErrorHeader">Snälla fyll i dessa fält:\n</string>
+    <string name="createPatientErrorForename">Förnamn\n</string>
+    <string name="createPatientErrorSurname">Efternamn\n</string>
+    <string name="createPatientErrorPhone">Telefonnummer (10 siffror)\n</string>
+    <string name="createPatientErrorAddress">Adress\n</string>
+    <string name="createPatientErrorCity">Ort\n</string>
+    <string name="createPatientErrorCounty">Län\n</string>
+    <string name="createPatientErrorPreferences">Inga preferenser</string>
+    <string name="createPatientErrorPhoneRestrictions">Inga allergier</string>
+    <string name="createPatientErrorPIN">PIN Kod (4 siffror)\n</string>
+    <string name="createPatientErrorConfirmPIN">Bekräfta PIN kod\n</string>
+
+
+
 </resources>
