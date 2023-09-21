@@ -34,7 +34,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/almost_black"
-            android:text="patient-name"
+            android:text="?"
             android:layout_gravity="center"
             android:textAlignment="center"
             android:textColor="@color/white"

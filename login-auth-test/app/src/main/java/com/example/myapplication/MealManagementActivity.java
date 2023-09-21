@@ -22,6 +22,8 @@ import android.widget.TextView;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import com.example.myapplication.util.GlobalApp;
 import com.example.myapplication.util.PatientMealStorage;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -35,7 +37,9 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
 
     View.OnClickListener btn_listener = null;
 
-    PatientMealStorage mealStorage = new PatientMealStorage();
+    PatientMealStorage getMealStorage() {
+        return ((GlobalApp) getApplicationContext()).mealStorage;
+    }
 
     boolean DEBUG_COLORED_LAYOUT = false;
 
@@ -74,14 +78,14 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
         Button button = (Button)view;
         if(showingPatients) {
             int patientId = (Integer) button.getTag();
-//            System.out.println("Press " + mealStorage.nameOfPatient(patientId));
+//            System.out.println("Press " + getMealStorage().nameOfPatient(patientId));
 
             Intent intent = new Intent(getApplicationContext(), PatientMealActivity.class);
             intent.putExtra("patientId", patientId);
             startActivity(intent);
         } else {
             int mealPlanId = (Integer) button.getTag();
-//            System.out.println("Press " + mealStorage.nameOfMealPlan(mealPlanId));
+//            System.out.println("Press " + getMealStorage().nameOfMealPlan(mealPlanId));
             Intent intent = new Intent(getApplicationContext(), PatientMealActivity.class);
             intent.putExtra("mealPlanId", mealPlanId);
             startActivity(intent);
@@ -98,10 +102,10 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
         // TODO(Emarioo): Optimize by reusing view instead of removing them?
         //   Another optimization would be to hide the list instead of removing and recreating them.
         scrolledLayout.removeAllViews();
-        int patientCount = mealStorage.patientCountOfCaregiver(currentCaregiverId);
+        int patientCount = getMealStorage().patientCountOfCaregiver(currentCaregiverId);
         for(int i=0;i<patientCount;i++) {
-            int patientId = mealStorage.patientIdFromIndex(currentCaregiverId,i);
-            String name = mealStorage.nameOfPatient(patientId);
+            int patientId = getMealStorage().patientIdFromIndex(currentCaregiverId,i);
+            String name = getMealStorage().nameOfPatient(patientId);
 
             LinearLayout itemLayout = new LinearLayout(this);
             itemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -150,10 +154,10 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
         // TODO(Emarioo): Optimize by reusing view instead of removing them?
         //   Another optimization would be to hide the list instead of removing and recreating them.
         scrolledLayout.removeAllViews();
-        int mealPlanCount = mealStorage.countOfMealPlans();
+        int mealPlanCount = getMealStorage().countOfMealPlans();
         for(int i=0;i<mealPlanCount;i++) {
-            int mealPlanId = mealStorage.mealPlanIdFromIndex(i);
-            String name = mealStorage.nameOfMealPlan(mealPlanId);
+            int mealPlanId = getMealStorage().mealPlanIdFromIndex(i);
+            String name = getMealStorage().nameOfMealPlan(mealPlanId);
 
             LinearLayout itemLayout = new LinearLayout(this);
             itemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));

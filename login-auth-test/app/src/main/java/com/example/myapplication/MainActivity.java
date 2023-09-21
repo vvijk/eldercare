@@ -17,6 +17,8 @@ public class MainActivity extends AppCompatActivity {
     Button button;
     TextView textView;
     FirebaseUser user;
+    
+    Button btn_mealManagement = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
         button = findViewById(R.id.logout);
         textView = findViewById(R.id.user_details);
         user = auth.getCurrentUser();
+        
+        btn_mealManagement = findViewById(R.id.btn_goto_meal_management);
 
         if(user == null){
             Intent intent = new Intent(getApplicationContext(), Login.class);
@@ -43,6 +47,14 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), Login.class);
                 startActivity(intent);
                 finish();
+            }
+        });
+
+        btn_mealManagement.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), MealManagementActivity.class);
+                startActivity(intent);
             }
         });
     }

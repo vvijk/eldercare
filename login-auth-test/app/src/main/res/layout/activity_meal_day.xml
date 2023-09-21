@@ -28,7 +28,7 @@
             android:gravity="center"
             android:layout_weight="1"
             android:textSize="30dp"
-            android:text="patient or meal name">
+            android:text="?">
         </TextView>
     </LinearLayout>
     <LinearLayout
@@ -46,7 +46,7 @@
             android:layout_gravity="center"
             android:layout_weight="100"
             android:textSize="30dp"
-            android:text="meal day name">
+            android:text="?">
         </TextView>
         <TextView
             android:id="@+id/meal_day_date"
@@ -55,38 +55,43 @@
             android:layout_weight="1"
             android:layout_gravity="center"
             android:textAlignment="center"
-            android:textSize="30dp"
-            android:text="4/12">
+            android:textSize="30sp"
+            android:text="?/?">
         </TextView>
     </LinearLayout>
 
+<!--        android:layout_marginBottom="10dp"-->
+<!--        android:layout_marginTop="10dp"-->
+<!--        android:layout_gravity="center"-->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="10dp"
         android:layout_weight="100"
         android:background="@color/purple_dark">
 
+        <!--
+        NOTE(Emarioo): Linear layout cannot be centered (layout_gravity="center") because
+          Some content will end up outside the scroll view for whatever reason.
+        -->
+<!--            android:layout_gravity="center"-->
         <LinearLayout
-            android:padding="10dp"
             android:id="@+id/meal_scroll"
+            android:padding="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:orientation="vertical">
 
-            <tag android:id="@+id/clicked_mealIndex"/>
-            <tag android:id="@+id/clicked_deleteMeal"/>
         </LinearLayout>
+        <tag android:id="@+id/clicked_mealIndex"/>
+        <tag android:id="@+id/clicked_deleteMeal"/>
     </ScrollView>
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="@string/str_add_meal"
         android:layout_weight="1"
-        android:text="Add meal"
-        android:textSize="30dp"
+        android:textSize="30sp"
         android:id="@+id/btn_add_meal"
         app:cornerRadius="15dp">
     </Button>

@@ -9,6 +9,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.telecom.Call;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -21,8 +22,12 @@ import android.widget.TextView;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 
+import com.example.myapplication.util.GlobalApp;
 import com.example.myapplication.util.PatientMealStorage;
 import com.google.android.gms.actions.ItemListIntents;
 import com.google.firebase.auth.FirebaseUser;
@@ -42,7 +47,9 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
     LinearLayout lastOpenedWeek = null;
 
     boolean DEBUG_COLORED_LAYOUT = false;
-    PatientMealStorage mealStorage = new PatientMealStorage();
+    PatientMealStorage getMealStorage() {
+        return ((GlobalApp) getApplicationContext()).mealStorage;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,26 +67,26 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
         if(patientId != 0) {
             curPatientId = patientId;
             showPatientDay = true;
-            String name = mealStorage.nameOfPatient(patientId);
+            String name = getMealStorage().nameOfPatient(patientId);
             if (name != null) {
                 text_name.setText(name);
             } else {
                 // error?
                 text_name.setText("null");
             }
-            int patientActiveMealPlanId = mealStorage.mealPlanIdOfPatient(patientId);
+            int patientActiveMealPlanId = getMealStorage().mealPlanIdOfPatient(patientId);
             String mealPlanName = null;
             if(patientActiveMealPlanId==0) {
                 mealPlanName = "No plan";  // TODO(Emarioo): Don't hardcode text
             } else {
-                mealPlanName = mealStorage.nameOfMealPlan(patientActiveMealPlanId);
+                mealPlanName = getMealStorage().nameOfMealPlan(patientActiveMealPlanId);
                 layout_description.setPadding(20,20,20, 20); // TODO(Emarioo): Don't hardcode padding
             }
             TextView textView = new TextView(this);
             textView.setText("Meal plan: " + mealPlanName); // TODO(Emarioo): Don't hardcode text
             textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25); // TODO(Emarioo): Don't hardcode text size
             textView.setGravity(Gravity.CENTER);
-            textView.setTextColor(Color.BLACK); // TODO(Emarioo): Pick a better color and move it into colors.xml
+            textView.setTextColor(getResources().getColor(R.color.black)); // TODO(Emarioo): Pick a better color and move it into colors.xml
             textView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
             textView.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -88,7 +95,7 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
         } else if(mealPlanId != 0){
             showPatientDay = false;
             curMealPlanId = mealPlanId;
-            String name = mealStorage.nameOfMealPlan(mealPlanId);
+            String name = getMealStorage().nameOfMealPlan(mealPlanId);
             if (name != null) {
                 text_name.setText(name);
             } else {
@@ -109,7 +116,7 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
 
         if(view == btn_back) {
             Button button = (Button)view;
-            System.out.println("BACK");
+//            System.out.println("BACK");
             finish();
         } else if(clickedWeekDay!=null) {
             int dayIndex = clickedWeekDay;
@@ -127,13 +134,13 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
         } else if(clickedWeek!=null) {
             int mealPlanId = 0;
             if(showPatientDay){
-                mealPlanId = mealStorage.mealPlanIdOfPatient(curPatientId);
+                mealPlanId = getMealStorage().mealPlanIdOfPatient(curPatientId);
             } else {
                 mealPlanId = curMealPlanId;
             }
             if(mealPlanId == 0)
                 return;
-            int mealDayCount = mealStorage.countOfMealDays(mealPlanId);
+            int mealDayCount = getMealStorage().countOfMealDays(mealPlanId);
 
             int dayIndex = clickedWeek;
 //            System.out.println("I "+dayIndex +", C "+mealDayCount);
@@ -149,7 +156,19 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
             } else {
                 lastOpenedWeek = subLayout;
                 subLayout.setBackgroundColor(getResources().getColor(R.color.dry_green_brigher));
-                String[] weekDays = {"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"}; // TODO(Emarioo): Don't hardcode text
+                String[] weekDays = {
+                        getResources().getString(R.string.str_monday),
+                        getResources().getString(R.string.str_tuesday),
+                        getResources().getString(R.string.str_wednesday),
+                        getResources().getString(R.string.str_thursday),
+                        getResources().getString(R.string.str_friday),
+                        getResources().getString(R.string.str_saturday),
+                        getResources().getString(R.string.str_sunday)
+                };
+
+//                Calendar calendar = Calendar.getInstance();
+//                calendar.get(Calendar.);
+
                 int len = 0;
                 while(len < 7 && dayIndex < mealDayCount) {
                     int weekNumber = 1 + dayIndex / 7; // TODO(Emarioo): This is flawed because of leap years.
@@ -199,13 +218,13 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
         scrolledLayout.removeAllViews();
         int mealPlanId = 0;
         if(showPatientDay){
-            mealPlanId = mealStorage.mealPlanIdOfPatient(curPatientId);
+            mealPlanId = getMealStorage().mealPlanIdOfPatient(curPatientId);
         } else {
             mealPlanId = curMealPlanId;
         }
         if(mealPlanId == 0)
             return;
-        int dayCount = mealStorage.countOfMealDays(mealPlanId);
+        int dayCount = getMealStorage().countOfMealDays(mealPlanId);
         int lastWeek = -1;
         for(int dayIndex=0;dayIndex<dayCount;dayIndex++) {
             int weekNumber = 1 + dayIndex / 7; // TODO(Emarioo): This is flawed because of leap years.
@@ -225,7 +244,7 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
             scrolledLayout.addView(itemLayout);
             {
                 TextView textview = new TextView(itemLayout.getContext());
-                textview.setText("Weak " + weekNumber); // TODO(Emarioo): Fix hardcoded string "Weak"
+                textview.setText(getResources().getString(R.string.str_week)+" " + weekNumber);
                 textview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25); // TODO(Emarioo): Don't hardcode text size
                 textview.setGravity(Gravity.CENTER);
                 textview.setLayoutParams(new ViewGroup.LayoutParams(
