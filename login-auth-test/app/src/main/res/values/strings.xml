@@ -25,7 +25,6 @@
     <string name="hem">Hem</string>
     <string name="patienter">Patienter</string>
     <string name="profil">Profil</string>
-
-    <string name="lorem_ipsum">
-    </string>
+    <string name="menu_drawer_open">Drawer Open</string>
+    <string name="menu_drawer_closed">Drawer Closed</string>
 </resources>
