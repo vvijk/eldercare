@@ -8,9 +8,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,7 +33,9 @@ public class Register extends AppCompatActivity {
     TextView loginBtn;
     //FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference databaseReference;
-
+    RadioGroup radioGroup;
+    boolean isCareGiver;
+    int checkedRadioButtonId;
 
     @Override
     public void onStart() {
@@ -61,7 +65,7 @@ public class Register extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         progressBar = findViewById(R.id.progressBar);
         loginBtn = findViewById(R.id.loginNow);
-
+        radioGroup = findViewById(R.id.radioGroup);
         databaseReference = FirebaseDatabase.getInstance().getReference("users");
 
         loginBtn.setOnClickListener(new View.OnClickListener() {
@@ -85,6 +89,15 @@ public class Register extends AppCompatActivity {
                 lastname = String.valueOf(editTextLastname.getText());
                 phoneNr = String.valueOf(editTextPhoneNr.getText());
                 personNummer = String.valueOf(editTextPersonNummer.getText());
+
+                checkedRadioButtonId = radioGroup.getCheckedRadioButtonId();
+                isCareGiver = checkedRadioButtonId == R.id.careGiverID;
+
+                if (checkedRadioButtonId == -1) {
+                    Toast.makeText(Register.this, "Du måste välja vårdtagare eller vårdgivare!", Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
+                    return;
+                }
 
                 if (TextUtils.isEmpty(email) || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     Toast.makeText(Register.this, "Ange epostadress", Toast.LENGTH_SHORT).show();
@@ -123,7 +136,7 @@ public class Register extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     FirebaseUser user = mAuth.getCurrentUser();
                                     String uid = user.getUid();
-                                    User newUser = new User(name, lastname, phoneNr, email, personNummer);
+                                    User newUser = new User(name, lastname, phoneNr, email, personNummer, isCareGiver);
                                     databaseReference.child(uid).setValue(newUser)
                                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
