@@ -4,15 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.android.material.textfield.TextInputEditText;
-
 public class CreatePatient extends AppCompatActivity {
 
     TextInputEditText entryForename, entrySurname, entryDOB, entryPhone, entryAddress, entryCity, entryCounty, entryPreferences, entryRestrictions, entryPIN, entryConfirmPIN;
-
     Button createButton;
 
     @Override
@@ -41,52 +38,47 @@ public class CreatePatient extends AppCompatActivity {
         });
     }
 
-    private void showErrorBox(String errorMessage){
-
-    }
-
     private void createPatient(){
         //TODO Send data from all fields to database, when schema is implemented
 
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(intent);
+        Toast.makeText(this, getString(R.string.createPatientSuccess), Toast.LENGTH_SHORT).show();
         finish();
     }
 
     private void validate(){
         boolean error = false;
-        String errorMessage = "@string/createPatientErrorHeader";
+        int errorMessage = R.string.createPatientErrorDefault;
         if (!validateForename()){
-            errorMessage = errorMessage.concat("@string/createPatientErrorForename");
+            errorMessage = R.string.createPatientErrorForename;
             error = true;
-        } if (!validateSurname()){
-            errorMessage = errorMessage.concat("@string/createPatientErrorSurname");
+        } else if (!validateSurname()){
+            errorMessage = R.string.createPatientErrorSurname;
             error = true;
-        } if (!validatePhone()){
-            errorMessage = errorMessage.concat("@string/createPatientErrorPhone");
+        } else if (!validatePhone()){
+            errorMessage = R.string.createPatientErrorPhone;
             error = true;
-        } if (!validateAddress()){
-            errorMessage = errorMessage.concat("@string/createPatientErrorAddress");
+        } else if (!validateAddress()){
+            errorMessage = R.string.createPatientErrorAddress;
             error = true;
-        } if (!validateCity()){
-            errorMessage = errorMessage.concat("@string/createPatientErrorCity");
+        } else if (!validateCity()){
+            errorMessage = R.string.createPatientErrorCity;
             error = true;
-        } if (!validateCounty()){
-            errorMessage = errorMessage.concat("@string/createPatientErrorCounty");
+        } else if (!validateCounty()){
+            errorMessage = R.string.createPatientErrorCounty;
             error = true;
-        } if (validateCounty()){
-            entryPreferences.setText("Inga preferenser.");
-        } if (validateCounty()){
-            entryPreferences.setText("Inga allergier.");
-        } if (!validatePIN()){
-            errorMessage = errorMessage.concat("@string/createPatientErrorPIN");
+        } else if (!validatePIN()){
+            errorMessage = R.string.createPatientErrorPIN;
             error = true;
-        } if (!validateConfirmPIN()){
-            errorMessage = errorMessage.concat("@string/createPatientErrorConfirmPIN");
+        } else if (!validateConfirmPIN()){
+            errorMessage = R.string.createPatientErrorConfirmPIN;
             error = true;
         }
 
-        if (error) { showErrorBox(errorMessage); }
+        if (error) {
+            Toast.makeText(this, getString(errorMessage), Toast.LENGTH_SHORT).show();
+        }
         else { createPatient(); }
     }
 
@@ -128,7 +120,9 @@ public class CreatePatient extends AppCompatActivity {
 
     }
     private boolean validateConfirmPIN(){
-        return entryPIN.getText() == entryConfirmPIN.getText();
+        System.out.print(entryPIN.getText());
+        System.out.print(entryConfirmPIN.getText());
+        if (!validatePIN()){ return true; } //if PIN already fails to validate, we don't need to send error for confirm pin.
+        else { return (String.valueOf(entryPIN.getText()).equals(String.valueOf(entryConfirmPIN.getText()))); }
     }
-
 }
