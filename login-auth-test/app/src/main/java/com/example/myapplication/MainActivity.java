@@ -44,9 +44,8 @@ public class MainActivity extends AppCompatActivity {
                 FirebaseAuth.getInstance().signOut();
                 Intent intent = new Intent(getApplicationContext(), Login.class);
                 startActivity(intent);
+                finish();
             }
-
-
         });
 
         createPatient.setOnClickListener(new View.OnClickListener(){ //PLACEHOLDER
