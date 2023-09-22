@@ -49,6 +49,8 @@
         android:background = "@color/purple"
         android:orientation="vertical">
 
+        <tag android:id="@+id/clicked_meal_plan"/>
+
     </LinearLayout>
 
     <ScrollView

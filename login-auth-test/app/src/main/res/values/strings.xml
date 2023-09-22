@@ -11,6 +11,8 @@
     
     <string name="manage_meals">Manage meals</string>
 
+    <string name="str_meal_plan">Meal plan</string>
+    <string name="str_no_plan">No plan</string>
     <string name="meal_time_bad_format">Time of meal was incorrectly formatted</string>
     <string name="meal_time_missing_colon">Meal time is missing a colon</string>
     <string name="patient_meals_edit">Edit</string>

@@ -77,13 +77,13 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
             int patientActiveMealPlanId = getMealStorage().mealPlanIdOfPatient(patientId);
             String mealPlanName = null;
             if(patientActiveMealPlanId==0) {
-                mealPlanName = "No plan";  // TODO(Emarioo): Don't hardcode text
+                mealPlanName = getResources().getString(R.string.str_no_plan);
             } else {
                 mealPlanName = getMealStorage().nameOfMealPlan(patientActiveMealPlanId);
                 layout_description.setPadding(20,20,20, 20); // TODO(Emarioo): Don't hardcode padding
             }
             TextView textView = new TextView(this);
-            textView.setText("Meal plan: " + mealPlanName); // TODO(Emarioo): Don't hardcode text
+            textView.setText(getResources().getString(R.string.str_meal_plan)+": " + mealPlanName);
             textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25); // TODO(Emarioo): Don't hardcode text size
             textView.setGravity(Gravity.CENTER);
             textView.setTextColor(getResources().getColor(R.color.black)); // TODO(Emarioo): Pick a better color and move it into colors.xml
@@ -91,7 +91,10 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
             textView.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT));
+
             layout_description.addView(textView);
+
+            layout_description.setOnClickListener(this);
         } else if(mealPlanId != 0){
             showPatientDay = false;
             curMealPlanId = mealPlanId;
@@ -113,6 +116,7 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
     public void onClick(View view) {
         Integer clickedWeek = (Integer)view.getTag(R.id.clicked_week);
         Integer clickedWeekDay = (Integer)view.getTag(R.id.clicked_weekday);
+        Integer clickedMealPlanId = (Integer)view.getTag(R.id.clicked_meal_plan);
 
         if(view == btn_back) {
             Button button = (Button)view;
@@ -130,6 +134,46 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
                 intent.putExtra("mealPlanId", curMealPlanId);
                 intent.putExtra("dayIndex", dayIndex);
                 startActivity(intent);
+            }
+        } else if(clickedMealPlanId != null) {
+            if(curPatientId != 0 && showPatientDay){
+                getMealStorage().setMealPlanIdOfPatient(curPatientId, clickedMealPlanId);
+
+                String mealPlanName = getMealStorage().nameOfMealPlan(clickedMealPlanId);
+                TextView view_activeMealPlan = (TextView)layout_description.getChildAt(0);
+                view_activeMealPlan.setText(getResources().getString(R.string.str_meal_plan) +": "+ mealPlanName);
+
+                refreshDays();
+            }
+        } else if(layout_description == view){
+            if(layout_description.getChildCount()>1){
+                layout_description.setBackgroundColor(getResources().getColor(R.color.purple));
+                TextView view_activeMealPlan = (TextView)layout_description.getChildAt(0);
+                view_activeMealPlan.setTextColor(getResources().getColor(R.color.black));
+                layout_description.removeViews(1,layout_description.getChildCount()-1);
+            } else {
+                TextView view_activeMealPlan = (TextView)layout_description.getChildAt(0);
+                view_activeMealPlan.setTextColor(getResources().getColor(R.color.white));
+                layout_description.setBackgroundColor(getResources().getColor(R.color.dry_green_brigher));
+                int mealPlanCount = getMealStorage().countOfMealPlans();
+                for(int i=0;i<mealPlanCount;i++){
+                    int mealPlanId = getMealStorage().mealPlanIdFromIndex(i);
+                    String name = getMealStorage().nameOfMealPlan(mealPlanId);
+
+                    TextView textview = new TextView(layout_description.getContext());
+                    textview.setText(name);
+                    textview.setTextColor(getResources().getColor(R.color.black));
+                    textview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25); // TODO(Emarioo): Don't hardcode text size
+                    textview.setGravity(Gravity.CENTER);
+                    textview.setLayoutParams(new ViewGroup.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT));
+                    textview.setTextColor(getResources().getColor(R.color.white));
+                    textview.setBackgroundColor(getResources().getColor(R.color.dry_green));
+                    textview.setTag(R.id.clicked_meal_plan, mealPlanId);
+                    textview.setOnClickListener(this);
+                    layout_description.addView(textview);
+                }
             }
         } else if(clickedWeek!=null) {
             int mealPlanId = 0;

@@ -127,6 +127,12 @@ public class PatientMealStorage {
             return 0;
         return patient.activeMealPlanId;
     }
+    public void setMealPlanIdOfPatient(int patientId, int mealPlanId) {
+        Patient patient = patients.get(patientId);
+        if(patient == null)
+            return;
+        patient.activeMealPlanId = mealPlanId;
+    }
 
     public int countOfMealPlans(){
         return mealPlanIds.size();

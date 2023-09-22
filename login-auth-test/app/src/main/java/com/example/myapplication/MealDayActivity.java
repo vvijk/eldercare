@@ -155,6 +155,7 @@ public class MealDayActivity extends AppCompatActivity implements View.OnClickLi
         } else {
             // what?
         }
+        curDayIndex = dayIndex;
 
         // NOTE(Emarioo): Copy pasted from PatientMealActivity.
         int weekNumber = 1 + dayIndex / 7; // TODO(Emarioo): This is flawed because of leap years.
@@ -238,7 +239,17 @@ public class MealDayActivity extends AppCompatActivity implements View.OnClickLi
                         ViewGroup.LayoutParams.WRAP_CONTENT));
                 itemLayout.addView(subLayout);
 
-                EditText editText = new EditText(itemLayout.getContext());
+                // NOTE(Emarioo): Disabling editing of description when you click in on a patient.
+                //  This is because you would modify the meal plan and thus changing the meals
+                //  for other patients too. We could allow you to edit description if each
+                //  patient has some kind of individual plan which wouldn't affect other patients.
+                TextView editText = null;
+                if(curPatientId!=0){
+                    editText = new TextView(itemLayout.getContext());
+                } else {
+                    editText = new EditText(itemLayout.getContext());
+                }
+
                 editText.setText(description);
                 editText.setHint(R.string.str_no_description);
                 editText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 24); // TODO(Emarioo): Don't hardcode text size
@@ -246,8 +257,7 @@ public class MealDayActivity extends AppCompatActivity implements View.OnClickLi
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT));
                 subLayout.addView(editText);
-
-                editText.setOnFocusChangeListener(this);
+//                    editText.setOnFocusChangeListener(this);
 
                 LinearLayout buttonLayout = new LinearLayout(this);
                 buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
@@ -347,6 +357,13 @@ public class MealDayActivity extends AppCompatActivity implements View.OnClickLi
 
         TextView view_mealName = null;
         TextView view_mealTime = null;
+
+        // NOTE(Emarioo): Disabling editing of meal when you click in on a patient.
+        //  This is because you would modify the meal plan and thus changing the meals
+        //  for other patients too. We could allow you to edit description if each
+        //  patient has some kind of individual plan which wouldn't affect other patients.
+        if(curPatientId!=0)
+            editable = false;
 
         if (editable) {
             view_mealName = new EditText(this);
