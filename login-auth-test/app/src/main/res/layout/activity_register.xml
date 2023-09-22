@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -12,9 +13,8 @@
     <TextView
         android:text="@string/register"
         android:textStyle="bold"
-        android:textSize="150px"
+        android:textSize="120px"
         android:gravity="center"
-        android:layout_marginBottom="100px"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
@@ -90,6 +90,28 @@
             android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/radioGroup">
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/careTaker"
+            android:id="@+id/careTakerID"
+            android:textSize="20dp"
+            android:layout_marginRight="50dp">
+        </RadioButton>
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/careGiver"
+            android:id="@+id/careGiverID"
+            android:textSize="20dp">
+        </RadioButton>
+    </RadioGroup>
+
     <ProgressBar
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -101,8 +123,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/registerButton"
-        android:text="@string/register"
-        android:layout_marginTop="20dp">
+        android:text="@string/register">
     </Button>
 
     <TextView

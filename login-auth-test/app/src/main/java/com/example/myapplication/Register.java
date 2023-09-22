@@ -8,9 +8,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,9 +31,11 @@ public class Register extends AppCompatActivity {
     FirebaseAuth mAuth;
     ProgressBar progressBar;
     TextView loginBtn;
-    //FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference databaseReference;
-
+    RadioGroup radioGroup;
+    boolean isCareGiver;
+    int checkedRadioButtonId;
+    dbLibrary db;
 
     @Override
     public void onStart() {
@@ -61,8 +65,9 @@ public class Register extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         progressBar = findViewById(R.id.progressBar);
         loginBtn = findViewById(R.id.loginNow);
+        radioGroup = findViewById(R.id.radioGroup);
 
-        databaseReference = FirebaseDatabase.getInstance().getReference("users");
+        db = new dbLibrary();
 
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,6 +90,15 @@ public class Register extends AppCompatActivity {
                 lastname = String.valueOf(editTextLastname.getText());
                 phoneNr = String.valueOf(editTextPhoneNr.getText());
                 personNummer = String.valueOf(editTextPersonNummer.getText());
+
+                checkedRadioButtonId = radioGroup.getCheckedRadioButtonId();
+                isCareGiver = checkedRadioButtonId == R.id.careGiverID;
+
+                if (checkedRadioButtonId == -1) {
+                    Toast.makeText(Register.this, "Du måste välja vårdtagare eller vårdgivare!", Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
+                    return;
+                }
 
                 if (TextUtils.isEmpty(email) || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     Toast.makeText(Register.this, "Ange epostadress", Toast.LENGTH_SHORT).show();
@@ -115,38 +129,23 @@ public class Register extends AppCompatActivity {
                     return;
                 }
 
-                mAuth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                progressBar.setVisibility(View.GONE);
-                                if (task.isSuccessful()) {
-                                    FirebaseUser user = mAuth.getCurrentUser();
-                                    String uid = user.getUid();
-                                    User newUser = new User(name, lastname, phoneNr, email, personNummer);
-                                    databaseReference.child(uid).setValue(newUser)
-                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    if (task.isSuccessful()) {
-                                                        Toast.makeText(Register.this, "Konto skapat!",
-                                                                Toast.LENGTH_SHORT).show();
-                                                        // Skicka användaren till MainAcitivity sidan.
-                                                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                                                        startActivity(intent);
-                                                        finish();
-                                                    } else {
-                                                        Toast.makeText(Register.this, "Fel vid skapande av användarprofil",
-                                                                Toast.LENGTH_SHORT).show();
-                                                    }
-                                                }
-                                            });
-                                } else {
-                                    Toast.makeText(Register.this, "Autentiseringen misslyckades: " + task.getException().getMessage(),
-                                            Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
+                db.registerUser(email, password, name, lastname, phoneNr, personNummer, isCareGiver, new dbLibrary.RegisterCallback() {
+                    @Override
+                    public void onSuccess(String message) {
+                        progressBar.setVisibility(View.GONE);
+                        Toast.makeText(Register.this, message, Toast.LENGTH_SHORT).show();
+                        // Skicka användaren till MainAcitivity sidan.
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                    @Override
+                    public void onError(String errorMessage) {
+                        progressBar.setVisibility(View.GONE);
+                        Toast.makeText(Register.this, errorMessage, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
             }
         });
 
