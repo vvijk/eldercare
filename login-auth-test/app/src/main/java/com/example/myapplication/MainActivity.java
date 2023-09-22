@@ -15,6 +15,7 @@ public class MainActivity extends AppCompatActivity {
 
     FirebaseAuth auth;
     Button button;
+    Button createPatient; //PLACEHOLDER
     TextView textView;
     FirebaseUser user;
     
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         button = findViewById(R.id.logout);
+        createPatient = findViewById(R.id.createpatient); //PLACEHOLDER
         textView = findViewById(R.id.user_details);
         user = auth.getCurrentUser();
         
@@ -47,6 +49,14 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), Login.class);
                 startActivity(intent);
                 finish();
+            }
+        });
+
+        createPatient.setOnClickListener(new View.OnClickListener(){ //PLACEHOLDER
+           @Override
+           public void onClick(View view) {
+               Intent intent = new Intent(getApplicationContext(), CreatePatient.class);
+               startActivity(intent);
             }
         });
 

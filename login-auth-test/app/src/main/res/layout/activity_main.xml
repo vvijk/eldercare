@@ -28,4 +28,10 @@
         android:id="@+id/btn_goto_meal_management">
     </Button>
 
+    <Button
+        android:id="@+id/createpatient"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create Patient" />
+
 </LinearLayout>
