@@ -31,11 +31,11 @@ public class Register extends AppCompatActivity {
     FirebaseAuth mAuth;
     ProgressBar progressBar;
     TextView loginBtn;
-    //FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference databaseReference;
     RadioGroup radioGroup;
     boolean isCareGiver;
     int checkedRadioButtonId;
+    dbLibrary db;
 
     @Override
     public void onStart() {
@@ -66,7 +66,8 @@ public class Register extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         loginBtn = findViewById(R.id.loginNow);
         radioGroup = findViewById(R.id.radioGroup);
-        databaseReference = FirebaseDatabase.getInstance().getReference("users");
+
+        db = new dbLibrary();
 
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,38 +129,23 @@ public class Register extends AppCompatActivity {
                     return;
                 }
 
-                mAuth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                progressBar.setVisibility(View.GONE);
-                                if (task.isSuccessful()) {
-                                    FirebaseUser user = mAuth.getCurrentUser();
-                                    String uid = user.getUid();
-                                    User newUser = new User(name, lastname, phoneNr, email, personNummer, isCareGiver);
-                                    databaseReference.child(uid).setValue(newUser)
-                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    if (task.isSuccessful()) {
-                                                        Toast.makeText(Register.this, "Konto skapat!",
-                                                                Toast.LENGTH_SHORT).show();
-                                                        // Skicka användaren till MainAcitivity sidan.
-                                                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                                                        startActivity(intent);
-                                                        finish();
-                                                    } else {
-                                                        Toast.makeText(Register.this, "Fel vid skapande av användarprofil",
-                                                                Toast.LENGTH_SHORT).show();
-                                                    }
-                                                }
-                                            });
-                                } else {
-                                    Toast.makeText(Register.this, "Autentiseringen misslyckades: " + task.getException().getMessage(),
-                                            Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
+                db.registerUser(email, password, name, lastname, phoneNr, personNummer, isCareGiver, new dbLibrary.RegisterCallback() {
+                    @Override
+                    public void onSuccess(String message) {
+                        progressBar.setVisibility(View.GONE);
+                        Toast.makeText(Register.this, message, Toast.LENGTH_SHORT).show();
+                        // Skicka användaren till MainAcitivity sidan.
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                    @Override
+                    public void onError(String errorMessage) {
+                        progressBar.setVisibility(View.GONE);
+                        Toast.makeText(Register.this, errorMessage, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
             }
         });
 
