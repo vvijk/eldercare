@@ -55,6 +55,8 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
         btn_mealPlans = findViewById(R.id.btn_meal_plans);
         btn_patients = findViewById(R.id.btn_patients);
 
+        getMealStorage().initDBConnection();
+
         btn_listener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {

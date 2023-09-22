@@ -1,8 +1,14 @@
 package com.example.myapplication.util;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import com.example.myapplication.dbLibrary;
 
 class Caregiver {
     ArrayList<Integer> patientIds = new ArrayList<>();
@@ -96,6 +102,22 @@ public class PatientMealStorage {
         }
     }
 
+    boolean initialized = false;
+    public void initDBConnection() {
+        if(initialized)
+            return;
+        initialized = true;
+        // TODO(Emarioo): Use dbLibrary instead of accessing firebase classes directly.
+        //   We don't because we need to figure out what functionality we need from firebase before
+        //   creating functions and abstractions in dbLibrary.
+//        mAuth = FirebaseAuth.getInstance();
+        dbRef = FirebaseDatabase.getInstance().getReference("mealPlans");
+        dbRef.setValue("okay");
+        dbRef.child("0").setValue("Ey");
+    }
+
+    DatabaseReference dbRef;
+
     private HashMap<Integer, Caregiver> caregivers = new HashMap<>(); // caregiverId -> list of patientIds
     private HashMap<Integer, Patient> patients = new HashMap<>();
     private HashMap<Integer, MealPlan> mealPlans = new HashMap<>();
@@ -135,6 +157,7 @@ public class PatientMealStorage {
     }
 
     public int countOfMealPlans(){
+//        dbRef.
         return mealPlanIds.size();
     }
     public int mealPlanIdFromIndex(int mealPlanIndex) {
