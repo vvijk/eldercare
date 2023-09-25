@@ -50,6 +50,13 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
     PatientMealStorage getMealStorage() {
         return ((GlobalApp) getApplicationContext()).mealStorage;
     }
+    int getMealPlanId() {
+        if (showPatientDay) {
+            return getMealStorage().mealPlanIdOfPatient(curPatientId);
+        } else {
+            return curMealPlanId;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,7 +116,12 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
             // what?
         }
 
-        refreshDays();
+        getMealStorage().refreshMealDays(getMealPlanId(), new Runnable() {
+            @Override
+            public void run() {
+                refreshDays();
+            }
+        });
     }
 
     @Override

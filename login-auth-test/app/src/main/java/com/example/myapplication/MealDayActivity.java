@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import com.example.myapplication.util.GlobalApp;
@@ -88,7 +89,7 @@ class TimeFixer implements TextWatcher {
     }
 }
 
-public class MealDayActivity extends AppCompatActivity implements View.OnClickListener, View.OnFocusChangeListener {
+public class MealDayActivity extends AppCompatActivity implements View.OnClickListener {
     LinearLayout scrolledLayout=null;
     TextView text_name=null;
     Button btn_back=null;
@@ -175,7 +176,12 @@ public class MealDayActivity extends AppCompatActivity implements View.OnClickLi
         meal_day_name.setText(weekDays[weekDayIndex]);
         meal_day_date.setText(monthNumber + "/" + dayNumber);
 
-        refreshMeals();
+        getMealStorage().refreshMeals(getMealPlanId(),dayIndex, new Runnable() {
+            @Override
+            public void run() {
+                refreshMeals();
+            }
+        });
     }
 
     @Override
@@ -214,7 +220,10 @@ public class MealDayActivity extends AppCompatActivity implements View.OnClickLi
             int dayIndex = curDayIndex;
 
             if(itemLayout.getChildCount() > 1) {
-                saveMeal(itemLayout, mealIndex);
+                // NOTE(Emarioo): The "patient view" cannot modify meals so we don't need to save them
+                if(!showPatientDay) {
+                    saveMeal(itemLayout, mealIndex);
+                }
 
                 itemLayout.removeViews(1,itemLayout.getChildCount()-1);
                 itemLayout.setBackgroundColor(getResources().getColor(R.color.purple_dark));
@@ -312,10 +321,10 @@ public class MealDayActivity extends AppCompatActivity implements View.OnClickLi
                 //   Tell the user which meal was bad. We shouldn't tell the user that here because this function
                 //   will save the content right before exiting this activity and then it will be to late for
                 //   the user to do anything about the bad format.
-                Toast.makeText(this, R.string.meal_time_bad_format, Toast.LENGTH_LONG);
+                Toast.makeText(this, R.string.meal_time_bad_format, Toast.LENGTH_LONG).show();
             }
         } else {
-            Toast.makeText(this, R.string.meal_time_missing_colon, Toast.LENGTH_LONG);
+            Toast.makeText(this, R.string.meal_time_missing_colon, Toast.LENGTH_LONG).show();
         }
         getMealStorage().setNameOfMeal(mealPlanId,dayIndex,mealIndex, view_name.getText().toString());
 
@@ -323,7 +332,7 @@ public class MealDayActivity extends AppCompatActivity implements View.OnClickLi
             LinearLayout subLayout = (LinearLayout) itemLayout.getChildAt(1);
             TextView view_desc = (TextView) subLayout.getChildAt(0);
             getMealStorage().setDescriptionOfMeal(mealPlanId, dayIndex, mealIndex, view_desc.getText().toString());
-            Toast.makeText(this,"saved "+view_desc.getText(),Toast.LENGTH_LONG);
+            // Toast.makeText(this,"saved "+view_desc.getText(),Toast.LENGTH_LONG).show();
         }
     }
     void saveAllMeals() {
@@ -350,7 +359,6 @@ public class MealDayActivity extends AppCompatActivity implements View.OnClickLi
             mealName = view_mealName.getText().toString();
 
         }
-        // Integer a = null; a.byteValue(); // Assert
 
         if(headLayout.getChildCount()>0)
             headLayout.removeViews(0,headLayout.getChildCount());
@@ -406,7 +414,33 @@ public class MealDayActivity extends AppCompatActivity implements View.OnClickLi
                     ViewGroup.LayoutParams.WRAP_CONTENT));
             scrolledLayout.addView(textView);
         } else {
+            int[] sortedMeals_index = new int[mealCount];
+            int[] sortedMeals_time = new int[mealCount];
             for(int mealIndex=0;mealIndex<mealCount;mealIndex++) {
+                int hour = getMealStorage().hourOfMeal(mealPlanId, curDayIndex, mealIndex);
+                int minute = getMealStorage().minuteOfMeal(mealPlanId, curDayIndex, mealIndex);
+                sortedMeals_time[mealIndex] = hour*100+minute;
+                sortedMeals_index[mealIndex] = mealIndex;
+            }
+            // TODO(Emarioo): Don't use bubble sort, you are better than this
+            for(int i=0;i<mealCount;i++) {
+                boolean swapped = false;
+                for(int j=0;j<mealCount - 1 - i;j++) {
+                    if (sortedMeals_time[j+1] < sortedMeals_time[j]) {
+                        int tmp = sortedMeals_time[j];
+                        sortedMeals_time[j] = sortedMeals_time[j+1];
+                        sortedMeals_time[j+1] = tmp;
+                        tmp = sortedMeals_index[j];
+                        sortedMeals_index[j] = sortedMeals_index[j+1];
+                        sortedMeals_index[j+1] = tmp;
+                        swapped = true;
+                    }
+                }
+                if(!swapped)
+                    break;
+            }
+            for(int i=0;i<mealCount;i++) {
+                int mealIndex = sortedMeals_index[i];
                 String name = getMealStorage().nameOfMeal(mealPlanId, curDayIndex, mealIndex);
                 int hour = getMealStorage().hourOfMeal(mealPlanId, curDayIndex, mealIndex);
                 int minute = getMealStorage().minuteOfMeal(mealPlanId, curDayIndex, mealIndex);
@@ -437,36 +471,7 @@ public class MealDayActivity extends AppCompatActivity implements View.OnClickLi
                 if(minute < 10) timeStr += "0";
                 timeStr += minute;
                 refreshMealHeader(headLayout, false, name, timeStr);
-//                {
-//                    TextView textView = new TextView(this);
-//                    textView.setText(name);
-//                    textView.setPadding(25,8,25,8); // TODO(Emarioo): don't hardcode padding
-//                    textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30); // TODO(Emarioo): Don't hardcode text size
-//                    textView.setLayoutParams(new ViewGroup.LayoutParams(
-//                            ViewGroup.LayoutParams.WRAP_CONTENT,
-//                            ViewGroup.LayoutParams.WRAP_CONTENT));
-//                    headLayout.addView(textView);
-//                }
-//                {
-//                    TextView textView = new TextView(this);
-//                    textView.setPadding(25,8,25,8); // TODO(Emarioo): don't hardcode padding
-//                    // TODO(Emarioo): Make a function for code below: String formatClock(hour, minute)
-//                    textView.setText(timeStr);
-//
-//                    textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30); // TODO(Emarioo): Don't hardcode text size
-//                    textView.setGravity(Gravity.RIGHT);
-//                    textView.setLayoutParams(new ViewGroup.LayoutParams(
-//                            ViewGroup.LayoutParams.MATCH_PARENT,
-//                            ViewGroup.LayoutParams.WRAP_CONTENT));
-//                    headLayout.addView(textView);
-//                }
             }
         }
-    }
-
-    @Override
-    public void onFocusChange(View view, boolean b) {
-        // description text change
-//        System.out.println("Yeah "+b+"\n");
     }
 }

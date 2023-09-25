@@ -14,6 +14,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:orientation="horizontal">
 
         <Button
@@ -51,6 +52,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="12dp"
+        android:layout_weight="100"
         android:background="@color/purple_dark">
 
         <LinearLayout
@@ -59,7 +61,24 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <tag android:id="@+id/clicked_meal_plan" ></tag>
+            <tag android:id="@+id/clicked_delete_meal_plan" ></tag>
         </LinearLayout>
     </ScrollView>
+
+    <Button
+        android:id="@+id/btn_add_meal_plan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:textSize="25sp"
+        android:backgroundTint="@color/purple_dark"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:text="@string/str_add_meal_plan"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        app:cornerRadius="0dp"/>
 
 </LinearLayout>

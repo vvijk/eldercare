@@ -2,11 +2,11 @@ package com.example.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.interpolator.view.animation.LinearOutSlowInInterpolator;
 
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -14,10 +14,11 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -26,14 +27,12 @@ import java.util.HashMap;
 import com.example.myapplication.util.GlobalApp;
 import com.example.myapplication.util.PatientMealStorage;
 
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserFactory;
-
 public class MealManagementActivity extends AppCompatActivity implements View.OnClickListener {
 
     LinearLayout scrolledLayout=null;
     Button btn_mealPlans = null;
     Button btn_patients = null;
+    Button btn_add = null;
 
     View.OnClickListener btn_listener = null;
 
@@ -54,6 +53,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
         scrolledLayout = findViewById(R.id.meal_scroll);
         btn_mealPlans = findViewById(R.id.btn_meal_plans);
         btn_patients = findViewById(R.id.btn_patients);
+        btn_add = findViewById(R.id.btn_add_meal_plan);
 
         getMealStorage().initDBConnection();
 
@@ -64,21 +64,90 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
                     refreshMealPlans();
                 } else if (view == btn_patients){
                     refreshPatients();
-                } else {
-                    // shouldn't happen
+
+                    btn_add = findViewById(R.id.btn_add_meal_plan);
+                } else if(view == btn_add){
+                    if(showingPatients) {
+                        Toast.makeText(view.getContext(), "can't add patients, not implemented", Toast.LENGTH_LONG).show();
+                    } else {
+                        getMealStorage().addMealPlan(getResources().getString(R.string.default_meal_plan_name));
+                        refreshMealPlans();
+                    }
                 }
             }
         };
         btn_mealPlans.setOnClickListener(btn_listener);
         btn_patients.setOnClickListener(btn_listener);
+        btn_add.setOnClickListener(btn_listener);
 
-        refreshPatients();
+        getMealStorage().refreshMealPlans(new Runnable() {
+            @Override
+            public void run() {
+                refreshPatients();
+            }
+        });
     }
 
     @Override
     public void onClick(View view) {
-        Button button = (Button)view;
-        if(showingPatients) {
+        Integer clickedMealPlan = (Integer)view.getTag(R.id.clicked_meal_plan);
+        Integer clickedDelete = (Integer)view.getTag(R.id.clicked_delete_meal_plan);
+
+        if(clickedMealPlan != null) {
+            LinearLayout itemLayout = (LinearLayout) view;
+
+            if(itemLayout.getChildCount()>1) {
+                LinearLayout headLayout = (LinearLayout) itemLayout.getChildAt(0);
+
+                getMealStorage().setNameOfMealPlan(clickedMealPlan, ((TextView)headLayout.getChildAt(0)).getText().toString());
+
+                itemLayout.removeViews(1,itemLayout.getChildCount()-1);
+                itemLayout.setBackgroundColor(getResources().getColor(R.color.purple_dark));
+
+                refreshMealHeader(headLayout, false, null);
+            } else {
+                itemLayout.setBackgroundColor(getResources().getColor(R.color.dry_green_brigher));
+
+                LinearLayout headLayout = (LinearLayout) itemLayout.getChildAt(0);
+
+                refreshMealHeader(headLayout, true, null);
+                LinearLayout subLayout = new LinearLayout(itemLayout.getContext());
+                subLayout.setOrientation(LinearLayout.VERTICAL);
+                subLayout.setBackgroundColor(getResources().getColor(R.color.dry_green));
+                subLayout.setPadding(25,10,25,12); // TODO(Emarioo): don't hardcode padding
+                subLayout.setLayoutParams(new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT));
+                itemLayout.addView(subLayout);
+
+                LinearLayout buttonLayout = new LinearLayout(this);
+                buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
+                buttonLayout.setGravity(Gravity.RIGHT);
+                buttonLayout.setLayoutParams(new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT));
+                subLayout.addView(buttonLayout);
+
+                Button delButton = new Button(itemLayout.getContext());
+                delButton.setAllCaps(false);
+                delButton.setText(getResources().getString(R.string.str_delete));
+                delButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18); // TODO(Emarioo): Don't hardcode text size
+                delButton.setLayoutParams(new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT));
+                GradientDrawable shape = new GradientDrawable();
+                shape.setCornerRadius(16);
+                shape.setColor(getResources().getColor(R.color.delete_button));
+                delButton.setBackground(shape);
+                delButton.setTag(R.id.clicked_delete_meal_plan, clickedMealPlan);
+                delButton.setOnClickListener(this);
+                buttonLayout.addView(delButton);
+            }
+        } else if(clickedDelete != null) {
+            Toast.makeText(view.getContext(), "meal plan removal not implemented",Toast.LENGTH_LONG).show();
+//            getMealStorage().deleteMealPlan(getMealPlanId(),curDayIndex,deleteMealIndex);
+        } else if(showingPatients) {
+            Button button = (Button)view;
             int patientId = (Integer) button.getTag();
 //            System.out.println("Press " + getMealStorage().nameOfPatient(patientId));
 
@@ -86,12 +155,61 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
             intent.putExtra("patientId", patientId);
             startActivity(intent);
         } else {
+            Button button = (Button)view;
             int mealPlanId = (Integer) button.getTag();
 //            System.out.println("Press " + getMealStorage().nameOfMealPlan(mealPlanId));
             Intent intent = new Intent(getApplicationContext(), PatientMealActivity.class);
             intent.putExtra("mealPlanId", mealPlanId);
             startActivity(intent);
         }
+    }
+    // mealName and mealTime can be null if they should be taken from the existing headerLayout.
+    void refreshMealHeader(LinearLayout headLayout, boolean editable, String mealPlanName) {
+        // NOTE(Emarioo): view_mealName may be EditText or TextView. We can use TextView since EditText
+        //   from it inherits.
+        if(mealPlanName == null) {
+            TextView view_mealName = (TextView) headLayout.getChildAt(0);
+            mealPlanName = view_mealName.getText().toString();
+        }
+
+        if(headLayout.getChildCount()>0)
+            headLayout.removeViews(0, 1); // don't delete edit button
+
+        TextView view_mealName = null;
+
+        // NOTE(Emarioo): You cannot edit patients here. Probably, we shall see how things end up.
+        if(showingPatients)
+            editable = false;
+
+        if (editable) {
+            view_mealName = new EditText(this);
+        } else {
+            view_mealName = new TextView(this);
+        }
+//        view_mealTime.setText(mealTime);
+//        view_mealTime.setPadding(25, 8, 25, 8); // TODO(Emarioo): don't hardcode padding
+//        view_mealTime.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30); // TODO(Emarioo): Don't hardcode text size
+//        view_mealTime.setLayoutParams(new ViewGroup.LayoutParams(
+//                ViewGroup.LayoutParams.WRAP_CONTENT,
+//                ViewGroup.LayoutParams.WRAP_CONTENT));
+//        headLayout.addView(view_mealTime);
+
+//        TextView textview = new TextView(this);
+//        textview.setText(name);
+//        textview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30); // TODO(Emarioo): Don't hardcode text size
+//        textview.setLayoutParams(new ViewGroup.LayoutParams(
+//                ViewGroup.LayoutParams.WRAP_CONTENT,
+//                ViewGroup.LayoutParams.WRAP_CONTENT));
+//        if(DEBUG_COLORED_LAYOUT)
+//            textview.setBackgroundColor(Color.GREEN);
+
+        view_mealName.setText(mealPlanName);
+//        view_mealName.setPadding(25, 8, 25, 8); // TODO(Emarioo): don't hardcode padding
+        view_mealName.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30); // TODO(Emarioo): Don't hardcode text size
+        view_mealName.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+        headLayout.addView(view_mealName, 0);
     }
     void refreshPatients() {
         showingPatients = true;
@@ -101,6 +219,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
         } else {
             // Colors won't work
         }
+        btn_add.setText(R.string.str_add_patient);
         // TODO(Emarioo): Optimize by reusing view instead of removing them?
         //   Another optimization would be to hide the list instead of removing and recreating them.
         scrolledLayout.removeAllViews();
@@ -110,8 +229,16 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
             String name = getMealStorage().nameOfPatient(patientId);
 
             LinearLayout itemLayout = new LinearLayout(this);
+            itemLayout.setOrientation(LinearLayout.VERTICAL);
             itemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             scrolledLayout.addView(itemLayout);
+
+            // TODO: Click listener?
+
+            LinearLayout headLayout = new LinearLayout(this);
+            headLayout.setOrientation(LinearLayout.HORIZONTAL);
+            headLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            itemLayout.addView(headLayout);
 
             TextView textview = new TextView(this);
             textview.setText(name);
@@ -122,7 +249,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
             if(DEBUG_COLORED_LAYOUT)
                 textview.setBackgroundColor(Color.GREEN);
 
-            itemLayout.addView(textview);
+            headLayout.addView(textview);
 
             LinearLayout buttonLayout = new LinearLayout(this);
             buttonLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -130,7 +257,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
             if(DEBUG_COLORED_LAYOUT)
                 buttonLayout.setBackgroundColor(Color.CYAN);
 
-            itemLayout.addView(buttonLayout);
+            headLayout.addView(buttonLayout);
 
             Button button = new Button(this);
             button.setText(R.string.patient_meals_edit);
@@ -146,6 +273,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
         }
     }
     void refreshMealPlans(){
+        btn_add.setText(R.string.str_add_meal_plan);
         showingPatients = false;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             btn_mealPlans.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.purple_dark)));
@@ -162,8 +290,17 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
             String name = getMealStorage().nameOfMealPlan(mealPlanId);
 
             LinearLayout itemLayout = new LinearLayout(this);
+            itemLayout.setOrientation(LinearLayout.VERTICAL);
             itemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             scrolledLayout.addView(itemLayout);
+
+            itemLayout.setTag(R.id.clicked_meal_plan, mealPlanId);
+            itemLayout.setOnClickListener(this);
+
+            LinearLayout headLayout = new LinearLayout(this);
+            headLayout.setOrientation(LinearLayout.HORIZONTAL);
+            headLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            itemLayout.addView(headLayout);
 
             TextView textview = new TextView(this);
             textview.setText(name);
@@ -174,7 +311,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
             if(DEBUG_COLORED_LAYOUT)
                 textview.setBackgroundColor(Color.GREEN);
 
-            itemLayout.addView(textview);
+            headLayout.addView(textview);
 
             LinearLayout buttonLayout = new LinearLayout(this);
             buttonLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -182,7 +319,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
             if(DEBUG_COLORED_LAYOUT)
                 buttonLayout.setBackgroundColor(Color.CYAN);
 
-            itemLayout.addView(buttonLayout);
+            headLayout.addView(buttonLayout);
 
             Button button = new Button(this);
             button.setText(R.string.patient_meals_edit);
