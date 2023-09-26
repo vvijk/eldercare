@@ -14,6 +14,31 @@
     <string name="password2">Bekräfta lösenord</string>
     <string name="idNumber">Personnummer (12 siffror)</string>
     <string name="forgotPassword">Glömt lösenord</string>
+
     <string name="careTaker">Vårdtagare</string>
     <string name="careGiver">Vårdgivare</string>
+
+    <!--STRINGS FOR CREATE PATIENT-->
+    <string name="address">Adress</string>
+    <string name="city">Ort</string>
+    <string name="county">Län</string>
+    <string name="preferences">Preferenser</string>
+    <string name="restrictions">Allergier</string>
+    <string name="PIN">PIN Kod</string>
+    <string name="confirmPIN">Bekräfta PIN Kod</string>
+    <string name="createPatient">Skapa patient</string>
+
+    <!--ERROR MESSAGES, CREATE PATIENT-->
+    <string name="createPatientSuccess">Patient tillagd! (TODO)</string>
+    <string name="createPatientErrorDefault">Ange inmatningsfel</string>
+    <string name="createPatientErrorForename">Ange förnamn</string>
+    <string name="createPatientErrorSurname">Ange efternamn</string>
+    <string name="createPatientErrorPhone">Ange telefonnummer (10 siffror)</string>
+    <string name="createPatientErrorAddress">Ange adress</string>
+    <string name="createPatientErrorCity">Ange ort</string>
+    <string name="createPatientErrorCounty">Ange län</string>
+    <string name="createPatientErrorPreferences">Inga preferenser</string>
+    <string name="createPatientErrorRestrictions">Inga allergier</string>
+    <string name="createPatientErrorPIN">Ange PIN Kod (4 siffror)</string>
+    <string name="createPatientErrorConfirmPIN">Bekräfta PIN kod</string>
 </resources>
