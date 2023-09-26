@@ -1,5 +1,10 @@
 package com.example.myapplication;
 
+import android.content.Context;
+import android.text.TextUtils;
+import android.view.View;
+import android.widget.Toast;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -8,12 +13,34 @@ import com.google.firebase.database.FirebaseDatabase;
 public class dbLibrary {
     private FirebaseAuth mAuth;
     private DatabaseReference dbRef;
+    private Context context;
 
-    public dbLibrary() {
+    public dbLibrary(Context context) {
+        this.context = context;
         mAuth = FirebaseAuth.getInstance();
         dbRef = FirebaseDatabase.getInstance().getReference("users");
     }
     public void registerUser(String email, String password, String firstname, String lastname, String phoneNr, String personNummer, boolean isCareGiver, final RegisterCallback callback) {
+
+        if (TextUtils.isEmpty(email) || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            Toast.makeText(context ,"Ange epostadress", Toast.LENGTH_SHORT).show();
+            return;
+        } else if (TextUtils.isEmpty(password) || password.length() < 6) {
+            Toast.makeText(context, "Lösenordet måste vara minst 6 siffror", Toast.LENGTH_SHORT).show();
+            return;
+        } else if(TextUtils.isEmpty(firstname)){
+            Toast.makeText(context, "Ange förnamn", Toast.LENGTH_SHORT).show();
+            return;
+        } else if(TextUtils.isEmpty(lastname)){
+            Toast.makeText(context, "Ange efternamn", Toast.LENGTH_SHORT).show();
+            return;
+        } else if(TextUtils.isEmpty(phoneNr) || !TextUtils.isDigitsOnly(phoneNr)){
+            Toast.makeText(context, "Ange telefonnummer", Toast.LENGTH_SHORT).show();
+            return;
+        } else if (TextUtils.isEmpty(personNummer) || personNummer.length() < 12) {
+            Toast.makeText(context, "Ange personnummret i 12 siffror", Toast.LENGTH_SHORT).show();
+            return;
+        }
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -37,5 +64,9 @@ public class dbLibrary {
         void onSuccess(String message);
 
         void onError(String errorMessage);
+    }
+    public String getUserID(){
+        FirebaseUser user = mAuth.getCurrentUser();
+        return (user != null) ? user.getUid() : null;
     }
 }

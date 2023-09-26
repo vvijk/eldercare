@@ -31,7 +31,6 @@ public class Register extends AppCompatActivity {
     FirebaseAuth mAuth;
     ProgressBar progressBar;
     TextView loginBtn;
-    DatabaseReference databaseReference;
     RadioGroup radioGroup;
     boolean isCareGiver;
     int checkedRadioButtonId;
@@ -67,7 +66,7 @@ public class Register extends AppCompatActivity {
         loginBtn = findViewById(R.id.loginNow);
         radioGroup = findViewById(R.id.radioGroup);
 
-        db = new dbLibrary();
+        db = new dbLibrary(Register.this);
 
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,36 +98,11 @@ public class Register extends AppCompatActivity {
                     progressBar.setVisibility(View.GONE);
                     return;
                 }
-
-                if (TextUtils.isEmpty(email) || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                    Toast.makeText(Register.this, "Ange epostadress", Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
-                    return;
-                } else if (TextUtils.isEmpty(password) || password.length() < 6) {
-                    Toast.makeText(Register.this, "Lösenordet måste vara minst 6 siffror", Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
-                    return;
-                } else if (!password.equals(password2)) {
+                if (!password.equals(password2)) {
                     Toast.makeText(Register.this, "Lösenorden matchar inte!", Toast.LENGTH_SHORT).show();
                     progressBar.setVisibility(View.GONE);
                     return;
-                } else if(TextUtils.isEmpty(name)){
-                    Toast.makeText(Register.this, "Ange förnamn", Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
-                    return;
-                } else if(TextUtils.isEmpty(lastname)){
-                    Toast.makeText(Register.this, "Ange efternamn", Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
-                    return;
-                } else if(TextUtils.isEmpty(phoneNr) || !TextUtils.isDigitsOnly(phoneNr)){
-                    Toast.makeText(Register.this, "Ange telefonnummer", Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
-                    return;
-                } else if (TextUtils.isEmpty(personNummer) || personNummer.length() < 12) {
-                    Toast.makeText(Register.this, "Ange personnummret i 12 siffror", Toast.LENGTH_SHORT).show();
-                    return;
                 }
-
                 db.registerUser(email, password, name, lastname, phoneNr, personNummer, isCareGiver, new dbLibrary.RegisterCallback() {
                     @Override
                     public void onSuccess(String message) {
