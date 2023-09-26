@@ -15,6 +15,9 @@
     <string name="idNumber">Personnummer (12 siffror)</string>
     <string name="forgotPassword">Glömt lösenord</string>
 
+    <string name="careTaker">Vårdtagare</string>
+    <string name="careGiver">Vårdgivare</string>
+
     <!--STRINGS FOR CREATE PATIENT-->
     <string name="address">Adress</string>
     <string name="city">Ort</string>
