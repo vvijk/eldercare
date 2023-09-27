@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -38,6 +39,9 @@ public class dbLibrary {
                         FirebaseUser user = mAuth.getCurrentUser();
                         String uid = user.getUid();
                         User newUser = new User(firstname, lastname, phoneNr, email, personNummer, prefFood, PIN, isCareGiver);
+
+                        Log.d("db123", "newuser.prefFood: " + newUser.getPrefFood());
+                        Log.d("db123", "newuser.PIN: " + newUser.getPIN());
 
                         DatabaseReference userRef = isCareGiver ? dbRef.child("caregivers") : dbRef.child("caretakers");
 

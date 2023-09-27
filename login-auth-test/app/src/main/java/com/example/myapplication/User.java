@@ -16,6 +16,8 @@ public class User {
         this.prefFood = prefFood;
         this.PIN = PIN;
     }
+    public String getPIN() { return PIN; }
+    public String getPrefFood() { return prefFood; }
     public String getFirstName() {
         return firstName;
     }

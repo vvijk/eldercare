@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -89,13 +90,15 @@ public class Register extends AppCompatActivity {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 checkedRadioButtonId = checkedId;
                 if (checkedId == R.id.careGiverID) {
-                    editTextPrefFood.setVisibility(View.VISIBLE);
-                    editTextPIN.setVisibility(View.VISIBLE);
-                    editTextPIN2.setVisibility(View.VISIBLE);
-                } else {
+                    isCareGiver = true;
                     editTextPrefFood.setVisibility(View.GONE);
                     editTextPIN.setVisibility(View.GONE);
                     editTextPIN2.setVisibility(View.GONE);
+                } else {
+                    isCareGiver = false;
+                    editTextPrefFood.setVisibility(View.VISIBLE);
+                    editTextPIN.setVisibility(View.VISIBLE);
+                    editTextPIN2.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -113,7 +116,6 @@ public class Register extends AppCompatActivity {
                 phoneNr = String.valueOf(editTextPhoneNr.getText());
                 personNummer = String.valueOf(editTextPersonNummer.getText());
 
-
                 if (checkedRadioButtonId == -1) {
                     Toast.makeText(Register.this, "Du måste välja vårdtagare eller vårdgivare!", Toast.LENGTH_SHORT).show();
                     progressBar.setVisibility(View.GONE);
@@ -124,7 +126,6 @@ public class Register extends AppCompatActivity {
                     progressBar.setVisibility(View.GONE);
                     return;
                 }
-
                 if(help.isValidUserInput(email, password, name, lastname, phoneNr, personNummer)) {
                     if (isCareGiver) {
                         PIN = "null";
