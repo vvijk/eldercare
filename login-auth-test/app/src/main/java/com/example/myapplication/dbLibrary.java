@@ -40,9 +40,6 @@ public class dbLibrary {
                         String uid = user.getUid();
                         User newUser = new User(firstname, lastname, phoneNr, email, personNummer, prefFood, PIN, isCareGiver);
 
-                        Log.d("db123", "newuser.prefFood: " + newUser.getPrefFood());
-                        Log.d("db123", "newuser.PIN: " + newUser.getPIN());
-
                         DatabaseReference userRef = isCareGiver ? dbRef.child("caregivers") : dbRef.child("caretakers");
 
                         userRef.child(uid).setValue(newUser)

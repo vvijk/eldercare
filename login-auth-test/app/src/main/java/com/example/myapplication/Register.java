@@ -51,7 +51,6 @@ public class Register extends AppCompatActivity {
             finish();
         }
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,7 +83,6 @@ public class Register extends AppCompatActivity {
                 finish();
             }
         });
-
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -102,7 +100,6 @@ public class Register extends AppCompatActivity {
                 }
             }
         });
-
         registerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
