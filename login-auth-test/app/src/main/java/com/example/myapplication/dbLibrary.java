@@ -2,7 +2,7 @@ package com.example.myapplication;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.view.View;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -10,17 +10,29 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.List;
+
 public class dbLibrary {
     private FirebaseAuth mAuth;
     private DatabaseReference dbRef;
     private Context context;
 
+    //Example of how to create a new instance:
+    //dbLibrary db;
+    //db = new dbLibrary(Register.this);
     public dbLibrary(Context context) {
         this.context = context;
         mAuth = FirebaseAuth.getInstance();
         dbRef = FirebaseDatabase.getInstance().getReference("users");
     }
-    public void registerUser(String email, String password, String firstname, String lastname, String phoneNr, String personNummer, boolean isCareGiver, final RegisterCallback callback) {
+    public void registerUser(String email,
+                             String password,
+                             String firstname,
+                             String lastname,
+                             String phoneNr,
+                             String personNummer,
+                             boolean isCareGiver,
+                             final RegisterCallback callback) {
 
         if (TextUtils.isEmpty(email) || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             Toast.makeText(context ,"Ange epostadress", Toast.LENGTH_SHORT).show();
@@ -47,7 +59,10 @@ public class dbLibrary {
                         FirebaseUser user = mAuth.getCurrentUser();
                         String uid = user.getUid();
                         User newUser = new User(firstname, lastname, phoneNr, email, personNummer, isCareGiver);
-                        dbRef.child(uid).setValue(newUser)
+
+                        DatabaseReference userRef = isCareGiver ? dbRef.child("caregivers") : dbRef.child("caretakers");
+
+                        userRef.child(uid).setValue(newUser)
                                 .addOnCompleteListener(task1 -> {
                                     if (task1.isSuccessful()) {
                                         callback.onSuccess("Konto skapat!");
@@ -69,4 +84,5 @@ public class dbLibrary {
         FirebaseUser user = mAuth.getCurrentUser();
         return (user != null) ? user.getUid() : null;
     }
+
 }

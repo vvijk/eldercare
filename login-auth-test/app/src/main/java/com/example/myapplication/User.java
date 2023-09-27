@@ -1,5 +1,7 @@
 package com.example.myapplication;
 
+import java.util.List;
+
 public class User {
     private String name;
     private String lastname;
@@ -29,6 +31,6 @@ public class User {
     }
     public String getEmail() { return email; }
     public String getPersonNummer() { return personNummer; }
-    public boolean getCareGiverBool() { return careGiver; }
+    public boolean isCareGiver() { return careGiver; }
 }
 

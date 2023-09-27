@@ -25,8 +25,19 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Register extends AppCompatActivity {
-    TextInputEditText editTextEmail, editTextPassword, editTextName, editTextLastname, editTextPhoneNr,editTextPassword2, editTextPersonNummer;
+    TextInputEditText editTextEmail,
+            editTextPassword,
+            editTextName,
+            editTextLastname,
+            editTextPhoneNr,
+            editTextPassword2,
+            editTextPersonNummer,
+            test,
+            pin;
     Button registerBtn;
     FirebaseAuth mAuth;
     ProgressBar progressBar;
@@ -60,13 +71,17 @@ public class Register extends AppCompatActivity {
         editTextPhoneNr = findViewById(R.id.phoneNumber);
         editTextPersonNummer = findViewById(R.id.idNumber);
 
+        test = findViewById(R.id.test);
+        pin = findViewById(R.id.pin);
+
         registerBtn = findViewById(R.id.registerButton);
         mAuth = FirebaseAuth.getInstance();
         progressBar = findViewById(R.id.progressBar);
         loginBtn = findViewById(R.id.loginNow);
         radioGroup = findViewById(R.id.radioGroup);
-
         db = new dbLibrary(Register.this);
+        checkedRadioButtonId = radioGroup.getCheckedRadioButtonId();
+        isCareGiver = checkedRadioButtonId == R.id.careGiverID;
 
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,6 +89,19 @@ public class Register extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), Login.class);
                 startActivity(intent);
                 finish();
+            }
+        });
+
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (checkedId == R.id.careGiverID) {
+                    test.setVisibility(View.VISIBLE);
+                    pin.setVisibility(View.VISIBLE);
+                } else {
+                    test.setVisibility(View.GONE);
+                    pin.setVisibility(View.GONE);
+                }
             }
         });
 
@@ -89,9 +117,6 @@ public class Register extends AppCompatActivity {
                 lastname = String.valueOf(editTextLastname.getText());
                 phoneNr = String.valueOf(editTextPhoneNr.getText());
                 personNummer = String.valueOf(editTextPersonNummer.getText());
-
-                checkedRadioButtonId = radioGroup.getCheckedRadioButtonId();
-                isCareGiver = checkedRadioButtonId == R.id.careGiverID;
 
                 if (checkedRadioButtonId == -1) {
                     Toast.makeText(Register.this, "Du måste välja vårdtagare eller vårdgivare!", Toast.LENGTH_SHORT).show();

@@ -4,10 +4,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -15,9 +17,11 @@ public class MainActivity extends AppCompatActivity {
 
     FirebaseAuth auth;
     Button button;
-    Button createPatient; //PLACEHOLDER
+    Button createPatient, addCaretakerButton; //PLACEHOLDER
     TextView textView;
     FirebaseUser user;
+    TextInputEditText addCaretakerInputText;
+    dbLibrary db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +33,9 @@ public class MainActivity extends AppCompatActivity {
         createPatient = findViewById(R.id.createpatient); //PLACEHOLDER
         textView = findViewById(R.id.user_details);
         user = auth.getCurrentUser();
+        addCaretakerButton = findViewById(R.id.addCaretakerToGiver);
+        addCaretakerInputText = findViewById(R.id.addCaretakerTextView);
+        db = new dbLibrary(MainActivity.this);
 
         if(user == null){
             Intent intent = new Intent(getApplicationContext(), Login.class);
@@ -55,5 +62,14 @@ public class MainActivity extends AppCompatActivity {
                startActivity(intent);
             }
         });
+        addCaretakerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //String msg = String.valueOf(addCaretakerInputText.getText());
+                //Log.d("MainActivity", msg);
+
+            }
+        });
+
     }
 }
