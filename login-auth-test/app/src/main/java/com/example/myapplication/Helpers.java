@@ -1,6 +1,14 @@
 package com.example.myapplication;
 
+import android.content.Context;
+import android.text.TextUtils;
+import android.widget.Toast;
+
 public class Helpers {
+    private Context context;
+    public Helpers(Context context) {
+        this.context = context;
+    }
     private static String[] segmentString(String str, int lowerLimit) {
         /* Splits string into segments of lowerLimit length + remaining characters on the current word. (so as to not cut string mid-sentance.) */
         String[] stringSegments = new String[99];
@@ -57,5 +65,31 @@ public class Helpers {
         }
         shaveLeadingWhitespace(out);
         return out;
+    }
+
+    public boolean isValidUserInput(String email, String password, String firstname, String lastname, String phoneNr, String personNummer) {
+        if (TextUtils.isEmpty(email) || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            showToast("Ange epostadress");
+            return false;
+        } else if (TextUtils.isEmpty(password) || password.length() < 6) {
+            showToast("Lösenordet måste vara minst 6 siffror");
+            return false;
+        } else if (TextUtils.isEmpty(firstname)) {
+            showToast("Ange förnamn");
+            return false;
+        } else if (TextUtils.isEmpty(lastname)) {
+            showToast("Ange efternamn");
+            return false;
+        } else if (TextUtils.isEmpty(phoneNr) || !TextUtils.isDigitsOnly(phoneNr)) {
+            showToast("Ange telefonnummer");
+            return false;
+        } else if (TextUtils.isEmpty(personNummer) || personNummer.length() < 12) {
+            showToast("Ange personnummret i 12 siffror");
+            return false;
+        }
+        return true;
+    }
+    private void showToast(String message) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 }
