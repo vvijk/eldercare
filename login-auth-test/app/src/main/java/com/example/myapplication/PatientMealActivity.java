@@ -123,6 +123,11 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
             }
         });
     }
+    @Override
+    protected void onDestroy() {
+//        getMealStorage().popRefresher();
+        super.onDestroy();
+    }
 
     @Override
     public void onClick(View view) {
@@ -141,11 +146,13 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
                 intent.putExtra("patientId", curPatientId);
                 intent.putExtra("dayIndex", dayIndex);
                 startActivity(intent);
+                refreshDays();
             } else {
                 Intent intent = new Intent(getApplicationContext(), MealDayActivity.class);
                 intent.putExtra("mealPlanId", curMealPlanId);
                 intent.putExtra("dayIndex", dayIndex);
                 startActivity(intent);
+                refreshDays();
             }
         } else if(clickedMealPlanId != null) {
             if(curPatientId != 0 && showPatientDay){
@@ -170,6 +177,8 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
                 int mealPlanCount = getMealStorage().countOfMealPlans();
                 for(int i=0;i<mealPlanCount;i++){
                     int mealPlanId = getMealStorage().mealPlanIdFromIndex(i);
+                    if(mealPlanId==0)
+                        continue;
                     String name = getMealStorage().nameOfMealPlan(mealPlanId);
 
                     TextView textview = new TextView(layout_description.getContext());
@@ -196,7 +205,8 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
             }
             if(mealPlanId == 0)
                 return;
-            int mealDayCount = getMealStorage().countOfMealDays(mealPlanId);
+            int mealDayCount = 365; // TODO: Don't hardcode
+//            int mealDayCount = getMealStorage().countOfMealDays(mealPlanId);
 
             int dayIndex = clickedWeek;
 //            System.out.println("I "+dayIndex +", C "+mealDayCount);
@@ -280,7 +290,8 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
         }
         if(mealPlanId == 0)
             return;
-        int dayCount = getMealStorage().countOfMealDays(mealPlanId);
+//        int dayCount = getMealStorage().countOfMealDays(mealPlanId);
+        int dayCount = 365; // TODO: Calculate days from the current year
         int lastWeek = -1;
         for(int dayIndex=0;dayIndex<dayCount;dayIndex++) {
             int weekNumber = 1 + dayIndex / 7; // TODO(Emarioo): This is flawed because of leap years.

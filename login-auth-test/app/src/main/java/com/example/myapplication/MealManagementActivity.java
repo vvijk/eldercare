@@ -57,12 +57,24 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
 
         getMealStorage().initDBConnection();
 
+        getMealStorage().pushRefresher(new Runnable() {
+            @Override
+            public void run() {
+                if(showingPatients)
+                    refreshPatients();
+                else
+                    refreshMealPlans(); // TODO: All text view and layouts are deleted and added each time childEventListener runs. It would be better to wait with refreshing until childEventListener is done.
+            }
+        });
+
         btn_listener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(view == btn_mealPlans) {
                     refreshMealPlans();
                 } else if (view == btn_patients){
+                    if(!showingPatients)
+                        saveAllMeals();
                     refreshPatients();
 
                     btn_add = findViewById(R.id.btn_add_meal_plan);
@@ -70,6 +82,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
                     if(showingPatients) {
                         Toast.makeText(view.getContext(), "can't add patients, not implemented", Toast.LENGTH_LONG).show();
                     } else {
+                        saveAllMeals();
                         getMealStorage().addMealPlan(getResources().getString(R.string.default_meal_plan_name));
                         refreshMealPlans();
                     }
@@ -79,13 +92,11 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
         btn_mealPlans.setOnClickListener(btn_listener);
         btn_patients.setOnClickListener(btn_listener);
         btn_add.setOnClickListener(btn_listener);
-
-        getMealStorage().refreshMealPlans(new Runnable() {
-            @Override
-            public void run() {
-                refreshPatients();
-            }
-        });
+    }
+    @Override
+    protected void onDestroy() {
+        getMealStorage().popRefresher();
+        super.onDestroy();
     }
 
     @Override
@@ -144,8 +155,9 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
                 buttonLayout.addView(delButton);
             }
         } else if(clickedDelete != null) {
-            Toast.makeText(view.getContext(), "meal plan removal not implemented",Toast.LENGTH_LONG).show();
-//            getMealStorage().deleteMealPlan(getMealPlanId(),curDayIndex,deleteMealIndex);
+            saveAllMeals();
+//            Toast.makeText(view.getContext(), "meal plan removal not implemented",Toast.LENGTH_LONG).show();
+            getMealStorage().deleteMealPlan(clickedDelete);
         } else if(showingPatients) {
             Button button = (Button)view;
             int patientId = (Integer) button.getTag();
@@ -154,13 +166,29 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
             Intent intent = new Intent(getApplicationContext(), PatientMealActivity.class);
             intent.putExtra("patientId", patientId);
             startActivity(intent);
+            refreshPatients();
         } else {
+            saveAllMeals();
             Button button = (Button)view;
             int mealPlanId = (Integer) button.getTag();
 //            System.out.println("Press " + getMealStorage().nameOfMealPlan(mealPlanId));
             Intent intent = new Intent(getApplicationContext(), PatientMealActivity.class);
             intent.putExtra("mealPlanId", mealPlanId);
             startActivity(intent);
+            refreshMealPlans();
+        }
+    }
+    void saveAllMeals() {
+        for(int i=0;i<scrolledLayout.getChildCount();i++) {
+            LinearLayout itemLayout = (LinearLayout)scrolledLayout.getChildAt(i);
+            Integer clickedMealPlan = (Integer)itemLayout.getTag(R.id.clicked_meal_plan);
+
+            if(itemLayout.getChildCount()>1) {
+                // only save if itemLayout is being edited. if it's not being edited then the meal plan name should be up to date.
+                LinearLayout headLayout = (LinearLayout) itemLayout.getChildAt(0);
+
+                getMealStorage().setNameOfMealPlan(clickedMealPlan, ((TextView) headLayout.getChildAt(0)).getText().toString());
+            }
         }
     }
     // mealName and mealTime can be null if they should be taken from the existing headerLayout.
@@ -204,7 +232,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
 //            textview.setBackgroundColor(Color.GREEN);
 
         view_mealName.setText(mealPlanName);
-//        view_mealName.setPadding(25, 8, 25, 8); // TODO(Emarioo): don't hardcode padding
+        view_mealName.setPadding(0,0,0,0); // TODO(Emarioo): don't hardcode padding?
         view_mealName.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30); // TODO(Emarioo): Don't hardcode text size
         view_mealName.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -287,7 +315,12 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
         int mealPlanCount = getMealStorage().countOfMealPlans();
         for(int i=0;i<mealPlanCount;i++) {
             int mealPlanId = getMealStorage().mealPlanIdFromIndex(i);
+//            System.out.println(">Bro id "+mealPlanId +", index "+i);
+            if(mealPlanId == 0)
+                continue;
             String name = getMealStorage().nameOfMealPlan(mealPlanId);
+
+//            System.out.println("Bro id "+mealPlanId +", index "+i);
 
             LinearLayout itemLayout = new LinearLayout(this);
             itemLayout.setOrientation(LinearLayout.VERTICAL);
@@ -323,6 +356,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
 
             Button button = new Button(this);
             button.setText(R.string.patient_meals_edit);
+            button.setAllCaps(false);
             button.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20); // TODO(Emarioo): Don't hardcode text size
             button.setLayoutParams(new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,

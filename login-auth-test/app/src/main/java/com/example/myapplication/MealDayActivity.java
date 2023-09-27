@@ -176,12 +176,18 @@ public class MealDayActivity extends AppCompatActivity implements View.OnClickLi
         meal_day_name.setText(weekDays[weekDayIndex]);
         meal_day_date.setText(monthNumber + "/" + dayNumber);
 
-        getMealStorage().refreshMeals(getMealPlanId(),dayIndex, new Runnable() {
+        refreshMeals();
+        getMealStorage().pushRefresher(getMealPlanId(),dayIndex, new Runnable() {
             @Override
             public void run() {
                 refreshMeals();
             }
         });
+    }
+    @Override
+    protected void onDestroy() {
+        getMealStorage().popRefresher();
+        super.onDestroy();
     }
 
     @Override
@@ -197,13 +203,18 @@ public class MealDayActivity extends AppCompatActivity implements View.OnClickLi
         Integer mealIndex = (Integer)view.getTag(R.id.clicked_mealIndex);
         Integer deleteMealIndex = (Integer)view.getTag(R.id.clicked_deleteMeal);
         if(view == btn_back) {
+            saveAllMeals();
             Button button = (Button)view;
 //            System.out.println("BACK");
             finish();
         } else if (view == btn_add_meal) {
-            saveAllMeals();
-            getMealStorage().addMeal(getMealPlanId(), curDayIndex, getResources().getString(R.string.default_meal_name));
-            refreshMeals();
+            if(showPatientDay) {
+                Toast.makeText(view.getContext(),"Cannot add meal in patient view",Toast.LENGTH_LONG).show();
+            } else {
+                saveAllMeals();
+                getMealStorage().addMeal(getMealPlanId(), curDayIndex, getResources().getString(R.string.default_meal_name));
+                // refreshMeals(); // addMeal will cause childEvent to run refresher
+            }
         } else if (mealIndex != null) {
             LinearLayout itemLayout = (LinearLayout) view;
 
@@ -215,14 +226,16 @@ public class MealDayActivity extends AppCompatActivity implements View.OnClickLi
             }
             if(mealPlanId == 0)
                 return;
-            int mealDayCount = getMealStorage().countOfMealDays(mealPlanId);
+            int mealDayCount = 365; // TODO: Don't hardcode
+            // getMealStorage().countOfMealDays(mealPlanId);
 
             int dayIndex = curDayIndex;
 
             if(itemLayout.getChildCount() > 1) {
                 // NOTE(Emarioo): The "patient view" cannot modify meals so we don't need to save them
                 if(!showPatientDay) {
-                    saveMeal(itemLayout, mealIndex);
+                    saveAllMeals();
+//                    saveMeal(itemLayout, mealIndex);
                 }
 
                 itemLayout.removeViews(1,itemLayout.getChildCount()-1);
@@ -294,7 +307,7 @@ public class MealDayActivity extends AppCompatActivity implements View.OnClickLi
         } else if(deleteMealIndex != null) {
             saveAllMeals();
             getMealStorage().deleteMeal(getMealPlanId(),curDayIndex,deleteMealIndex);
-            refreshMeals();
+//            refreshMeals();
         }
     }
     void saveMeal(LinearLayout itemLayout, int mealIndex) {
@@ -338,12 +351,19 @@ public class MealDayActivity extends AppCompatActivity implements View.OnClickLi
     void saveAllMeals() {
         int mealPlanId = getMealPlanId();
         int mealCount = getMealStorage().countOfMeals(mealPlanId, curDayIndex);
+        int index = 0;
         for (int mealIndex = 0; mealIndex < mealCount; mealIndex++) {
-            if (scrolledLayout.getChildCount() <= mealIndex)
+
+            if(!getMealStorage().isMealIndexValid(mealPlanId, curDayIndex, mealIndex))
+                continue;
+
+            if (scrolledLayout.getChildCount() <= index)
                 break;
 
-            LinearLayout layout = (LinearLayout)scrolledLayout.getChildAt(mealIndex);
+            // is it okay to do getChildAt, what if a meal is added suddenly, indices might become misplaced.
+            LinearLayout layout = (LinearLayout)scrolledLayout.getChildAt(index);
             saveMeal(layout, mealIndex);
+            index++;
         }
     }
     // mealName and mealTime can be null if they should be taken from the existing headerLayout.
@@ -405,27 +425,31 @@ public class MealDayActivity extends AppCompatActivity implements View.OnClickLi
 
         scrolledLayout.removeAllViews();
 
-        if(mealCount == 0){
+        int[] sortedMeals_index = new int[mealCount];
+        int[] sortedMeals_time = new int[mealCount];
+        int usedCount = 0;
+        for(int mealIndex=0;mealIndex<mealCount;mealIndex++) {
+            if(!getMealStorage().isMealIndexValid(mealPlanId, curDayIndex, mealIndex))
+                continue;
+            int hour = getMealStorage().hourOfMeal(mealPlanId, curDayIndex, mealIndex);
+            int minute = getMealStorage().minuteOfMeal(mealPlanId, curDayIndex, mealIndex);
+            sortedMeals_time[usedCount] = hour*100+minute;
+            sortedMeals_index[usedCount] = mealIndex;
+            usedCount++;
+        }
+        if(usedCount == 0){
             TextView textView = new TextView(this);
             textView.setText(getResources().getString(R.string.str_no_meals));
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20); // TODO(Emarioo): Don't hardcode text size
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30); // TODO(Emarioo): Don't hardcode text size
             textView.setLayoutParams(new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT));
             scrolledLayout.addView(textView);
         } else {
-            int[] sortedMeals_index = new int[mealCount];
-            int[] sortedMeals_time = new int[mealCount];
-            for(int mealIndex=0;mealIndex<mealCount;mealIndex++) {
-                int hour = getMealStorage().hourOfMeal(mealPlanId, curDayIndex, mealIndex);
-                int minute = getMealStorage().minuteOfMeal(mealPlanId, curDayIndex, mealIndex);
-                sortedMeals_time[mealIndex] = hour*100+minute;
-                sortedMeals_index[mealIndex] = mealIndex;
-            }
             // TODO(Emarioo): Don't use bubble sort, you are better than this
-            for(int i=0;i<mealCount;i++) {
+            for(int i=0;i<usedCount;i++) {
                 boolean swapped = false;
-                for(int j=0;j<mealCount - 1 - i;j++) {
+                for(int j=0;j<usedCount - 1 - i;j++) {
                     if (sortedMeals_time[j+1] < sortedMeals_time[j]) {
                         int tmp = sortedMeals_time[j];
                         sortedMeals_time[j] = sortedMeals_time[j+1];
@@ -439,8 +463,11 @@ public class MealDayActivity extends AppCompatActivity implements View.OnClickLi
                 if(!swapped)
                     break;
             }
-            for(int i=0;i<mealCount;i++) {
+            for(int i=0;i<usedCount;i++) {
                 int mealIndex = sortedMeals_index[i];
+                if(!getMealStorage().isMealIndexValid(mealPlanId,curDayIndex,mealIndex))
+                    continue;
+
                 String name = getMealStorage().nameOfMeal(mealPlanId, curDayIndex, mealIndex);
                 int hour = getMealStorage().hourOfMeal(mealPlanId, curDayIndex, mealIndex);
                 int minute = getMealStorage().minuteOfMeal(mealPlanId, curDayIndex, mealIndex);

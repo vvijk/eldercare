@@ -73,7 +73,7 @@
         android:layout_gravity="center"
         android:layout_weight="1"
         android:textSize="25sp"
-        android:backgroundTint="@color/purple_dark"
+        android:backgroundTint="@color/purple"
         android:insetTop="0dp"
         android:insetBottom="0dp"
         android:text="@string/str_add_meal_plan"
