@@ -41,4 +41,19 @@
     <string name="createPatientErrorRestrictions">Inga allergier</string>
     <string name="createPatientErrorPIN">Ange PIN Kod (4 siffror)</string>
     <string name="createPatientErrorConfirmPIN">Bekräfta PIN kod</string>
+
+    <string name="title_activity_drop_down">dropDown</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+  <!-- WILLES -->
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="eldercare">ElderCare</string>
+    <string name="inställningar">Inställningar</string>
+    <string name="hem">Hem</string>
+    <string name="patienter">Patienter</string>
+    <string name="profil">Profil</string>
+    <string name="menu_drawer_open">Drawer Open</string>
+    <string name="menu_drawer_closed">Drawer Closed</string>
 </resources>
