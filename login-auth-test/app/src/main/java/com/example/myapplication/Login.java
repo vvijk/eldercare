@@ -25,7 +25,7 @@ public class Login extends AppCompatActivity {
     Button buttonLogin;
     FirebaseAuth mAuth;
     ProgressBar progressBar;
-    TextView textView;
+    TextView textViewLogin, textViewReset;
 
     @Override
     public void onStart() {
@@ -48,9 +48,10 @@ public class Login extends AppCompatActivity {
         buttonLogin = findViewById(R.id.loginButton);
         mAuth = FirebaseAuth.getInstance();
         progressBar = findViewById(R.id.progressBar);
-        textView = findViewById(R.id.registerNow);
+        textViewLogin = findViewById(R.id.registerNow);
+        textViewReset = findViewById(R.id.forgotPasswordBtn);
 
-        textView.setOnClickListener(new View.OnClickListener() {
+        textViewLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), Register.class);
@@ -92,6 +93,15 @@ public class Login extends AppCompatActivity {
                                 }
                             }
                         });
+            }
+        });
+
+        textViewReset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), ForgotPassword.class);
+                startActivity(intent);
+                finish();
             }
         });
     }
