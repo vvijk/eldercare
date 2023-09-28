@@ -62,12 +62,38 @@ public class MainActivity extends AppCompatActivity {
                startActivity(intent);
             }
         });
+
         addCaretakerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //String msg = String.valueOf(addCaretakerInputText.getText());
-                //Log.d("MainActivity", msg);
+                String caretakerFromInput = String.valueOf(addCaretakerInputText.getText());
 
+                db.getCaretakerUidByEmail(caretakerFromInput, new dbLibrary.UserUidCallback() {
+                    @Override
+                    public void onUserUidFound(String uid) {
+                        db.addCaretakerToGiver(db.getUserID(), caretakerFromInput, new dbLibrary.CaretakerAddCallback() {
+                            @Override
+                            public void onCaretakerAdded(String message) {
+
+                            }
+
+                            @Override
+                            public void onCaretakerAddError(String errorMessage) {
+
+                            }
+                        });
+                    }
+                    @Override
+                    public void onUserUidNotFound() {
+                        // Handle the case where no user with the specified email was found
+                        //Log.d("dbtest", "UID for: " + caretakerFromInput + ", was not found..");
+                    }
+                    @Override
+                    public void onUserUidError(String errorMessage) {
+                        //Log.d("dbtest", "Error while searching for: " + caretakerFromInput);
+                        // Handle the error
+                    }
+                });
             }
         });
 

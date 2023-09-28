@@ -3,10 +3,17 @@ package com.example.myapplication;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 public class dbLibrary {
     private FirebaseAuth mAuth;
@@ -63,6 +70,94 @@ public class dbLibrary {
     public String getUserID(){
         FirebaseUser user = mAuth.getCurrentUser();
         return (user != null) ? user.getUid() : null;
+    }
+    public void getCaretakerUidByEmail(String email, final UserUidCallback callback) {
+        DatabaseReference caregiversRef = dbRef.child("caretakers");
+
+        caregiversRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                    String userEmail = userSnapshot.child("email").getValue(String.class);
+                    //Log.d("dbtest", "User email from database: " + userEmail);
+                    if (userEmail != null && userEmail.equals(email)) {
+                        String uid = userSnapshot.getKey(); // This will give you the UID
+                        //Log.d("dbtest", "Matching UID found: " + uid + " For email: " + email);
+                        callback.onUserUidFound(uid);
+                        return;
+                    }
+                }
+                // If the loop completes without finding a matching user, call the error callback
+                //Log.d("dbtest", "No matching email found.");
+                callback.onUserUidNotFound();
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Handle any database errors
+                callback.onUserUidError(databaseError.getMessage());
+            }
+        });
+    }
+    public interface UserUidCallback {
+        void onUserUidFound(String uid);
+
+        void onUserUidNotFound();
+
+        void onUserUidError(String errorMessage);
+    }
+    public void addCaretakerToGiver(String caregiverUID, String caretakerUID, final CaretakerAddCallback callback) {
+        DatabaseReference usersRef = dbRef.child("caregivers").child(caregiverUID); // Reference to the specific caregiver user
+        Log.d("dbtest", "userRef:" + usersRef.toString());
+        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // Retrieve the caregiver user's data
+                    User caregiver = dataSnapshot.getValue(User.class);
+                    if (caregiver != null) {
+                        Log.d("dbtest", "Caregiver data retrieved: " + caregiver.toString());
+
+                        if (caregiver.getCaretakers() == null) {
+                            caregiver.setCaretakers(new ArrayList<>());
+                        }
+
+                        Log.d("dbtest", "Adding caretaker with UID: " + caretakerUID + " to caregiver.");
+                        caregiver.getCaretakers().add(caretakerUID);
+
+                        // Update the caregiver user's data with the new "tab"
+                        usersRef.setValue(caregiver)
+                                .addOnCompleteListener(task -> {
+                                    if (task.isSuccessful()) {
+                                        Log.d("dbtest", "Caretaker added successfully.");
+                                        callback.onCaretakerAdded("Caretaker added successfully.");
+                                    } else {
+                                        Log.d("dbtest", "Failed to add caretaker.");
+                                        callback.onCaretakerAddError("Failed to add caretaker.");
+                                    }
+                                });
+                    } else {
+                        Log.d("dbtest", "Caregiver data is null.");
+                        callback.onCaretakerAddError("Caregiver data is null.");
+                    }
+                } else {
+                    Log.d("dbtest", "Caregiver with UID " + caregiverUID + " not found.");
+                    callback.onCaretakerAddError("Caregiver with UID " + caregiverUID + " not found.");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle any database errors
+                Log.d("dbtest", "Database error: " + databaseError.getMessage());
+                callback.onCaretakerAddError("Database error: " + databaseError.getMessage());
+            }
+        });
+    }
+
+    public interface CaretakerAddCallback {
+        void onCaretakerAdded(String message);
+
+        void onCaretakerAddError(String errorMessage);
     }
 
 }

@@ -28,8 +28,7 @@ public class Register extends AppCompatActivity {
             editTextPersonNummer,
             editTextPrefFood,
             editTextPIN,
-            editTextPIN2,
-            prefFood;
+            editTextPIN2;
     Button registerBtn;
     FirebaseAuth mAuth;
     ProgressBar progressBar;
@@ -123,46 +122,30 @@ public class Register extends AppCompatActivity {
                     progressBar.setVisibility(View.GONE);
                     return;
                 }
+                if (isCareGiver) {
+                    PIN = "null";
+                    prefFood = "null";
+                } else {
+                    PIN = String.valueOf(editTextPIN.getText());
+                    prefFood = String.valueOf(editTextPrefFood.getText());
+                }
                 if(help.isValidUserInput(email, password, name, lastname, phoneNr, personNummer)) {
-                    if (isCareGiver) {
-                        PIN = "null";
-                        prefFood = "null";
-                        db.registerUser(email, password, name, lastname, phoneNr, personNummer, prefFood, PIN, isCareGiver, new dbLibrary.RegisterCallback() {
-                            @Override
-                            public void onSuccess(String message) {
-                                progressBar.setVisibility(View.GONE);
-                                Toast.makeText(Register.this, message, Toast.LENGTH_SHORT).show();
-                                // Skicka användaren till MainAcitivity sidan.
-                                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                                startActivity(intent);
-                                finish();
-                            }
-                            @Override
-                            public void onError(String errorMessage) {
-                                progressBar.setVisibility(View.GONE);
-                                Toast.makeText(Register.this, errorMessage, Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    } else {
-                        PIN = String.valueOf(editTextPIN.getText());
-                        prefFood = String.valueOf(editTextPrefFood.getText());
-                        db.registerUser(email, password, name, lastname, phoneNr, personNummer, prefFood, PIN, isCareGiver, new dbLibrary.RegisterCallback() {
-                            @Override
-                            public void onSuccess(String message) {
-                                progressBar.setVisibility(View.GONE);
-                                Toast.makeText(Register.this, message, Toast.LENGTH_SHORT).show();
-                                // Skicka användaren till MainAcitivity sidan.
-                                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                                startActivity(intent);
-                                finish();
-                            }
-                            @Override
-                            public void onError(String errorMessage) {
-                                progressBar.setVisibility(View.GONE);
-                                Toast.makeText(Register.this, errorMessage, Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
+                    db.registerUser(email, password, name, lastname, phoneNr, personNummer, prefFood, PIN, isCareGiver, new dbLibrary.RegisterCallback() {
+                        @Override
+                        public void onSuccess(String message) {
+                            progressBar.setVisibility(View.GONE);
+                            Toast.makeText(Register.this, message, Toast.LENGTH_SHORT).show();
+                            // Skicka användaren till MainAcitivity sidan.
+                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                        @Override
+                        public void onError(String errorMessage) {
+                            progressBar.setVisibility(View.GONE);
+                            Toast.makeText(Register.this, errorMessage, Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
         });
