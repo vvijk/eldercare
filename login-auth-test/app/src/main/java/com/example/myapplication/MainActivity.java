@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
@@ -74,23 +75,22 @@ public class MainActivity extends AppCompatActivity {
                         db.addCaretakerToGiver(db.getUserID(), caretakerFromInput, new dbLibrary.CaretakerAddCallback() {
                             @Override
                             public void onCaretakerAdded(String message) {
-
+                                Toast.makeText(MainActivity.this, "Användare: " + caretakerFromInput + " har lagts till i din patientlista!", Toast.LENGTH_SHORT).show();
                             }
-
                             @Override
                             public void onCaretakerAddError(String errorMessage) {
-
+                                Toast.makeText(MainActivity.this, "Användare: " + caretakerFromInput + " finns redan i din patientlista!", Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
                     @Override
                     public void onUserUidNotFound() {
                         // Handle the case where no user with the specified email was found
-                        //Log.d("dbtest", "UID for: " + caretakerFromInput + ", was not found..");
+                        Toast.makeText(MainActivity.this, "Användare: " + caretakerFromInput + " hittades inte bland vårdtagare!", Toast.LENGTH_SHORT).show();
                     }
                     @Override
                     public void onUserUidError(String errorMessage) {
-                        //Log.d("dbtest", "Error while searching for: " + caretakerFromInput);
+                        Toast.makeText(MainActivity.this, "ERROR, kolla onUserUidError()..", Toast.LENGTH_SHORT).show();
                         // Handle the error
                     }
                 });
