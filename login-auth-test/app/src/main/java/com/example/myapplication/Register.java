@@ -2,12 +2,10 @@ package com.example.myapplication;
 
 
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -16,26 +14,30 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 public class Register extends AppCompatActivity {
-    TextInputEditText editTextEmail, editTextPassword, editTextName, editTextLastname, editTextPhoneNr,editTextPassword2, editTextPersonNummer;
+    TextInputEditText editTextEmail,
+            editTextPassword,
+            editTextName,
+            editTextLastname,
+            editTextPhoneNr,
+            editTextPassword2,
+            editTextPersonNummer,
+            editTextPrefFood,
+            editTextPIN,
+            editTextPIN2;
     Button registerBtn;
     FirebaseAuth mAuth;
     ProgressBar progressBar;
     TextView loginBtn;
-    DatabaseReference databaseReference;
     RadioGroup radioGroup;
     boolean isCareGiver;
     int checkedRadioButtonId;
     dbLibrary db;
+    Helpers help;
 
     @Override
     public void onStart() {
@@ -48,7 +50,6 @@ public class Register extends AppCompatActivity {
             finish();
         }
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,15 +61,19 @@ public class Register extends AppCompatActivity {
         editTextLastname = findViewById(R.id.lastName);
         editTextPhoneNr = findViewById(R.id.phoneNumber);
         editTextPersonNummer = findViewById(R.id.idNumber);
+        editTextPrefFood = findViewById(R.id.test);
+        editTextPIN = findViewById(R.id.pin);
+        editTextPIN2 = findViewById(R.id.pin2);
 
         registerBtn = findViewById(R.id.registerButton);
         mAuth = FirebaseAuth.getInstance();
         progressBar = findViewById(R.id.progressBar);
         loginBtn = findViewById(R.id.loginNow);
         radioGroup = findViewById(R.id.radioGroup);
-
-        db = new dbLibrary();
-
+        db = new dbLibrary(Register.this);
+        checkedRadioButtonId = radioGroup.getCheckedRadioButtonId();
+        isCareGiver = checkedRadioButtonId == R.id.careGiverID;
+        help = new Helpers(this);
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -77,12 +82,28 @@ public class Register extends AppCompatActivity {
                 finish();
             }
         });
-
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                checkedRadioButtonId = checkedId;
+                if (checkedId == R.id.careGiverID) {
+                    isCareGiver = true;
+                    editTextPrefFood.setVisibility(View.GONE);
+                    editTextPIN.setVisibility(View.GONE);
+                    editTextPIN2.setVisibility(View.GONE);
+                } else {
+                    isCareGiver = false;
+                    editTextPrefFood.setVisibility(View.VISIBLE);
+                    editTextPIN.setVisibility(View.VISIBLE);
+                    editTextPIN2.setVisibility(View.VISIBLE);
+                }
+            }
+        });
         registerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 progressBar.setVisibility(View.VISIBLE);
-                String email, password, password2, name, lastname, phoneNr, personNummer;
+                String email, password, password2, name, lastname, phoneNr, personNummer, prefFood, PIN;
                 email = String.valueOf(editTextEmail.getText());
                 password = String.valueOf(editTextPassword.getText());
                 password2 = String.valueOf(editTextPassword2.getText());
@@ -91,61 +112,41 @@ public class Register extends AppCompatActivity {
                 phoneNr = String.valueOf(editTextPhoneNr.getText());
                 personNummer = String.valueOf(editTextPersonNummer.getText());
 
-                checkedRadioButtonId = radioGroup.getCheckedRadioButtonId();
-                isCareGiver = checkedRadioButtonId == R.id.careGiverID;
-
                 if (checkedRadioButtonId == -1) {
                     Toast.makeText(Register.this, "Du måste välja vårdtagare eller vårdgivare!", Toast.LENGTH_SHORT).show();
                     progressBar.setVisibility(View.GONE);
                     return;
                 }
-
-                if (TextUtils.isEmpty(email) || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                    Toast.makeText(Register.this, "Ange epostadress", Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
-                    return;
-                } else if (TextUtils.isEmpty(password) || password.length() < 6) {
-                    Toast.makeText(Register.this, "Lösenordet måste vara minst 6 siffror", Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
-                    return;
-                } else if (!password.equals(password2)) {
+                if (!password.equals(password2)) {
                     Toast.makeText(Register.this, "Lösenorden matchar inte!", Toast.LENGTH_SHORT).show();
                     progressBar.setVisibility(View.GONE);
                     return;
-                } else if(TextUtils.isEmpty(name)){
-                    Toast.makeText(Register.this, "Ange förnamn", Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
-                    return;
-                } else if(TextUtils.isEmpty(lastname)){
-                    Toast.makeText(Register.this, "Ange efternamn", Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
-                    return;
-                } else if(TextUtils.isEmpty(phoneNr) || !TextUtils.isDigitsOnly(phoneNr)){
-                    Toast.makeText(Register.this, "Ange telefonnummer", Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
-                    return;
-                } else if (TextUtils.isEmpty(personNummer) || personNummer.length() < 12) {
-                    Toast.makeText(Register.this, "Ange personnummret i 12 siffror", Toast.LENGTH_SHORT).show();
-                    return;
                 }
-
-                db.registerUser(email, password, name, lastname, phoneNr, personNummer, isCareGiver, new dbLibrary.RegisterCallback() {
-                    @Override
-                    public void onSuccess(String message) {
-                        progressBar.setVisibility(View.GONE);
-                        Toast.makeText(Register.this, message, Toast.LENGTH_SHORT).show();
-                        // Skicka användaren till MainAcitivity sidan.
-                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                    @Override
-                    public void onError(String errorMessage) {
-                        progressBar.setVisibility(View.GONE);
-                        Toast.makeText(Register.this, errorMessage, Toast.LENGTH_SHORT).show();
-                    }
-                });
-
+                if (isCareGiver) {
+                    PIN = "null";
+                    prefFood = "null";
+                } else {
+                    PIN = String.valueOf(editTextPIN.getText());
+                    prefFood = String.valueOf(editTextPrefFood.getText());
+                }
+                if(help.isValidUserInput(email, password, name, lastname, phoneNr, personNummer)) {
+                    db.registerUser(email, password, name, lastname, phoneNr, personNummer, prefFood, PIN, isCareGiver, new dbLibrary.RegisterCallback() {
+                        @Override
+                        public void onSuccess(String message) {
+                            progressBar.setVisibility(View.GONE);
+                            Toast.makeText(Register.this, message, Toast.LENGTH_SHORT).show();
+                            // Skicka användaren till MainAcitivity sidan.
+                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                        @Override
+                        public void onError(String errorMessage) {
+                            progressBar.setVisibility(View.GONE);
+                            Toast.makeText(Register.this, errorMessage, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
             }
         });
 
