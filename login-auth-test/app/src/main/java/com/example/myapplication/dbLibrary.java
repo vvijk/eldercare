@@ -14,6 +14,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class dbLibrary {
     private FirebaseAuth mAuth;
@@ -87,7 +88,6 @@ public class dbLibrary {
                         return;
                     }
                 }
-                // If the loop completes without finding a matching user, call the error callback
                 //Log.d("dbtest", "No matching email found.");
                 callback.onUserUidNotFound();
             }
@@ -106,7 +106,7 @@ public class dbLibrary {
         void onUserUidError(String errorMessage);
     }
     public void addCaretakerToGiver(String caregiverUID, String caretakerUID, final CaretakerAddCallback callback) {
-        DatabaseReference usersRef = dbRef.child("caregivers").child(caregiverUID); // Reference to the specific caregiver user
+        DatabaseReference usersRef = dbRef.child("caregivers").child(caregiverUID);
         Log.d("dbtest", "userRef:" + usersRef.toString());
         usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -119,6 +119,13 @@ public class dbLibrary {
 
                         if (caregiver.getCaretakers() == null) {
                             caregiver.setCaretakers(new ArrayList<>());
+                        } else {
+                            // Check if the caretakerUID is already in the list
+                            if (caregiver.getCaretakers().contains(caretakerUID)) {
+                                Log.d("dbtest", "Caretaker with UID: " + caretakerUID + " already exists.");
+                                callback.onCaretakerAddError("Caretaker with UID: " + caretakerUID + " already exists.");
+                                return;
+                            }
                         }
 
                         Log.d("dbtest", "Adding caretaker with UID: " + caretakerUID + " to caregiver.");
