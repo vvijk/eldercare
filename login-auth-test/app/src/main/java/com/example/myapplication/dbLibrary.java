@@ -32,37 +32,57 @@ public class dbLibrary {
         help = new Helpers(context);
     }
     public void registerUser(String email,
-                             String password,
-                             String firstname,
-                             String lastname,
-                             String phoneNr,
-                             String personNummer,
-                             String prefFood,
-                             String PIN,
-                             boolean isCareGiver,
-                             final RegisterCallback callback) {
+                              String password,
+                              String firstname,
+                              String lastname,
+                              String phoneNr,
+                              String personNummer,
+                              String prefFood,
+                              String PIN,
+                              boolean isCareGiver,
+                              final RegisterCallback callback) {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
                         String uid = user.getUid();
-                        User newUser = new User(firstname, lastname, phoneNr, email, personNummer, prefFood, PIN, isCareGiver);
 
-                        DatabaseReference userRef = isCareGiver ? dbRef.child("caregivers") : dbRef.child("caretakers");
+                        if (isCareGiver) {
+                            // Register as a CareGiver
+                            CareGiver newCareGiver = new CareGiver(firstname, lastname, phoneNr, email, personNummer);
 
-                        userRef.child(uid).setValue(newUser)
-                                .addOnCompleteListener(task1 -> {
-                                    if (task1.isSuccessful()) {
-                                        callback.onSuccess("Konto skapat!");
-                                    } else {
-                                        callback.onError("Fel vid skapande av användarprofil");
-                                    }
-                                });
+                            DatabaseReference careGiverRef = dbRef.child("caregivers");
+                            careGiverRef.child(uid).setValue(newCareGiver)
+                                    .addOnCompleteListener(task1 -> {
+                                        if (task1.isSuccessful()) {
+                                            callback.onSuccess("CareGiver account created!");
+                                        } else {
+                                            callback.onError("Error creating CareGiver profile");
+                                        }
+                                    });
+                        } else {
+                            // Register as a CareTaker
+                            // Newly registerd CareTakers have Handler set to "null"
+                            CareTaker newCareTaker = new CareTaker(firstname, lastname, phoneNr, email, personNummer, prefFood, PIN, null);
+                            newCareTaker.setPrefFood(prefFood);
+                            newCareTaker.setPIN(PIN);
+
+                            DatabaseReference careTakerRef = dbRef.child("caretakers");
+                            careTakerRef.child(uid).setValue(newCareTaker)
+                                    .addOnCompleteListener(task1 -> {
+                                        if (task1.isSuccessful()) {
+                                            callback.onSuccess("CareTaker account created!");
+                                        } else {
+                                            callback.onError("Error creating CareTaker profile");
+                                        }
+                                    });
+                        }
                     } else {
-                        callback.onError("Autentiseringen misslyckades: " + task.getException().getMessage());
+                        callback.onError("Authentication failed: " + task.getException().getMessage());
                     }
                 });
     }
+
     public interface RegisterCallback {
         void onSuccess(String message);
 
@@ -106,17 +126,18 @@ public class dbLibrary {
         void onUserUidError(String errorMessage);
     }
     public void addCaretakerToGiver(String caregiverUID, String caretakerUID, final CaretakerAddCallback callback) {
-        DatabaseReference usersRef = dbRef.child("caregivers").child(caregiverUID);
-        Log.d("dbtest", "userRef:" + usersRef.toString());
-        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        Log.d("dbtest", "caregiverUID: " + caregiverUID);
+        Log.d("dbtest", "caretakerUID: " + caretakerUID);
+        DatabaseReference caregiversRef = dbRef.child("caregivers").child(caregiverUID);
+        DatabaseReference caretakersRef = dbRef.child("caretakers").child(caretakerUID);
+
+        caregiversRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    // Retrieve the caregiver user's data
-                    User caregiver = dataSnapshot.getValue(User.class);
+                    // Retrieve the caregiver's data
+                    CareGiver caregiver = dataSnapshot.getValue(CareGiver.class);
                     if (caregiver != null) {
-                        Log.d("dbtest", "Caregiver data retrieved: " + caregiver.toString());
-
                         if (caregiver.getCaretakers() == null) {
                             caregiver.setCaretakers(new ArrayList<>());
                         } else {
@@ -127,18 +148,28 @@ public class dbLibrary {
                                 return;
                             }
                         }
-
-                        Log.d("dbtest", "Adding caretaker with UID: " + caretakerUID + " to caregiver.");
+                        // Add the caretakerUID to the caregiver's list of caretakers
                         caregiver.getCaretakers().add(caretakerUID);
 
-                        // Update the caregiver user's data with the new "tab"
-                        usersRef.setValue(caregiver)
+                        // Update the caregiver's data in the database
+                        caregiversRef.setValue(caregiver)
                                 .addOnCompleteListener(task -> {
                                     if (task.isSuccessful()) {
-                                        Log.d("dbtest", "Caretaker added successfully.");
-                                        callback.onCaretakerAdded("Caretaker added successfully.");
+                                        Log.d("dbtest", "Caretaker added successfully to caregiver.");
+
+                                        // Now, add the caregiver's UID to the caretaker's data as the handler
+                                        caretakersRef.child("handler").setValue(caregiverUID)
+                                                .addOnCompleteListener(handlerTask -> {
+                                                    if (handlerTask.isSuccessful()) {
+                                                        Log.d("dbtest", "Handler set successfully for caretaker.");
+                                                        callback.onCaretakerAdded("Caretaker added successfully.");
+                                                    } else {
+                                                        Log.d("dbtest", "Failed to set handler for caretaker.");
+                                                        callback.onCaretakerAddError("Failed to set handler for caretaker.");
+                                                    }
+                                                });
                                     } else {
-                                        Log.d("dbtest", "Failed to add caretaker.");
+                                        Log.d("dbtest", "Failed to add caretaker to caregiver.");
                                         callback.onCaretakerAddError("Failed to add caretaker.");
                                     }
                                 });
