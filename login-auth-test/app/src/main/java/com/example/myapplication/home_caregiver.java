@@ -1,15 +1,15 @@
 package com.example.myapplication;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.example.myapplication.databinding.ActivityHomeCaregiverBinding;
-import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -25,15 +25,19 @@ public class home_caregiver extends AppCompatActivity{
 
 
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_caregiver);
-
         patients_btn = findViewById(R.id.patients_btn);
         notifications_btn = findViewById(R.id.notifications_btn);
         settings_btn = findViewById(R.id.settings_btn);
         logout_btn = findViewById(R.id.logout_home_btn);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
 
 
         patients_btn.setOnClickListener(new View.OnClickListener() {
@@ -71,7 +75,16 @@ public class home_caregiver extends AppCompatActivity{
                 finish();
             }
         });
-
-
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // Handle the Up button click (e.g., navigate back)
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
