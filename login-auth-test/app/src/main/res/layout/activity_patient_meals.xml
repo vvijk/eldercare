@@ -42,16 +42,16 @@
             app:cornerRadius="0dp"/>
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/meal_patient_description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background = "@color/purple"
-        android:orientation="vertical">
+<!--    <LinearLayout-->
+<!--        android:id="@+id/meal_patient_description"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:background = "@color/purple"-->
+<!--        android:orientation="vertical">-->
 
-        <tag android:id="@+id/clicked_meal_plan"/>
+<!--        <tag android:id="@+id/clicked_meal_plan"/>-->
 
-    </LinearLayout>
+<!--    </LinearLayout>-->
 
     <ScrollView
         android:layout_width="match_parent"

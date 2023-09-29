@@ -1,77 +1,52 @@
 package com.example.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.interpolator.view.animation.LinearOutSlowInInterpolator;
 
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
-import android.telecom.Call;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
 
 import com.example.myapplication.util.GlobalApp;
 import com.example.myapplication.util.PatientMealStorage;
-import com.google.android.gms.actions.ItemListIntents;
-import com.google.firebase.auth.FirebaseUser;
-
-import org.w3c.dom.Text;
 
 public class PatientMealActivity extends AppCompatActivity implements View.OnClickListener {
     LinearLayout scrolledLayout=null;
     TextView text_name=null;
     Button btn_back=null;
-    LinearLayout layout_description=null;
 
-    boolean showPatientDay = false;
-    int curMealPlanId = 0;
     int curPatientId = 0;
 
     boolean DEBUG_COLORED_LAYOUT = false;
     PatientMealStorage getMealStorage() {
         return ((GlobalApp) getApplicationContext()).mealStorage;
     }
-    int getMealPlanId() {
-        if (showPatientDay) {
-            return getMealStorage().mealPlanIdOfPatient(curPatientId);
-        } else {
-            return curMealPlanId;
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_meal_days);
+        setContentView(R.layout.activity_patient_meals);
         scrolledLayout = findViewById(R.id.week_scroll);
         text_name = findViewById(R.id.text_patient_name);
         btn_back = findViewById(R.id.manage_patient_back);
-        layout_description = findViewById(R.id.meal_patient_description);
+        // layout_description = findViewById(R.id.meal_patient_description);
         btn_back.setOnClickListener(this);
 
         Intent intent = getIntent();
         int patientId = intent.getIntExtra("patientId", 0);
-        int mealPlanId = intent.getIntExtra("mealPlanId", 0);
+        // int mealPlanId = intent.getIntExtra("mealPlanId", 0);
         if(patientId != 0) {
             curPatientId = patientId;
-            showPatientDay = true;
             String name = getMealStorage().nameOfPatient(patientId);
             if (name != null) {
                 text_name.setText(name);
@@ -79,39 +54,8 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
                 // error?
                 text_name.setText("null");
             }
-            int patientActiveMealPlanId = getMealStorage().mealPlanIdOfPatient(patientId);
-            String mealPlanName = null;
-            if(patientActiveMealPlanId==0) {
-                mealPlanName = getResources().getString(R.string.str_no_plan);
-            } else {
-                mealPlanName = getMealStorage().nameOfMealPlan(patientActiveMealPlanId);
-                layout_description.setPadding(20,20,20, 20); // TODO(Emarioo): Don't hardcode padding
-            }
-            TextView textView = new TextView(this);
-            textView.setText(getResources().getString(R.string.str_meal_plan)+": " + mealPlanName);
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25); // TODO(Emarioo): Don't hardcode text size
-            textView.setGravity(Gravity.CENTER);
-            textView.setTextColor(getResources().getColor(R.color.black)); // TODO(Emarioo): Pick a better color and move it into colors.xml
-            textView.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
-            textView.setLayoutParams(new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT));
-
-            layout_description.addView(textView);
-
-            layout_description.setOnClickListener(this);
-        } else if(mealPlanId != 0){
-            showPatientDay = false;
-            curMealPlanId = mealPlanId;
-            String name = getMealStorage().nameOfMealPlan(mealPlanId);
-            if (name != null) {
-                text_name.setText(name);
-            } else {
-                // error?
-                text_name.setText("null");
-            }
         } else {
-            // what?
+            // error?
         }
 
         getMealStorage().refreshMealDays(getMealPlanId(), new Runnable() {
@@ -130,70 +74,11 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
     @Override
     public void onClick(View view) {
         Integer clickedWeek = (Integer)view.getTag(R.id.clicked_week);
-        Integer clickedWeekDay = (Integer)view.getTag(R.id.clicked_weekday);
-        Integer clickedMealPlanId = (Integer)view.getTag(R.id.clicked_meal_plan);
 
         if(view == btn_back) {
             Button button = (Button)view;
 //            System.out.println("BACK");
             finish();
-        } else if(clickedWeekDay!=null) {
-            int dayIndex = clickedWeekDay;
-            if(showPatientDay) {
-                Intent intent = new Intent(getApplicationContext(), MealDayActivity.class);
-                intent.putExtra("patientId", curPatientId);
-                intent.putExtra("dayIndex", dayIndex);
-                startActivity(intent);
-                // refreshDays();
-            } else {
-                Intent intent = new Intent(getApplicationContext(), MealDayActivity.class);
-                intent.putExtra("mealPlanId", curMealPlanId);
-                intent.putExtra("dayIndex", dayIndex);
-                startActivity(intent);
-                // refreshDays();
-            }
-        } else if(clickedMealPlanId != null) {
-            if(curPatientId != 0 && showPatientDay){
-                getMealStorage().setMealPlanIdOfPatient(curPatientId, clickedMealPlanId);
-
-                String mealPlanName = getMealStorage().nameOfMealPlan(clickedMealPlanId);
-                TextView view_activeMealPlan = (TextView)layout_description.getChildAt(0);
-                view_activeMealPlan.setText(getResources().getString(R.string.str_meal_plan) +": "+ mealPlanName);
-
-                refreshDays();
-            }
-        } else if(layout_description == view){
-            if(layout_description.getChildCount()>1){
-                layout_description.setBackgroundColor(getResources().getColor(R.color.purple));
-                TextView view_activeMealPlan = (TextView)layout_description.getChildAt(0);
-                view_activeMealPlan.setTextColor(getResources().getColor(R.color.black));
-                layout_description.removeViews(1,layout_description.getChildCount()-1);
-            } else {
-                TextView view_activeMealPlan = (TextView)layout_description.getChildAt(0);
-                view_activeMealPlan.setTextColor(getResources().getColor(R.color.white));
-                layout_description.setBackgroundColor(getResources().getColor(R.color.dry_green_brigher));
-                int mealPlanCount = getMealStorage().countOfMealPlans();
-                for(int i=0;i<mealPlanCount;i++){
-                    int mealPlanId = getMealStorage().mealPlanIdFromIndex(i);
-                    if(mealPlanId==0)
-                        continue;
-                    String name = getMealStorage().nameOfMealPlan(mealPlanId);
-
-                    TextView textview = new TextView(layout_description.getContext());
-                    textview.setText(name);
-                    textview.setTextColor(getResources().getColor(R.color.black));
-                    textview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25); // TODO(Emarioo): Don't hardcode text size
-                    textview.setGravity(Gravity.CENTER);
-                    textview.setLayoutParams(new ViewGroup.LayoutParams(
-                            ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.WRAP_CONTENT));
-                    textview.setTextColor(getResources().getColor(R.color.white));
-                    textview.setBackgroundColor(getResources().getColor(R.color.dry_green));
-                    textview.setTag(R.id.clicked_meal_plan, mealPlanId);
-                    textview.setOnClickListener(this);
-                    layout_description.addView(textview);
-                }
-            }
         } else if(clickedWeek!=null) {
             int mealPlanId = getMealPlanId();
             if(mealPlanId == 0)
@@ -271,49 +156,159 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
+    // refresh the items (meals, days)
     void refreshDays(){
-        // TODO(Emarioo): Optimize by reusing view instead of removing them?
+        // TODO(Emarioo): Optimize by reusing views instead of removing them?
         //   Another optimization would be to hide the list instead of removing and recreating them.
         scrolledLayout.removeAllViews();
-        int mealPlanId = 0;
-        if(showPatientDay){
-            mealPlanId = getMealStorage().mealPlanIdOfPatient(curPatientId);
-        } else {
-            mealPlanId = curMealPlanId;
-        }
-        if(mealPlanId == 0)
-            return;
 
-        int year = 2023;
-        Calendar cal = Calendar.getInstance(Locale.UK); // Monday is the first day of the week for UK same as Sweden.
-        cal.set(Calendar.YEAR,year); // TODO: Don't hardcode
+        Calendar calendar = Calendar.getInstance(Locale.UK);
+        int dayCount = 2;
 
-        int dayCount = cal.getActualMaximum(Calendar.DAY_OF_YEAR);
-        int lastWeek = -1;
+        String[] weekDays = {
+                // NOTE: Calendar specifies sunday as the first day of the week
+                getResources().getString(R.string.str_sunday),
+                getResources().getString(R.string.str_monday),
+                getResources().getString(R.string.str_tuesday),
+                getResources().getString(R.string.str_wednesday),
+                getResources().getString(R.string.str_thursday),
+                getResources().getString(R.string.str_friday),
+                getResources().getString(R.string.str_saturday),
+        };
+
         for(int dayIndex=0;dayIndex<dayCount;dayIndex++) {
-            cal.set(Calendar.DAY_OF_YEAR, dayIndex+1);
-            int weekNumber = cal.get(Calendar.WEEK_OF_YEAR);
+            int weekDayIndex = calendar.get(Calendar.DAY_OF_WEEK)-1;
+            int monthNumber = calendar.get(Calendar.MONTH)+1;
+            int dayNumber = calendar.get(Calendar.DAY_OF_MONTH);
 
-            if(lastWeek == weekNumber) {
-                continue; // week already covered;
-            }
-            lastWeek = weekNumber;
-
+            // item layout contains the name of the day (monday 3/5) and the meals that day (breakfast, lunch...).
             LinearLayout itemLayout = new LinearLayout(this);
-            itemLayout.setTag(R.id.clicked_week, dayIndex);
             itemLayout.setOrientation(LinearLayout.VERTICAL);
             itemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             itemLayout.setOnClickListener(this);
             scrolledLayout.addView(itemLayout);
+
+            LinearLayout headLayout = new LinearLayout(itemLayout.getContext());
+            headLayout.setOrientation(LinearLayout.HORIZONTAL);
+            headLayout.setBackgroundColor(getResources().getColor(R.color.dry_green));
+            headLayout.setPadding(25,8,25,8); // TODO(Emarioo): don't hardcode padding
+            headLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            headLayout.setOnClickListener(this);
+            itemLayout.addView(headLayout);
             {
                 TextView textview = new TextView(itemLayout.getContext());
-                textview.setText(getResources().getString(R.string.str_week)+" " + weekNumber);
+                textview.setText(weekDays[weekDayIndex]);
                 textview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25); // TODO(Emarioo): Don't hardcode text size
-                textview.setGravity(Gravity.CENTER);
+                textview.setLayoutParams(new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT));
+                headLayout.addView(textview);
+            }
+            {
+                TextView textview = new TextView(itemLayout.getContext());
+                textview.setText(monthNumber + "/" + dayNumber);
+                textview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25); // TODO(Emarioo): Don't hardcode text size
+                textview.setGravity(Gravity.RIGHT);
+                textview.setTextAlignment(TextView.TEXT_ALIGNMENT_TEXT_END);
                 textview.setLayoutParams(new ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT));
-                itemLayout.addView(textview);
+                if (DEBUG_COLORED_LAYOUT)
+                    textview.setBackgroundColor(Color.GREEN);
+                headLayout.addView(textview);
+            }
+
+            LinearLayout mealLayout = new LinearLayout(itemLayout.getContext());
+            mealLayout.setOrientation(LinearLayout.HORIZONTAL);
+            mealLayout.setBackgroundColor(getResources().getColor(R.color.dry_green));
+            mealLayout.setPadding(25,8,25,8); // TODO(Emarioo): don't hardcode padding
+            mealLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            mealLayout.setOnClickListener(this);
+            itemLayout.addView(mealLayout);
+
+            refreshMeals(mealLayout);
+
+            calendar.add(Calendar.DAY_OF_YEAR, 1);
+        }
+    }
+    void refreshMeals(LinearLayout layout) {
+        scrolledLayout.removeAllViews();
+
+
+
+        int[] sortedMeals_index = new int[mealCount];
+        int[] sortedMeals_time = new int[mealCount];
+        int usedCount = 0;
+        for(int mealIndex=0;mealIndex<mealCount;mealIndex++) {
+            if(!getMealStorage().isMealIndexValid(mealPlanId, curDayIndex, mealIndex))
+                continue;
+            int hour = getMealStorage().hourOfMeal(mealPlanId, curDayIndex, mealIndex);
+            int minute = getMealStorage().minuteOfMeal(mealPlanId, curDayIndex, mealIndex);
+            sortedMeals_time[usedCount] = hour*100+minute;
+            sortedMeals_index[usedCount] = mealIndex;
+            usedCount++;
+        }
+        if(usedCount == 0){
+            TextView textView = new TextView(this);
+            textView.setText(getResources().getString(R.string.str_no_meals));
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30); // TODO(Emarioo): Don't hardcode text size
+            textView.setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT));
+            scrolledLayout.addView(textView);
+        } else {
+            // TODO(Emarioo): Don't use bubble sort, you are better than this
+            for(int i=0;i<usedCount;i++) {
+                boolean swapped = false;
+                for(int j=0;j<usedCount - 1 - i;j++) {
+                    if (sortedMeals_time[j+1] < sortedMeals_time[j]) {
+                        int tmp = sortedMeals_time[j];
+                        sortedMeals_time[j] = sortedMeals_time[j+1];
+                        sortedMeals_time[j+1] = tmp;
+                        tmp = sortedMeals_index[j];
+                        sortedMeals_index[j] = sortedMeals_index[j+1];
+                        sortedMeals_index[j+1] = tmp;
+                        swapped = true;
+                    }
+                }
+                if(!swapped)
+                    break;
+            }
+            for(int i=0;i<usedCount;i++) {
+                int mealIndex = sortedMeals_index[i];
+                if(!getMealStorage().isMealIndexValid(mealPlanId,curDayIndex,mealIndex))
+                    continue;
+
+                String name = getMealStorage().nameOfMeal(mealPlanId, curDayIndex, mealIndex);
+                int hour = getMealStorage().hourOfMeal(mealPlanId, curDayIndex, mealIndex);
+                int minute = getMealStorage().minuteOfMeal(mealPlanId, curDayIndex, mealIndex);
+
+                // layout that expands and shows description and other information regarding the meal
+                LinearLayout itemLayout = new LinearLayout(this);
+                itemLayout.setLayoutParams(new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT));
+                itemLayout.setOrientation(LinearLayout.VERTICAL);
+                itemLayout.setGravity(Gravity.LEFT);
+                scrolledLayout.addView(itemLayout);
+
+                itemLayout.setTag(R.id.clicked_mealIndex, mealIndex);
+                itemLayout.setOnClickListener(this);
+
+                // layout for the meal's name and time
+                LinearLayout headLayout = new LinearLayout(this);
+                headLayout.setLayoutParams(new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT));
+                headLayout.setGravity(Gravity.LEFT);
+                itemLayout.addView(headLayout);
+
+                String timeStr = "";
+                if(hour < 10) timeStr += "0";
+                timeStr += hour + ":";
+                if(minute < 10) timeStr += "0";
+                timeStr += minute;
+                refreshMealHeader(headLayout, false, name, timeStr);
             }
         }
     }
