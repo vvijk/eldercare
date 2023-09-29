@@ -28,7 +28,9 @@ import android.widget.Toast;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Locale;
 
 import com.example.myapplication.util.GlobalApp;
 import com.example.myapplication.util.PatientMealStorage;
@@ -158,20 +160,22 @@ public class MealDayActivity extends AppCompatActivity implements View.OnClickLi
         }
         curDayIndex = dayIndex;
 
-        // NOTE(Emarioo): Copy pasted from PatientMealActivity.
-        int weekNumber = 1 + dayIndex / 7; // TODO(Emarioo): This is flawed because of leap years.
-        int monthNumber = 1 + dayIndex / 30;
-        int dayNumber = 1 + dayIndex % 30;
-        int weekDayIndex = dayIndex % 7;
+        int year = 2023;
+        Calendar cal = Calendar.getInstance(Locale.UK);
+        cal.set(Calendar.YEAR,year); // TODO: Don't hardcode
+        cal.set(Calendar.DAY_OF_YEAR,curDayIndex+1);
+        int monthNumber = cal.get(Calendar.MONTH)+1;
+        int dayNumber = cal.get(Calendar.DAY_OF_MONTH);
+        int weekDayIndex = cal.get(Calendar.DAY_OF_WEEK)-1;
 
         String[] weekDays = {
+                getResources().getString(R.string.str_sunday),
                 getResources().getString(R.string.str_monday),
                 getResources().getString(R.string.str_tuesday),
                 getResources().getString(R.string.str_wednesday),
                 getResources().getString(R.string.str_thursday),
                 getResources().getString(R.string.str_friday),
                 getResources().getString(R.string.str_saturday),
-                getResources().getString(R.string.str_sunday)
         };
         meal_day_name.setText(weekDays[weekDayIndex]);
         meal_day_date.setText(monthNumber + "/" + dayNumber);
@@ -244,7 +248,6 @@ public class MealDayActivity extends AppCompatActivity implements View.OnClickLi
                 LinearLayout headLayout = (LinearLayout) itemLayout.getChildAt(0);
 
                 refreshMealHeader(headLayout, false, null, null);
-
             } else {
                 String description = getMealStorage().descriptionOfMeal(mealPlanId, dayIndex, mealIndex);
                 itemLayout.setBackgroundColor(getResources().getColor(R.color.dry_green_brigher));

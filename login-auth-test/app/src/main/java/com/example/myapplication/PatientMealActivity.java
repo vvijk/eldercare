@@ -44,8 +44,6 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
     int curMealPlanId = 0;
     int curPatientId = 0;
 
-    LinearLayout lastOpenedWeek = null;
-
     boolean DEBUG_COLORED_LAYOUT = false;
     PatientMealStorage getMealStorage() {
         return ((GlobalApp) getApplicationContext()).mealStorage;
@@ -146,13 +144,13 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
                 intent.putExtra("patientId", curPatientId);
                 intent.putExtra("dayIndex", dayIndex);
                 startActivity(intent);
-                refreshDays();
+                // refreshDays();
             } else {
                 Intent intent = new Intent(getApplicationContext(), MealDayActivity.class);
                 intent.putExtra("mealPlanId", curMealPlanId);
                 intent.putExtra("dayIndex", dayIndex);
                 startActivity(intent);
-                refreshDays();
+                // refreshDays();
             }
         } else if(clickedMealPlanId != null) {
             if(curPatientId != 0 && showPatientDay){
@@ -197,67 +195,62 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
                 }
             }
         } else if(clickedWeek!=null) {
-            int mealPlanId = 0;
-            if(showPatientDay){
-                mealPlanId = getMealStorage().mealPlanIdOfPatient(curPatientId);
-            } else {
-                mealPlanId = curMealPlanId;
-            }
+            int mealPlanId = getMealPlanId();
             if(mealPlanId == 0)
                 return;
-            int mealDayCount = 365; // TODO: Don't hardcode
-//            int mealDayCount = getMealStorage().countOfMealDays(mealPlanId);
 
-            int dayIndex = clickedWeek;
-//            System.out.println("I "+dayIndex +", C "+mealDayCount);
+            LinearLayout itemLayout = (LinearLayout) view;
 
-            LinearLayout subLayout = (LinearLayout) view;
-
-            if(lastOpenedWeek != null) {
-                lastOpenedWeek.removeViews(1,lastOpenedWeek.getChildCount()-1);
-                lastOpenedWeek.setBackgroundColor(getResources().getColor(R.color.purple_dark));
-            }
-            if(lastOpenedWeek == subLayout) {
-                lastOpenedWeek = null;
-            } else {
-                lastOpenedWeek = subLayout;
-                subLayout.setBackgroundColor(getResources().getColor(R.color.dry_green_brigher));
+            if(itemLayout.getChildCount() > 1) {
+                itemLayout.removeViews(1, itemLayout.getChildCount() - 1);
+                itemLayout.setBackgroundColor(getResources().getColor(R.color.purple_dark));
+            }  else {
+                itemLayout.setBackgroundColor(getResources().getColor(R.color.dry_green_brigher));
                 String[] weekDays = {
+                        // NOTE: Calendar specifies sunday as the first day of the week
+                        getResources().getString(R.string.str_sunday),
                         getResources().getString(R.string.str_monday),
                         getResources().getString(R.string.str_tuesday),
                         getResources().getString(R.string.str_wednesday),
                         getResources().getString(R.string.str_thursday),
                         getResources().getString(R.string.str_friday),
                         getResources().getString(R.string.str_saturday),
-                        getResources().getString(R.string.str_sunday)
                 };
 
-//                Calendar calendar = Calendar.getInstance();
-//                calendar.get(Calendar.);
+                int year = 2023;
+                Calendar cal = Calendar.getInstance(Locale.UK);  // Monday is the first day of the week for UK same as Sweden.
+                cal.set(Calendar.YEAR,year); // TODO: Don't hardcode
 
-                int len = 0;
-                while(len < 7 && dayIndex < mealDayCount) {
-                    int weekNumber = 1 + dayIndex / 7; // TODO(Emarioo): This is flawed because of leap years.
-                    int monthNumber = 1 + dayIndex / 30;
-                    int dayNumber = 1 + dayIndex % 30;
-                    int weekDayIndex = dayIndex % 7;
-                    len++;
-                    LinearLayout itemLayout = new LinearLayout(subLayout.getContext());
-                    itemLayout.setOrientation(LinearLayout.HORIZONTAL);
-                    itemLayout.setBackgroundColor(getResources().getColor(R.color.dry_green));
-                    itemLayout.setPadding(25,8,25,8); // TODO(Emarioo): don't hardcode padding
-                    itemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                    itemLayout.setTag(R.id.clicked_weekday, dayIndex);
-                    itemLayout.setOnClickListener(this);
-                    subLayout.addView(itemLayout);
+                int dayIndex = clickedWeek;
+                int dayCount = cal.getActualMaximum(Calendar.DAY_OF_YEAR);
+                cal.set(Calendar.DAY_OF_YEAR,dayIndex+1);
+
+                int lastWeek = cal.get(Calendar.WEEK_OF_YEAR);
+                while(dayIndex < dayCount) {
+                    cal.set(Calendar.DAY_OF_YEAR, dayIndex+1);
+                    int weekNumber = cal.get(Calendar.WEEK_OF_YEAR);
+                    if(weekNumber != lastWeek)
+                        break;
+                    int monthNumber = cal.get(Calendar.MONTH)+1;
+                    int dayNumber = cal.get(Calendar.DAY_OF_MONTH);
+                    int weekDayIndex = cal.get(Calendar.DAY_OF_WEEK)-1;
+
+                    LinearLayout subLayout = new LinearLayout(itemLayout.getContext());
+                    subLayout.setOrientation(LinearLayout.HORIZONTAL);
+                    subLayout.setBackgroundColor(getResources().getColor(R.color.dry_green));
+                    subLayout.setPadding(25,8,25,8); // TODO(Emarioo): don't hardcode padding
+                    subLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                    subLayout.setTag(R.id.clicked_weekday, dayIndex);
+                    subLayout.setOnClickListener(this);
+                    itemLayout.addView(subLayout);
                     {
-                        TextView textview = new TextView(subLayout.getContext());
+                        TextView textview = new TextView(itemLayout.getContext());
                         textview.setText(weekDays[weekDayIndex]);
                         textview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25); // TODO(Emarioo): Don't hardcode text size
                         textview.setLayoutParams(new ViewGroup.LayoutParams(
                                 ViewGroup.LayoutParams.WRAP_CONTENT,
                                 ViewGroup.LayoutParams.WRAP_CONTENT));
-                        itemLayout.addView(textview);
+                        subLayout.addView(textview);
                     }
                     {
                         TextView textview = new TextView(itemLayout.getContext());
@@ -270,7 +263,7 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
                                 ViewGroup.LayoutParams.WRAP_CONTENT));
                         if (DEBUG_COLORED_LAYOUT)
                             textview.setBackgroundColor(Color.GREEN);
-                        itemLayout.addView(textview);
+                        subLayout.addView(textview);
                     }
                     dayIndex++;
                 }
@@ -290,13 +283,16 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
         }
         if(mealPlanId == 0)
             return;
-//        int dayCount = getMealStorage().countOfMealDays(mealPlanId);
-        int dayCount = 365; // TODO: Calculate days from the current year
+
+        int year = 2023;
+        Calendar cal = Calendar.getInstance(Locale.UK); // Monday is the first day of the week for UK same as Sweden.
+        cal.set(Calendar.YEAR,year); // TODO: Don't hardcode
+
+        int dayCount = cal.getActualMaximum(Calendar.DAY_OF_YEAR);
         int lastWeek = -1;
         for(int dayIndex=0;dayIndex<dayCount;dayIndex++) {
-            int weekNumber = 1 + dayIndex / 7; // TODO(Emarioo): This is flawed because of leap years.
-            int monthNumber = 1 + dayIndex / 30;
-            int dayNumber = 1 + dayIndex % 30;
+            cal.set(Calendar.DAY_OF_YEAR, dayIndex+1);
+            int weekNumber = cal.get(Calendar.WEEK_OF_YEAR);
 
             if(lastWeek == weekNumber) {
                 continue; // week already covered;
