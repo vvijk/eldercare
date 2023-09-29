@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
                 db.getCaretakerUidByEmail(caretakerFromInput, new dbLibrary.UserUidCallback() {
                     @Override
                     public void onUserUidFound(String uid) {
-                        db.addCaretakerToGiver(db.getUserID(), caretakerFromInput, new dbLibrary.CaretakerAddCallback() {
+                        db.addCaretakerToGiver(db.getUserID(), uid, new dbLibrary.CaretakerAddCallback() {
                             @Override
                             public void onCaretakerAdded(String message) {
                                 Toast.makeText(MainActivity.this, "Användare: " + caretakerFromInput + " har lagts till i din patientlista!", Toast.LENGTH_SHORT).show();
