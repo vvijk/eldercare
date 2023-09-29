@@ -17,7 +17,8 @@ import com.google.firebase.auth.FirebaseUser;
 public class MainActivity extends AppCompatActivity {
 
     FirebaseAuth auth;
-    Button button;
+    Button button, homebutton;
+
     Button createPatient, addCaretakerButton; //PLACEHOLDER
     TextView textView;
     FirebaseUser user;
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         button = findViewById(R.id.logout);
+        homebutton = findViewById(R.id.goHome);
         createPatient = findViewById(R.id.createpatient); //PLACEHOLDER
         textView = findViewById(R.id.user_details);
         user = auth.getCurrentUser();
@@ -61,6 +63,15 @@ public class MainActivity extends AppCompatActivity {
            public void onClick(View view) {
                Intent intent = new Intent(getApplicationContext(), CreatePatient.class);
                startActivity(intent);
+            }
+        });
+
+
+        homebutton.setOnClickListener(new View.OnClickListener(){ //PLACEHOLDER
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), home_caregiver.class);
+                startActivity(intent);
             }
         });
 
