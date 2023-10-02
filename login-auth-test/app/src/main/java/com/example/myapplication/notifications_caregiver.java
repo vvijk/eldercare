@@ -1,10 +1,12 @@
 package com.example.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 
 public class notifications_caregiver extends AppCompatActivity {
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -13,4 +15,6 @@ public class notifications_caregiver extends AppCompatActivity {
 
 
     }
+
+
 }
