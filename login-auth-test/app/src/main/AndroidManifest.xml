@@ -38,6 +38,14 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"></activity>
+        <activity
+            android:name=".LogHistory"
+            android:exported="true"
+            android:theme="@style/Theme.Material3.Dark.NoActionBar"/>
+        <activity
+            android:name=".DropdownAdapter"
+            android:exported="true"
+            android:theme="@style/Theme.Material3.Dark.NoActionBar"/>
     </application>
 
 </manifest>

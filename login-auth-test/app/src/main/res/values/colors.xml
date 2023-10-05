@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="black">#ff000000</color>
+    <color name="white">#ffffffff</color>
     <color name="purple">#d0bcff</color>
+
+
+
+    <!-- LOG COLORS -->
+    <!-- TODO: dubbelkolla att dessa färger är accessible (färgblindhet). -->
+    <color name="PATIENT_ADD">#ff9acc1b</color>
+    <color name="PATIENT_MODIFY">#ff1597d4</color>
+    <color name="PATIENT_DELETE">#ffbf1bd1</color>
+
+    <color name="MEAL_CONFIRM">#ffffffff</color>
+    <color name="MEAL_SKIP">#ffeef205</color>
+    <color name="MEAL_MISS">#fff06d0a</color>
+
+    <color name="EMERGENCY">#ffff0000</color>
+    <!-- END OF LOG COLORS -->
 </resources>
