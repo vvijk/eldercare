@@ -16,6 +16,9 @@
         android:theme="@style/Theme.Material3.Dark"
         tools:targetApi="31">
         <activity
+            android:name=".PatientProfile"
+            android:exported="true" />
+        <activity
             android:name=".ForgotPassword"
             android:exported="false" />
         <activity
@@ -32,23 +35,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".MainActivity"
-            android:exported="true">
-        </activity>
-
+            android:exported="true"></activity>
         <activity
             android:name=".MealManagementActivity"
             android:exported="true"
-            android:theme="@style/Theme.Material3.Dark.NoActionBar">
-        </activity>
+            android:theme="@style/Theme.Material3.Dark.NoActionBar"></activity>
         <activity
             android:name=".PatientMealActivity"
             android:exported="true"
-            android:theme="@style/Theme.Material3.Dark.NoActionBar">
-        </activity>
-
+            android:theme="@style/Theme.Material3.Dark.NoActionBar"></activity>
     </application>
 
 </manifest>
