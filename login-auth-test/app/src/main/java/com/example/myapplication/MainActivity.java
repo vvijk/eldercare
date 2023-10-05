@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
 
     FirebaseAuth auth;
     Button button;
-    Button createPatient, addCaretakerButton; //PLACEHOLDER
+    Button addCaretakerButton;
     TextView textView;
     FirebaseUser user;
     TextInputEditText addCaretakerInputText;
@@ -28,10 +28,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        
         auth = FirebaseAuth.getInstance();
         button = findViewById(R.id.logout);
-        createPatient = findViewById(R.id.createpatient); //PLACEHOLDER
         textView = findViewById(R.id.user_details);
         user = auth.getCurrentUser();
         addCaretakerButton = findViewById(R.id.addCaretakerToGiver);
@@ -53,14 +52,6 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), Login.class);
                 startActivity(intent);
                 finish();
-            }
-        });
-
-        createPatient.setOnClickListener(new View.OnClickListener(){ //PLACEHOLDER
-           @Override
-           public void onClick(View view) {
-               Intent intent = new Intent(getApplicationContext(), CreatePatient.class);
-               startActivity(intent);
             }
         });
 

@@ -126,8 +126,8 @@ public class dbLibrary {
         void onUserUidError(String errorMessage);
     }
     public void addCaretakerToGiver(String caregiverUID, String caretakerUID, final CaretakerAddCallback callback) {
-        Log.d("dbtest", "caregiverUID: " + caregiverUID);
-        Log.d("dbtest", "caretakerUID: " + caretakerUID);
+        //Log.d("dbtest", "caregiverUID: " + caregiverUID);
+        //Log.d("dbtest", "caretakerUID: " + caretakerUID);
         DatabaseReference caregiversRef = dbRef.child("caregivers").child(caregiverUID);
         DatabaseReference caretakersRef = dbRef.child("caretakers").child(caretakerUID);
 
