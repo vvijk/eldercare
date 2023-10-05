@@ -51,11 +51,6 @@
             android:exported="true"
             android:theme="@style/Theme.Material3.Dark.NoActionBar">
         </activity>
-        <activity
-            android:name=".MealDayActivity"
-            android:exported="true"
-            android:theme="@style/Theme.Material3.Dark.NoActionBar">
-        </activity>
     </application>
 
 </manifest>

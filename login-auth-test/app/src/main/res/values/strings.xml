@@ -43,21 +43,19 @@
 
     <!-- Meal management -->
     <string name="manage_meals">Manage meals</string>
-
+    <string name="str_template_meals">Template meals</string>
     <string name="str_meal_plan">Meal plan</string>
     <string name="str_no_plan">No plan</string>
     <string name="meal_time_bad_format">Time of meal was incorrectly formatted</string>
     <string name="meal_time_missing_colon">Meal time is missing a colon</string>
     <string name="patient_meals_edit">Edit</string>
-    <string name="str_add_meal_plan">Add meal plan</string>
+    <string name="btn_replace_template_meal">Replace with template meal</string>
     <string name="str_add_patient">Add patient</string>
     <string name="str_add_meal">Add meal</string>
-    <string name="str_meal_plans">Meal plans</string>
     <string name="str_patients">Patients</string>
     <string name="str_back">Back</string>
 <!--    <string name="str_back">&lt</string> &lt;!&ndash; &lt is converted to the character '<' &ndash;&gt;-->
     <string name="default_meal_name">Unnamed</string>
-    <string name="default_meal_plan_name">Unnamed</string>
     <string name="str_delete">Delete</string>
     <string name="str_week">Week</string>
     <string name="str_no_meals">There are no meals</string>

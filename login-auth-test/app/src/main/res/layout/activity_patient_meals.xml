@@ -65,10 +65,11 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <tag android:id="@+id/clicked_weekday"/>
-            <tag android:id="@+id/clicked_week"/>
-
-
+            <tag android:id="@+id/tag_add_meal_at_day" ></tag>
+            <tag android:id="@+id/tag_mealIndex" ></tag>
+            <tag android:id="@+id/tag_dayIndex" ></tag>
+            <tag android:id="@+id/tag_deleteMeal" ></tag>
+            <tag android:id="@+id/tag_replace_template_meal" ></tag>
         </LinearLayout>
     </ScrollView>
 
