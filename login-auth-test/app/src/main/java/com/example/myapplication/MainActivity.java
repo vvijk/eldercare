@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -18,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
 
     FirebaseAuth auth;
     Button button;
-    Button createPatient, addCaretakerButton; //PLACEHOLDER
+    Button addCaretakerButton;
     TextView textView;
     FirebaseUser user;
     TextInputEditText addCaretakerInputText;
@@ -30,10 +31,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        
         auth = FirebaseAuth.getInstance();
         button = findViewById(R.id.logout);
-        createPatient = findViewById(R.id.createpatient); //PLACEHOLDER
         textView = findViewById(R.id.user_details);
         user = auth.getCurrentUser();
         
@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
         createPatient.setOnClickListener(new View.OnClickListener(){ //PLACEHOLDER
            @Override
            public void onClick(View view) {
@@ -80,7 +81,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String caretakerFromInput = String.valueOf(addCaretakerInputText.getText());
-
+                if (TextUtils.isEmpty(caretakerFromInput) || !android.util.Patterns.EMAIL_ADDRESS.matcher(caretakerFromInput).matches()) {
+                    Toast.makeText(MainActivity.this, "Ange epost i rätt format: test@test.com", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 db.getCaretakerUidByEmail(caretakerFromInput, new dbLibrary.UserUidCallback() {
                     @Override
                     public void onUserUidFound(String uid) {
