@@ -23,6 +23,8 @@ public class MainActivity extends AppCompatActivity {
     FirebaseUser user;
     TextInputEditText addCaretakerInputText;
     dbLibrary db;
+    
+    Button btn_mealManagement = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
         createPatient = findViewById(R.id.createpatient); //PLACEHOLDER
         textView = findViewById(R.id.user_details);
         user = auth.getCurrentUser();
+        
+        btn_mealManagement = findViewById(R.id.btn_goto_meal_management);
         addCaretakerButton = findViewById(R.id.addCaretakerToGiver);
         addCaretakerInputText = findViewById(R.id.addCaretakerTextView);
         db = new dbLibrary(MainActivity.this);
@@ -61,6 +65,14 @@ public class MainActivity extends AppCompatActivity {
            public void onClick(View view) {
                Intent intent = new Intent(getApplicationContext(), CreatePatient.class);
                startActivity(intent);
+            }
+        });
+
+        btn_mealManagement.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), MealManagementActivity.class);
+                startActivity(intent);
             }
         });
 
