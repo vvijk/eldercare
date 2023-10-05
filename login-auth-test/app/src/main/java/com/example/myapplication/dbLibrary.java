@@ -97,7 +97,7 @@ public class dbLibrary {
 
         caregiversRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
                     String userEmail = userSnapshot.child("email").getValue(String.class);
                     //Log.d("dbtest", "User email from database: " + userEmail);
@@ -113,7 +113,6 @@ public class dbLibrary {
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                // Handle any database errors
                 callback.onUserUidError(databaseError.getMessage());
             }
         });

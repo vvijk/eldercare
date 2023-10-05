@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -59,7 +60,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String caretakerFromInput = String.valueOf(addCaretakerInputText.getText());
-
+                if (TextUtils.isEmpty(caretakerFromInput) || !android.util.Patterns.EMAIL_ADDRESS.matcher(caretakerFromInput).matches()) {
+                    Toast.makeText(MainActivity.this, "Ange epost i rätt format: test@test.com", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 db.getCaretakerUidByEmail(caretakerFromInput, new dbLibrary.UserUidCallback() {
                     @Override
                     public void onUserUidFound(String uid) {
