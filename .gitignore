@@ -1,2 +1,5 @@
-
 .vscode
+
+# Gradle generated files and directories
+.gradle/
+app/build/
