@@ -3,4 +3,10 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="purple">#d0bcff</color>
+    <color name="purple_dark">#331033</color>
+    <color name="almost_black">#1C1B1F</color>
+    <color name="purple_normal">#6B226F</color>
+    <color name="dry_green_brigher">#1B520F</color>
+    <color name="dry_green">#18333A</color>
+    <color name="delete_button">#BC3050</color>
 </resources>
