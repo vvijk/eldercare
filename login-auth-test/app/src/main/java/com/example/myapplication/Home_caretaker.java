@@ -21,7 +21,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class Home_patient extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class Home_caretaker extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     private Set<Integer> clickedPositions = new HashSet<>(); // Håller reda på klickade positioner
     private HashMap<String, String> mealTimes = new HashMap<>();
@@ -57,7 +57,7 @@ public class Home_patient extends AppCompatActivity implements AdapterView.OnIte
         buttonAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Home_patient.this, AlarmActivity.class);
+                Intent intent = new Intent(Home_caretaker.this, AlarmActivity.class);
                 startActivityForResult(intent, 1);
 
             }
@@ -109,7 +109,7 @@ public class Home_patient extends AppCompatActivity implements AdapterView.OnIte
         //När en list-item klickas på.
         // När en list-item klickas på.
         String meal = meals[position];
-        Toast.makeText(Home_patient.this, "Clicked: " + meal, Toast.LENGTH_SHORT).show();
+        Toast.makeText(Home_caretaker.this, "Clicked: " + meal, Toast.LENGTH_SHORT).show();
 
         if (!clickedPositions.add(position)) {
             clickedPositions.remove(position);

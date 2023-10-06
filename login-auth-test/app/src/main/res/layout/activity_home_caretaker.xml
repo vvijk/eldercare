@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bubble_backgroundgreen"
-    tools:context=".MainActivity"
+    tools:context=".Home_caretaker"
     android:orientation="vertical"
     android:padding="32dp">
 
@@ -36,7 +36,6 @@
         android:layout_marginTop="32dp"
         android:text="LARMA"
         android:textSize="32dp"
-        android:backgroundTint="@color/red"
-        >
+        android:backgroundTint="@color/red">
     </Button>
 </LinearLayout>
