@@ -253,20 +253,21 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
         }
         scrolledLayout.removeAllViews();
 
-        int mealCount = getMealStorage().caregiver_template_countOfMeals(currentCaregiverId);
+        int[] sortedMeals_index = getMealStorage().caregiver_template_sortedMealIndices(currentCaregiverId);
+        int usedCount = sortedMeals_index.length;
 
-        int[] sortedMeals_index = new int[mealCount];
-        int[] sortedMeals_time = new int[mealCount];
-        int usedCount = 0;
-        for(int mealIndex=0;mealIndex<mealCount;mealIndex++) {
-            if(!getMealStorage().caregiver_template_isMealIndexValid(currentCaregiverId, mealIndex))
-                continue;
-            int hour = getMealStorage().caregiver_template_hourOfMeal(currentCaregiverId, mealIndex);
-            int minute = getMealStorage().caregiver_template_minuteOfMeal(currentCaregiverId, mealIndex);
-            sortedMeals_time[usedCount] = hour*100+minute;
-            sortedMeals_index[usedCount] = mealIndex;
-            usedCount++;
-        }
+        // int mealCount = getMealStorage().caregiver_template_countOfMeals(currentCaregiverId);
+        // int[] sortedMeals_index = new int[mealCount];
+        // int[] sortedMeals_time = new int[mealCount];
+        // for(int mealIndex=0;mealIndex<mealCount;mealIndex++) {
+        //     if(!getMealStorage().caregiver_template_isMealIndexValid(currentCaregiverId, mealIndex))
+        //         continue;
+        //     int hour = getMealStorage().caregiver_template_hourOfMeal(currentCaregiverId, mealIndex);
+        //     int minute = getMealStorage().caregiver_template_minuteOfMeal(currentCaregiverId, mealIndex);
+        //     sortedMeals_time[usedCount] = hour*100+minute;
+        //     sortedMeals_index[usedCount] = mealIndex;
+        //     usedCount++;
+        // }
         if(usedCount == 0){
             TextView textView = new TextView(this);
             textView.setText(getResources().getString(R.string.str_no_meals));
@@ -277,23 +278,23 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
             textView.setGravity(Gravity.CENTER);
             scrolledLayout.addView(textView);
         } else {
-            // TODO(Emarioo): Don't use bubble sort, you are better than this
-            for (int i = 0; i < usedCount; i++) {
-                boolean swapped = false;
-                for (int j = 0; j < usedCount - 1 - i; j++) {
-                    if (sortedMeals_time[j + 1] < sortedMeals_time[j]) {
-                        int tmp = sortedMeals_time[j];
-                        sortedMeals_time[j] = sortedMeals_time[j + 1];
-                        sortedMeals_time[j + 1] = tmp;
-                        tmp = sortedMeals_index[j];
-                        sortedMeals_index[j] = sortedMeals_index[j + 1];
-                        sortedMeals_index[j + 1] = tmp;
-                        swapped = true;
-                    }
-                }
-                if (!swapped)
-                    break;
-            }
+            // // TODO(Emarioo): Don't use bubble sort, you are better than this
+            // for (int i = 0; i < usedCount; i++) {
+            //     boolean swapped = false;
+            //     for (int j = 0; j < usedCount - 1 - i; j++) {
+            //         if (sortedMeals_time[j + 1] < sortedMeals_time[j]) {
+            //             int tmp = sortedMeals_time[j];
+            //             sortedMeals_time[j] = sortedMeals_time[j + 1];
+            //             sortedMeals_time[j + 1] = tmp;
+            //             tmp = sortedMeals_index[j];
+            //             sortedMeals_index[j] = sortedMeals_index[j + 1];
+            //             sortedMeals_index[j + 1] = tmp;
+            //             swapped = true;
+            //         }
+            //     }
+            //     if (!swapped)
+            //         break;
+            // }
             for (int i = 0; i < usedCount; i++) {
                 int mealIndex = sortedMeals_index[i];
                 if (!getMealStorage().caregiver_template_isMealIndexValid(currentCaregiverId, mealIndex))

@@ -1,8 +1,14 @@
 package com.example.myapplication.util;
 
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.myapplication.R;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -16,8 +22,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 
 /*
     This class provides ways of accessing meals from the database.
@@ -697,6 +705,12 @@ public class PatientMealStorage {
             db_meals.child(caregiver.uuid).child("templateMeal").child(meal.key).removeValue();
         }
     }
+    public int todaysDayIndex() {
+        Calendar calendar = Calendar.getInstance(Locale.UK);
+        int sunday_first_weekDayIndex = calendar.get(Calendar.DAY_OF_WEEK)-1;
+        int weekDayIndex =  (7 + sunday_first_weekDayIndex - 1) % 7;
+        return weekDayIndex;
+    }
     public void caretaker_replaceMealsWithTemplate(int caretakerId, int dayIndex, int caregiverId) {
         Caregiver caregiver = getCaregiver(caregiverId);
         Caretaker caretaker = getCaretaker(caretakerId);
@@ -765,6 +779,65 @@ public class PatientMealStorage {
         if(day == null)
             return 0;
         return day.meals.size();
+    }
+    private int[] getSortedMealIndexList(MealDay day) {
+        int mealCount = day.meals.size();
+
+        int[] sortedMeals_index = new int[mealCount];
+        int[] sortedMeals_time = new int[mealCount];
+        int usedCount = 0;
+
+        for(int mealIndex=0;mealIndex<mealCount;mealIndex++) {
+            Meal meal = day.getMeal(mealIndex);
+            if(meal == null)
+                continue;
+            int hour = meal.hour;
+            int minute = meal.minute;
+            sortedMeals_time[usedCount] = hour*100+minute;
+            sortedMeals_index[usedCount] = mealIndex;
+            usedCount++;
+        }
+        if(usedCount == 0)
+            return new int[0];
+
+        // TODO(Emarioo): Don't use bubble sort, you are better than this
+        for(int i=0;i<usedCount;i++) {
+            boolean swapped = false;
+            for(int j=0;j<usedCount - 1 - i;j++) {
+                if (sortedMeals_time[j+1] < sortedMeals_time[j]) {
+                    int tmp = sortedMeals_time[j];
+                    sortedMeals_time[j] = sortedMeals_time[j+1];
+                    sortedMeals_time[j+1] = tmp;
+                    tmp = sortedMeals_index[j];
+                    sortedMeals_index[j] = sortedMeals_index[j+1];
+                    sortedMeals_index[j+1] = tmp;
+                    swapped = true;
+                }
+            }
+            if(!swapped)
+                break;
+        }
+        int[] out = new int[usedCount];
+        System.arraycopy(sortedMeals_index, 0, out, 0, usedCount);
+        return out;
+    }
+    public int[] caregiver_template_sortedMealIndices(int caregiverId) {
+        Caregiver caregiver = getCaregiver(caregiverId);
+        if(caregiver == null)
+            return new int[0];
+        MealDay day = caregiver.templateMeal;
+        if(day == null)
+            return new int[0];
+        return getSortedMealIndexList(day);
+    }
+    public int[] caretaker_sortedMealIndices(int caretakerId, int weekDay) {
+        Caretaker caretaker = getCaretaker(caretakerId);
+        if(caretaker == null)
+            return new int[0];
+        MealDay day = caretaker.days[weekDay];
+        if(day == null)
+            return new int[0];
+        return getSortedMealIndexList(day);
     }
     public boolean caretaker_isMealIndexValid(int caretakerId, int weekDay, int mealIndex) {
         Caretaker caretaker = getCaretaker(caretakerId);

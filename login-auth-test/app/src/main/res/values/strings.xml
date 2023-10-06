@@ -86,6 +86,7 @@
     <!--    <string name="str_back">&lt</string> &lt;!&ndash; &lt is converted to the character '<' &ndash;&gt;-->
     <string name="default_meal_name">Namn</string>
     <string name="str_caregiverUUID_was_null">UUID för caregiver är null</string>
+    <string name="str_caretakerUUID_was_null">UUID för caretaker är null</string>
     <string name="str_delete">Ta bort</string>
     <string name="str_patient_info">Info</string>
     <string name="str_no_meals">Inga måltider</string>

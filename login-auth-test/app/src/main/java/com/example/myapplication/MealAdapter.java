@@ -9,13 +9,17 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Set;
 public class MealAdapter extends ArrayAdapter<String> {
     private final Context context;
-    private final String[] values;
+    // private final String[] values;
+    private final ArrayList<String> values;
     private final Set<Integer> clickedPositions;
 
-    public MealAdapter(Context context, String[] values, Set<Integer> clickedPositions) {
+    // public MealAdapter(Context context, String[] values, Set<Integer> clickedPositions) {
+    public MealAdapter(Context context, ArrayList<String> values, Set<Integer> clickedPositions) {
         super(context, R.layout.list_item, values);
         this.context = context;
         this.values = values;
@@ -29,7 +33,8 @@ public class MealAdapter extends ArrayAdapter<String> {
         TextView textView = rowView.findViewById(R.id.textView);
         ImageView starImageView = rowView.findViewById(R.id.starImageView);
 
-        textView.setText(values[position]);
+        // textView.setText(values[position]);
+        textView.setText(values.get(position));
 
         if (clickedPositions.contains(position)) {
             starImageView.setColorFilter(Color.YELLOW); // Ändra färgen på stjärnan till gul

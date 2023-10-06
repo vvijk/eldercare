@@ -151,7 +151,7 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
             int monthNumber = calendar.get(Calendar.MONTH)+1;
             int dayNumber = calendar.get(Calendar.DAY_OF_MONTH);
 
-            int weekDayIndex =  (7 + sunday_first_weekDayIndex - 1) % 7;
+            int weekDayIndex = (7 + sunday_first_weekDayIndex - 1) % 7;
 
             // item layout contains the name of the day (monday 3/5) and the meals that day (breakfast, lunch...).
             LinearLayout dayLayout = new LinearLayout(this);
@@ -207,20 +207,20 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
 
     }
     void refreshMeals(LinearLayout mealLayout, int weekDayIndex) {
-        int mealCount = getMealStorage().caretaker_countOfMeals(curCaretakerId, weekDayIndex);
+        // int mealCount = getMealStorage().caretaker_countOfMeals(curCaretakerId, weekDayIndex);
 
-        int[] sortedMeals_index = new int[mealCount];
-        int[] sortedMeals_time = new int[mealCount];
-        int usedCount = 0;
-        for(int mealIndex=0;mealIndex<mealCount;mealIndex++) {
-            if(!getMealStorage().caretaker_isMealIndexValid(curCaretakerId, weekDayIndex, mealIndex))
-                continue;
-            int hour = getMealStorage().caretaker_hourOfMeal(curCaretakerId, weekDayIndex, mealIndex);
-            int minute = getMealStorage().caretaker_minuteOfMeal(curCaretakerId, weekDayIndex, mealIndex);
-            sortedMeals_time[usedCount] = hour*100+minute;
-            sortedMeals_index[usedCount] = mealIndex;
-            usedCount++;
-        }
+        int[] sortedMeals_index = getMealStorage().caretaker_sortedMealIndices(curCaretakerId, weekDayIndex);
+        int usedCount = sortedMeals_index.length;
+        // int[] sortedMeals_time = new int[mealCount];
+        // for(int mealIndex=0;mealIndex<mealCount;mealIndex++) {
+        //     if(!getMealStorage().caretaker_isMealIndexValid(curCaretakerId, weekDayIndex, mealIndex))
+        //         continue;
+        //     int hour = getMealStorage().caretaker_hourOfMeal(curCaretakerId, weekDayIndex, mealIndex);
+        //     int minute = getMealStorage().caretaker_minuteOfMeal(curCaretakerId, weekDayIndex, mealIndex);
+        //     sortedMeals_time[usedCount] = hour*100+minute;
+        //     sortedMeals_index[usedCount] = mealIndex;
+        //     usedCount++;
+        // }
         if(usedCount == 0){
             TextView textView = new TextView(this);
             textView.setText(getResources().getString(R.string.str_no_meals));
@@ -232,22 +232,22 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
             mealLayout.addView(textView);
         } else {
             // TODO(Emarioo): Don't use bubble sort, you are better than this
-            for(int i=0;i<usedCount;i++) {
-                boolean swapped = false;
-                for(int j=0;j<usedCount - 1 - i;j++) {
-                    if (sortedMeals_time[j+1] < sortedMeals_time[j]) {
-                        int tmp = sortedMeals_time[j];
-                        sortedMeals_time[j] = sortedMeals_time[j+1];
-                        sortedMeals_time[j+1] = tmp;
-                        tmp = sortedMeals_index[j];
-                        sortedMeals_index[j] = sortedMeals_index[j+1];
-                        sortedMeals_index[j+1] = tmp;
-                        swapped = true;
-                    }
-                }
-                if(!swapped)
-                    break;
-            }
+            // for(int i=0;i<usedCount;i++) {
+            //     boolean swapped = false;
+            //     for(int j=0;j<usedCount - 1 - i;j++) {
+            //         if (sortedMeals_time[j+1] < sortedMeals_time[j]) {
+            //             int tmp = sortedMeals_time[j];
+            //             sortedMeals_time[j] = sortedMeals_time[j+1];
+            //             sortedMeals_time[j+1] = tmp;
+            //             tmp = sortedMeals_index[j];
+            //             sortedMeals_index[j] = sortedMeals_index[j+1];
+            //             sortedMeals_index[j+1] = tmp;
+            //             swapped = true;
+            //         }
+            //     }
+            //     if(!swapped)
+            //         break;
+            // }
             for(int i=0;i<usedCount;i++) {
                 int mealIndex = sortedMeals_index[i];
                 if(!getMealStorage().caretaker_isMealIndexValid(curCaretakerId, weekDayIndex, mealIndex))
