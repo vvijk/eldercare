@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">ElderCare</string>
     <string name="login">Logga in</string>
     <string name="register">Skapa konto</string>
     <string name="email">Epostadress</string>
@@ -66,5 +65,6 @@
     <string name="swedish">Svenska</string>
     <string name="english">Engelska</string>
     <string name="msg_token_fmt" translatable="false">FCM registration Token: %s</string>
+    <string name="app_name">Eldercare</string>
 
 </resources>
