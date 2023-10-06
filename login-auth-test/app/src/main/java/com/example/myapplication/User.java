@@ -26,6 +26,7 @@ public class User {
     public String getLastName() {
         return lastName;
     }
+    public String getFullName() { return getFirstName() + " " + getLastName(); }
     public String getPhoneNr() {
         return phoneNr;
     }

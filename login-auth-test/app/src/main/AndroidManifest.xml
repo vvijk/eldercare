@@ -82,7 +82,17 @@
             android:exported="true"
             android:theme="@style/Theme.Material3.Dark.NoActionBar" />
 
+
         <activity
+            android:name=".LogHistory"
+            android:exported="true"
+            android:theme="@style/Theme.Material3.Dark.NoActionBar"/>
+        
+      <activity
+            android:name=".DropdownAdapter"
+            android:exported="true"
+            android:theme="@style/Theme.Material3.Dark.NoActionBar"/>
+      <activity
             android:name=".PatientMealActivity"
             android:exported="true"
             android:theme="@style/Theme.Material3.Dark.NoActionBar">
