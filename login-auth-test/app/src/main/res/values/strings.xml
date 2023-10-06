@@ -46,6 +46,7 @@
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
+
    
   <!-- WILLES -->
     <string name="next">Next</string>
@@ -82,7 +83,7 @@
     <string name="str_add_meal">Add meal</string>
     <string name="str_patients">Patients</string>
     <string name="str_back">Back</string>
-<!--    <string name="str_back">&lt</string> &lt;!&ndash; &lt is converted to the character '<' &ndash;&gt;-->
+    <!--    <string name="str_back">&lt</string> &lt;!&ndash; &lt is converted to the character '<' &ndash;&gt;-->
     <string name="default_meal_name">Unnamed</string>
     <string name="str_delete">Delete</string>
     <string name="str_week">Week</string>
@@ -95,5 +96,6 @@
     <string name="str_friday">Friday</string>
     <string name="str_saturday">Saturday</string>
     <string name="str_sunday">Sunday</string>
+    <string name="str_BackToMealPlan">Tillbaka till måltidsplan</string>
 
 </resources>
