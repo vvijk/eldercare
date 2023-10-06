@@ -32,7 +32,7 @@
         <TextView
             android:id="@+id/text_patient_name"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="wreaap_content"
             android:backgroundTint="@color/almost_black"
             android:text="?"
             android:layout_gravity="center"

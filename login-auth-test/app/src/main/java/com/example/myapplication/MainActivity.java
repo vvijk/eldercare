@@ -1,12 +1,19 @@
 package com.example.myapplication;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,11 +21,18 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 public class MainActivity extends AppCompatActivity {
 
     FirebaseAuth auth;
     Button button;
-    Button createPatient, addCaretakerButton; //PLACEHOLDER
+    Button addCaretakerButton;
     TextView textView;
     FirebaseUser user;
     TextInputEditText addCaretakerInputText;
@@ -26,14 +40,16 @@ public class MainActivity extends AppCompatActivity {
     
     Button btn_mealManagement = null;
 
+    final String TAG = "tcctag";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        
         auth = FirebaseAuth.getInstance();
         button = findViewById(R.id.logout);
-        createPatient = findViewById(R.id.createpatient); //PLACEHOLDER
+
         textView = findViewById(R.id.user_details);
         user = auth.getCurrentUser();
         
@@ -41,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
         addCaretakerButton = findViewById(R.id.addCaretakerToGiver);
         addCaretakerInputText = findViewById(R.id.addCaretakerTextView);
         db = new dbLibrary(MainActivity.this);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         if(user == null){
             Intent intent = new Intent(getApplicationContext(), Login.class);
@@ -50,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
             textView.setText(user.getEmail());
         }
 
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -57,14 +75,6 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), Login.class);
                 startActivity(intent);
                 finish();
-            }
-        });
-
-        createPatient.setOnClickListener(new View.OnClickListener(){ //PLACEHOLDER
-           @Override
-           public void onClick(View view) {
-               Intent intent = new Intent(getApplicationContext(), CreatePatient.class);
-               startActivity(intent);
             }
         });
 
@@ -80,7 +90,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String caretakerFromInput = String.valueOf(addCaretakerInputText.getText());
-
+                if (TextUtils.isEmpty(caretakerFromInput) || !android.util.Patterns.EMAIL_ADDRESS.matcher(caretakerFromInput).matches()) {
+                    Toast.makeText(MainActivity.this, "Ange epost i rätt format: test@test.com", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 db.getCaretakerUidByEmail(caretakerFromInput, new dbLibrary.UserUidCallback() {
                     @Override
                     public void onUserUidFound(String uid) {
@@ -109,5 +122,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // Handle the Up button click (e.g., navigate back)
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
