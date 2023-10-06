@@ -147,7 +147,7 @@ public class home_caregiver extends AppCompatActivity{
         history_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), MealManagementActivity.class);
+                Intent intent = new Intent(getApplicationContext(), LogHistory.class);
                 startActivity(intent);
                 finish();
             }
