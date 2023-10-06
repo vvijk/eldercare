@@ -10,16 +10,13 @@ public class User {
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
-    public User(String name, String lastname, String phoneNr, String email, String personNummer, String prefFood, String PIN, Boolean careGiver) {
+    public User(String name, String lastname, String phoneNr, String email, String personNummer, Boolean careGiver) {
         this.firstName = name;
         this.lastName = lastname;
         this.phoneNr = phoneNr;
         this.email = email;
         this.idNumber = personNummer;
         this.careGiver = careGiver;
-        this.prefFood = prefFood;
-        this.PIN = PIN;
-        this.caretakers = new ArrayList<>();
     }
     public String getPIN() { return PIN; }
     public String getPrefFood() { return prefFood; }
@@ -35,10 +32,6 @@ public class User {
     public String getEmail() { return email; }
     public String getIdNumber() { return idNumber; }
     public boolean isCareGiver() { return careGiver; }
-    public List<String> getCaretakers() { return caretakers; }
-    public void setCaretakers(List<String> caretakers) {
-        this.caretakers = caretakers;
-    }
 
 }
 

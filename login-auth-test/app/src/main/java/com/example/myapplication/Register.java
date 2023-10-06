@@ -111,6 +111,8 @@ public class Register extends AppCompatActivity {
                 lastname = String.valueOf(editTextLastname.getText());
                 phoneNr = String.valueOf(editTextPhoneNr.getText());
                 personNummer = String.valueOf(editTextPersonNummer.getText());
+                PIN = String.valueOf(editTextPIN.getText());
+                prefFood = String.valueOf(editTextPrefFood.getText());
 
                 if (checkedRadioButtonId == -1) {
                     Toast.makeText(Register.this, "Du måste välja vårdtagare eller vårdgivare!", Toast.LENGTH_SHORT).show();
@@ -122,13 +124,7 @@ public class Register extends AppCompatActivity {
                     progressBar.setVisibility(View.GONE);
                     return;
                 }
-                if (isCareGiver) {
-                    PIN = "null";
-                    prefFood = "null";
-                } else {
-                    PIN = String.valueOf(editTextPIN.getText());
-                    prefFood = String.valueOf(editTextPrefFood.getText());
-                }
+
                 if(help.isValidUserInput(email, password, name, lastname, phoneNr, personNummer)) {
                     db.registerUser(email, password, name, lastname, phoneNr, personNummer, prefFood, PIN, isCareGiver, new dbLibrary.RegisterCallback() {
                         @Override
