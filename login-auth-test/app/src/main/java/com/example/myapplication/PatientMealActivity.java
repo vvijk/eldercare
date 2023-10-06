@@ -28,6 +28,7 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
     LinearLayout scrolledLayout=null;
     TextView text_name=null;
     Button btn_back=null;
+    Button btn_info=null;
 
     int curCaretakerId = 0;
     int curCaregiverId = 0;
@@ -50,8 +51,10 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
         scrolledLayout = findViewById(R.id.week_scroll);
         text_name = findViewById(R.id.text_patient_name);
         btn_back = findViewById(R.id.manage_patient_back);
+        btn_info = findViewById(R.id.btn_patient_info);
         // layout_description = findViewById(R.id.meal_patient_description);
         btn_back.setOnClickListener(this);
+        btn_info.setOnClickListener(this);
 
         Intent intent = getIntent();
         curCaregiverId = intent.getIntExtra("caregiverId", -1);
@@ -105,6 +108,13 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
         } else if(replaceMeal_dayIndex != null) {
             saveAllMeals();
             getMealStorage().caretaker_replaceMealsWithTemplate(curCaretakerId, replaceMeal_dayIndex, curCaregiverId);
+        } else if(view == btn_info) {
+            saveAllMeals();
+            // THIS IS WHERE YO GO TO THE PATIENT INFO SCREEN
+//            Intent intent = new Intent(getApplicationContext(), PatientInfoScreen.class);
+//            intent.putExtra("caretakerId", patientId);
+//            intent.putExtra("caregiverId", currentCaregiverId);
+//            startActivity(intent);
         }
     }
 
@@ -186,6 +196,7 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
 
             calendar.add(Calendar.DAY_OF_YEAR, 1);
         }
+
     }
     void refreshMeals(LinearLayout mealLayout, int weekDayIndex) {
         int mealCount = getMealStorage().caretaker_countOfMeals(curCaretakerId, weekDayIndex);
@@ -361,6 +372,30 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
             replaceButton.setTextColor(getResources().getColor(R.color.white));
             footLayout.addView(replaceButton);
         }
+//        LinearLayout bottomLayout = new LinearLayout(scrolledLayout.getContext());
+//        bottomLayout.setOrientation(LinearLayout.HORIZONTAL);
+//        bottomLayout.setGravity(Gravity.CENTER);
+//        bottomLayout.setLayoutParams(new ViewGroup.LayoutParams(
+//                ViewGroup.LayoutParams.MATCH_PARENT,
+//                ViewGroup.LayoutParams.WRAP_CONTENT));
+//        scrolledLayout.addView(bottomLayout);
+//
+//        Button replaceButton = new Button(bottomLayout.getContext());
+//        replaceButton.setAllCaps(false);
+//        replaceButton.setText(getResources().getString(R.string.btn));
+//        replaceButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18); // TODO(Emarioo): Don't hardcode text size
+//        replaceButton.setLayoutParams(new ViewGroup.LayoutParams(
+//                ViewGroup.LayoutParams.WRAP_CONTENT,
+//                ViewGroup.LayoutParams.WRAP_CONTENT));
+//        GradientDrawable shape = new GradientDrawable();
+//        shape.setCornerRadius(16);
+//        shape.setColor(getResources().getColor(R.color.purple));
+//        replaceButton.setBackground(shape);
+//        replaceButton.setOnClickListener(this);
+//        replaceButton.setTextColor(getResources().getColor(R.color.white));
+//        bottomLayout.addView(replaceButton);
+
+
     }
 
     void refreshMealHeader(LinearLayout headLayout, boolean editable, String mealName, String mealTime) {
@@ -406,7 +441,6 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT));
         headLayout.addView(view_mealName);
-
     }
     void saveAllMeals() {
         for(int i=0;i<scrolledLayout.getChildCount();i++) {

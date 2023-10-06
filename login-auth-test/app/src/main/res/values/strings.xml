@@ -73,6 +73,7 @@
 <!--    <string name="str_back">&lt</string> &lt;!&ndash; &lt is converted to the character '<' &ndash;&gt;-->
     <string name="default_meal_name">Unnamed</string>
     <string name="str_delete">Delete</string>
+    <string name="str_patient_info">Info</string>
     <string name="str_week">Week</string>
     <string name="str_no_meals">There are no meals</string>
     <string name="str_no_description">No description</string>
