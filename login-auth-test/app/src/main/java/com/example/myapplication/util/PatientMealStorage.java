@@ -15,6 +15,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -824,13 +825,18 @@ public class PatientMealStorage {
             return "";
         return meal.desc;
     }
-    // private String weekDays[] = { "mon", "tue", "wed", "thu", "fri", "sat", "sun" };
+    private String weekDays[] = { "mon", "tue", "wed", "thu", "fri", "sat", "sun" };
     private String dayref(int index) {
-        return ""+index;
-        // return weekDays[index];
+        // return ""+index;
+        return weekDays[index];
     }
     private int refday(String key) {
-        return Integer.parseInt(key);
+        for(int i=0;i<weekDays.length;i++) {
+            if(weekDays[i].equals(key))
+                return i;
+        }
+        return -1;
+        // return Integer.parseInt(key);
     }
     public void caretaker_addMeal(int caretakerId, int weekDay, String name) {
         if(useDatabase){

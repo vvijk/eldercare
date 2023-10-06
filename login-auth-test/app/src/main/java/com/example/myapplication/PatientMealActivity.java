@@ -360,7 +360,7 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
             addButton.setBackground(shape);
             addButton.setTag(R.id.tag_add_meal_at_day, weekDayIndex);
             addButton.setOnClickListener(this);
-            addButton.setTextColor(getResources().getColor(R.color.white));
+            addButton.setTextColor(getResources().getColor(R.color.black));
             footLayout.addView(addButton);
         }
         {
@@ -377,7 +377,7 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
             replaceButton.setBackground(shape);
             replaceButton.setTag(R.id.tag_replace_template_meal, weekDayIndex);
             replaceButton.setOnClickListener(this);
-            replaceButton.setTextColor(getResources().getColor(R.color.white));
+            replaceButton.setTextColor(getResources().getColor(R.color.black));
             footLayout.addView(replaceButton);
         }
 //        LinearLayout bottomLayout = new LinearLayout(scrolledLayout.getContext());
