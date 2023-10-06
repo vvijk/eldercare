@@ -71,14 +71,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        createPatient.setOnClickListener(new View.OnClickListener(){ //PLACEHOLDER
-           @Override
-           public void onClick(View view) {
-               Intent intent = new Intent(getApplicationContext(), CreatePatient.class);
-               startActivity(intent);
-            }
-        });
-
 
         btn_mealManagement.setOnClickListener(new View.OnClickListener() {
             @Override

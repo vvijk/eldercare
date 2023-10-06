@@ -33,7 +33,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class home_caregiver extends AppCompatActivity{
 
-    Button patients_btn, settings_btn, logout_btn, home_bottom_btn;
+    Button patients_btn, settings_btn, logout_btn, home_bottom_btn, history_btn;
     TextView eldercare_text;
     dbLibrary db;
 
@@ -68,6 +68,7 @@ public class home_caregiver extends AppCompatActivity{
         patients_btn = findViewById(R.id.patients_btn);
         settings_btn = findViewById(R.id.settings_btn);
         logout_btn = findViewById(R.id.logout_home_btn);
+        history_btn = findViewById(R.id.historylog_btn);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
@@ -137,7 +138,16 @@ public class home_caregiver extends AppCompatActivity{
         patients_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                Intent intent = new Intent(getApplicationContext(), MealManagementActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        history_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), MealManagementActivity.class);
                 startActivity(intent);
                 finish();
             }

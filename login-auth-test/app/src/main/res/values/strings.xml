@@ -67,7 +67,7 @@
     <string name="swedish">Svenska</string>
     <string name="english">Engelska</string>
     <string name="msg_token_fmt" translatable="false">FCM registration Token: %s</string>
-
+    <string name="historylog">Historik</string>
 
     <!-- Meal management -->
     <string name="manage_meals">Manage meals</string>
