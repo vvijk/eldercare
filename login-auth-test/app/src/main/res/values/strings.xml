@@ -46,16 +46,28 @@
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
+   
   <!-- WILLES -->
     <string name="next">Next</string>
     <string name="previous">Previous</string>
-    <string name="eldercare">ElderCare</string>
-    <string name="inställningar">Inställningar</string>
-    <string name="hem">Hem</string>
-    <string name="patienter">Patienter</string>
-    <string name="profil">Profil</string>
+    <string name="settings">Inställningar</string>
+    <string name="home">Hem</string>
+    <string name="patients">Patienter</string>
+    <string name="profile">Profil</string>
     <string name="menu_drawer_open">Drawer Open</string>
     <string name="menu_drawer_closed">Drawer Closed</string>
+    <string name="notifications">Notiser</string>
+    <string name="notis">Notis</string>
+    <string name="logout_home">Logga Ut</string>
+    <string name="name">Namn</string>
+    <string name="time">Tid</string>
+    <string name="default_channel_id">1337</string>
+    <string name="default_channel_name">caregiver_channel</string>
+    <string name="languageText">Välj språk</string>
+    <string name="swedish">Svenska</string>
+    <string name="english">Engelska</string>
+    <string name="msg_token_fmt" translatable="false">FCM registration Token: %s</string>
+
 
     <!-- Meal management -->
     <string name="manage_meals">Manage meals</string>

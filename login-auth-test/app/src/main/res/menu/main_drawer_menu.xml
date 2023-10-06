@@ -4,22 +4,22 @@
 
         <item android:id="@+id/home"
             android:icon="@drawable/ic_home"
-            android:title="@string/hem"
+            android:title="@string/home"
         />
 
         <item android:id="@+id/profile"
             android:icon="@drawable/ic_profile"
-            android:title="@string/profil"
+            android:title="@string/profile"
         />
 
         <item android:id="@+id/patients"
             android:icon="@drawable/ic_profile"
-            android:title="@string/patienter"
+            android:title="@string/patients"
         />
 
         <item android:id="@+id/settings"
             android:icon="@drawable/ic_settings"
-            android:title="@string/inställningar"
+            android:title="@string/settings"
         />
 
     </group>
