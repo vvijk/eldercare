@@ -30,6 +30,8 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
     Button btn_back=null;
     Button btn_info=null;
 
+    String curCaretakerUUID = null;
+    String curCaregiverUUID = null;
     int curCaretakerId = 0;
     int curCaregiverId = 0;
 
@@ -57,19 +59,26 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
         btn_info.setOnClickListener(this);
 
         Intent intent = getIntent();
-        curCaregiverId = intent.getIntExtra("caregiverId", -1);
-        if(curCaregiverId == -1) {
+
+        curCaregiverUUID = intent.getStringExtra("caregiverUUID");
+        if(curCaregiverUUID != null) {
+            curCaregiverId = getMealStorage().idFromCaregiverUUID(curCaregiverUUID);
+        } else {
             // bad, throw error?
         }
-        curCaretakerId = intent.getIntExtra("caretakerId", -1);
-        // int mealPlanId = intent.getIntExtra("mealPlanId", 0);
-        if(curCaretakerId != -1) {
+        curCaretakerUUID = intent.getStringExtra("caretakerUUID");
+        if(curCaretakerUUID != null) {
+            curCaretakerId = getMealStorage().idFromCaretakerUUID(curCaretakerUUID);
             String name = getMealStorage().nameOfCaretaker(curCaretakerId);
             if (name != null) {
                 text_name.setText(name);
             } else {
+                // TODO(Emarioo): This may happen if the name of caretaker isn't cached.
+                //  PatientMealStorage will not fetch caretaker's name. If the name was fetched by
+                //  MealManagementActivity before you got to this activity things will be fine.
+                //  If not, you end up here.
                 // error?
-                text_name.setText("null");
+                text_name.setText("Missing name");
             }
         } else {
             // error?
@@ -110,11 +119,10 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
             getMealStorage().caretaker_replaceMealsWithTemplate(curCaretakerId, replaceMeal_dayIndex, curCaregiverId);
         } else if(view == btn_info) {
             saveAllMeals();
-            // THIS IS WHERE YO GO TO THE PATIENT INFO SCREEN
-//            Intent intent = new Intent(getApplicationContext(), PatientInfoScreen.class);
-//            intent.putExtra("caretakerId", patientId);
-//            intent.putExtra("caregiverId", currentCaregiverId);
-//            startActivity(intent);
+            Intent intent = new Intent(getApplicationContext(), PatientProfile.class);
+            intent.putExtra("caretakerUUID", curCaretakerUUID);
+            intent.putExtra("caregiverUUID", curCaregiverUUID);
+            startActivity(intent);
         }
     }
 

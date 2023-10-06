@@ -19,8 +19,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 /*
-    This class provides ways of accessing an artificial database.
-    It's temporary until the database supports patients and meal plans.
+    This class provides ways of accessing meals from the database.
+    There only needs to be one instance per android application.
+    The class caches results from the database and has listeners which automatically update the cached results.
+    You can pass a callback (Runnable) to the functions called pushRefresher which will run the callback when the cached results change.
 */
 public class PatientMealStorage {
     public class Caregiver {
@@ -122,63 +124,6 @@ public class PatientMealStorage {
     }
 
     public PatientMealStorage() {
-        // add dummy values
-        // String[] names = {
-        //         "Carol",
-        //         "Onion",
-        //         "Steven",
-        //         "Broccoli",
-        //         "Mr. Java",
-        //         "Mr. Rust",
-        //         "Mrs. C++",
-        //         "Roger",
-        //         "Molly",
-        //         "Sarah",
-        //         "Crocodile",
-        //         "Cat",
-        //         "Sir. Burp",
-        //         "Patient A",
-        //         "Patient B",
-        //         "Patient C",
-        //         "Patient D",
-        //         "Patient E",
-        //         "Patient X",
-        //     };
-        // String[] meal_names = {
-        //         "Beef meal",
-        //         "Vegan meal",
-        //         "Snack meal",
-        //         "Fruit meal",
-        // };
-        // Caregiver caregiver = new Caregiver();
-        // for (String str : names) {
-        //     int patientId = patients.size() + 1;
-        //     Patient patient = new Patient();
-        //     patient.name = str;
-        //     patients.put(patientId, patient);
-        //     caregiver.patientIds.add(patientId);
-        // }
-        // int caregiverId = 1;
-        // caregivers.put(caregiverId, caregiver);
-
-        // if(!useDatabase) {
-        //     for (String str : meal_names) {
-        //         MealPlan mealPlan = new MealPlan();
-        //         mealPlan.name = str;
-        //         for (int i = 0; i < 365; i++) {
-        //             MealDay mealDay = new MealDay();
-        //             Meal breakfast = new Meal("Breakfast", 8, 10);
-        //             Meal lunch = new Meal("Lunch", 12, 30);
-        //             Meal dinner = new Meal("Dinner", 19, 30);
-        //             mealDay.meals.add(breakfast);
-        //             mealDay.meals.add(lunch);
-        //             mealDay.meals.add(dinner);
-        //             mealPlan.setDay(i, mealDay);
-        //         }
-        //
-        //         addMealPlan(mealPlan);
-        //     }
-        // }
     }
 
     private boolean useDatabase = true;
@@ -621,12 +566,21 @@ public class PatientMealStorage {
         }
         refresher_stack.remove(refresher_stack.size()-1);
     }
+    // adds a new caregiver if uuid isn't cached
     public int idFromCaregiverUUID(String uuid) {
         Caregiver caregiver = caregivers_by_uuid.get(uuid);
         if(caregiver == null) {
             return addCaregiver(uuid);
         } else {
             return caregivers.indexOf(caregiver);
+        }
+    }
+    public int idFromCaretakerUUID(String uuid) {
+        Caretaker caretaker = caretakers_by_uuid.get(uuid);
+        if(caretaker == null) {
+            return addCaretaker(uuid);
+        } else {
+            return caretakers.indexOf(caretaker);
         }
     }
     public int caretakerCountOfCaregiver(int caregiverId) {
@@ -641,6 +595,18 @@ public class PatientMealStorage {
         if(caregiver == null)
             return 0;
         return caregiver.getCaretakerByIndex(caretakerIndex);
+    }
+    public String uuidOfCaretaker(int caretakerId) {
+        Caretaker caretaker = caretakers.get(caretakerId);
+        if(caretaker == null)
+            return "";
+        return caretaker.uuid;
+    }
+    public String uuidOfCaregiver(int caregiverId) {
+        Caregiver caregiver = caregivers.get(caregiverId);
+        if(caregiver == null)
+            return "";
+        return caregiver.uuid;
     }
     // returns null if patientId was invalid
     public String nameOfCaretaker(int caretakerId) {

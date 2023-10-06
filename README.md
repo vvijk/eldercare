@@ -2,12 +2,16 @@
 Android Studio, Java, Firebase
 
 # Git tutorial
-git add .
-git commit -m "Meddelande"
-git push
-git pull
 
-git checkout <branchnamn>
+Stage: ```git add .```
+
+Commit: ```git commit -m "Meddelande"```
+
+Push: ```git pull``` kan behövas innan ```git push```
+
+Ändra branch: ```git checkout <branch-namn>```
+
+Skapa branch: ```git checkout -b <branch-namn>```
 
 ## Login/register UI
 ![](docs/img/login-register.png)
