@@ -18,6 +18,21 @@
         android:orientation="horizontal">
 
         <Button
+            android:id="@+id/btn_back"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:textSize="25sp"
+            android:backgroundTint="@color/purple_dark"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/str_back"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            app:cornerRadius="0dp"/>
+
+        <Button
             android:id="@+id/btn_meal_plan"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

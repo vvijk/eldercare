@@ -37,6 +37,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
     LinearLayout scrolledLayout=null;
     Button btn_mealPlan = null;
     Button btn_patients = null;
+    Button btn_back = null;
 
     View.OnClickListener btn_listener = null;
 
@@ -63,6 +64,9 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
         scrolledLayout = findViewById(R.id.meal_scroll);
         btn_mealPlan = findViewById(R.id.btn_meal_plan);
         btn_patients = findViewById(R.id.btn_patients);
+        btn_back = findViewById(R.id.btn_back);
+
+        btn_back.setOnClickListener(this);
 
         getMealStorage().initDBConnection();
 
@@ -125,6 +129,9 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
         } else if(addMeal != null) {
             saveAllMeals();
             getMealStorage().caregiver_template_addMeal(currentCaregiverId, getResources().getString(R.string.default_meal_name));
+        } else if(btn_back != null) {
+            saveAllMeals();
+            finish();
         }
     }
     void saveAllMeals() {
