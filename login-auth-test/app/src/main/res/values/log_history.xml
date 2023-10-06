@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- LOG HISTORY -->
+    <string name="log_header">Historik</string>
+    <string name="log_category">Kategori:</string>
+    <string name="log_patient">Patienter:</string>
+    <string name="Refresh">Återhämta historik</string>
+
+    <string-array name="log_category_array">
+        <item>Filtrera kategori</item>
+        <item>Alla</item>
+        <item>Patient tillagd</item>
+        <item>Patient modifierad</item>
+        <item>Måltid avbockad</item>
+        <item>Måltid missad</item>
+        <item>Nödfallsaviseringar</item>
+    </string-array>
+
+    <string name="log_patient_array_title">Filtrera patient</string>
+    <string name="all">Alla</string>
+
+    <!-- SEGMENTS FOR LOG MESSAGES -->
+    <string name="LOG_ADD_PATIENT_S1">lade till ny patient,</string>
+    <string name="LOG_MODIFY_PATIENT_S1">modifierade</string>
+    <string name="LOG_MODIFY_PATIENT_S2">\'s information</string>
+    <string name="LOG_EMERGENCY_S1">skickade en nödfallssignal</string>
+    <string name="LOG_MEAL_CONFIRM_S1">bekräftade att </string>
+    <string name="LOG_MEAL_CONFIRM_S2">ätits</string>
+    <string name="LOG_MEAL_SKIP_V1">missade att bekräfta första gången</string>
+    <string name="LOG_MEAL_SKIP_V2">missade att bekräfta andra gången</string>
+    <string name="LOG_MEAL_MISS_S1">missade att bekräfta sista gången, notis skickad till vårdgivare</string>
+
+
+
+
+
+
+
+
+</resources>
