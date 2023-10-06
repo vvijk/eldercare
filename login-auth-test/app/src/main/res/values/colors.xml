@@ -3,6 +3,8 @@
     <color name="black">#ff000000</color>
     <color name="white">#ffffffff</color>
     <color name="purple">#d0bcff</color>
+    <color name="red">#CD5C5C</color>
+    <color name="grey">#50BEBEBE</color>
 
 
     <!-- LOG COLORS -->
