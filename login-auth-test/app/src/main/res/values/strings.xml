@@ -46,14 +46,54 @@
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
-    <!-- WILLES -->
+   
+  <!-- WILLES -->
     <string name="next">Next</string>
     <string name="previous">Previous</string>
-    <string name="eldercare">ElderCare</string>
-    <string name="inställningar">Inställningar</string>
-    <string name="hem">Hem</string>
-    <string name="patienter">Patienter</string>
-    <string name="profil">Profil</string>
+    <string name="settings">Inställningar</string>
+    <string name="home">Hem</string>
+    <string name="patients">Patienter</string>
+    <string name="profile">Profil</string>
     <string name="menu_drawer_open">Drawer Open</string>
     <string name="menu_drawer_closed">Drawer Closed</string>
+    <string name="notifications">Notiser</string>
+    <string name="notis">Notis</string>
+    <string name="logout_home">Logga Ut</string>
+    <string name="name">Namn</string>
+    <string name="time">Tid</string>
+    <string name="default_channel_id">1337</string>
+    <string name="default_channel_name">caregiver_channel</string>
+    <string name="languageText">Välj språk</string>
+    <string name="swedish">Svenska</string>
+    <string name="english">Engelska</string>
+    <string name="msg_token_fmt" translatable="false">FCM registration Token: %s</string>
+    <string name="historylog">Historik</string>
+
+    <!-- Meal management -->
+    <string name="manage_meals">Manage meals</string>
+    <string name="str_template_meals">Template meals</string>
+    <string name="str_meal_plan">Meal plan</string>
+    <string name="str_no_plan">No plan</string>
+    <string name="meal_time_bad_format">Time of meal was incorrectly formatted</string>
+    <string name="meal_time_missing_colon">Meal time is missing a colon</string>
+    <string name="patient_meals_edit">Edit</string>
+    <string name="btn_replace_template_meal">Replace with template meal</string>
+    <string name="str_add_patient">Add patient</string>
+    <string name="str_add_meal">Add meal</string>
+    <string name="str_patients">Patients</string>
+    <string name="str_back">Back</string>
+<!--    <string name="str_back">&lt</string> &lt;!&ndash; &lt is converted to the character '<' &ndash;&gt;-->
+    <string name="default_meal_name">Unnamed</string>
+    <string name="str_delete">Delete</string>
+    <string name="str_week">Week</string>
+    <string name="str_no_meals">There are no meals</string>
+    <string name="str_no_description">No description</string>
+    <string name="str_monday">Monday</string>
+    <string name="str_tuesday">Tuesday</string>
+    <string name="str_wednesday">Wednesday</string>
+    <string name="str_thursday">Thursday</string>
+    <string name="str_friday">Friday</string>
+    <string name="str_saturday">Saturday</string>
+    <string name="str_sunday">Sunday</string>
+
 </resources>

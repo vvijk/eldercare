@@ -97,7 +97,7 @@ public class dbLibrary {
 
         caregiversRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
                     String userEmail = userSnapshot.child("email").getValue(String.class);
                     //Log.d("dbtest", "User email from database: " + userEmail);
@@ -113,7 +113,6 @@ public class dbLibrary {
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                // Handle any database errors
                 callback.onUserUidError(databaseError.getMessage());
             }
         });
@@ -126,8 +125,8 @@ public class dbLibrary {
         void onUserUidError(String errorMessage);
     }
     public void addCaretakerToGiver(String caregiverUID, String caretakerUID, final CaretakerAddCallback callback) {
-        Log.d("dbtest", "caregiverUID: " + caregiverUID);
-        Log.d("dbtest", "caretakerUID: " + caretakerUID);
+        //Log.d("dbtest", "caregiverUID: " + caregiverUID);
+        //Log.d("dbtest", "caretakerUID: " + caretakerUID);
         DatabaseReference caregiversRef = dbRef.child("caregivers").child(caregiverUID);
         DatabaseReference caretakersRef = dbRef.child("caretakers").child(caretakerUID);
 
