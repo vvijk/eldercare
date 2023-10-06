@@ -33,17 +33,7 @@
         android:layout_marginTop="30dp"
 
        />
-    <Button
-        android:id="@+id/notifications_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/notifications"
-        android:textStyle="bold"
-        android:textSize="30sp"
-        android:textColor="@color/white"
-        android:layout_marginTop="15dp"
 
-        />
     <Button
         android:id="@+id/settings_btn"
         android:layout_width="wrap_content"
@@ -66,18 +56,6 @@
         android:layout_marginTop="15dp"
 
         />
-    <LinearLayout
-        android:id="@+id/content"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical">
 
-    </LinearLayout>
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:menu="@menu/bottom_menu"
-        />
 
 </LinearLayout>

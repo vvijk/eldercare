@@ -60,6 +60,11 @@
     <string name="logout_home">Logga Ut</string>
     <string name="name">Namn</string>
     <string name="time">Tid</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="default_channel_id">1337</string>
+    <string name="default_channel_name">caregiver_channel</string>
+    <string name="languageText">Välj språk</string>
+    <string name="swedish">Svenska</string>
+    <string name="english">Engelska</string>
+    <string name="msg_token_fmt" translatable="false">FCM registration Token: %s</string>
+
 </resources>
