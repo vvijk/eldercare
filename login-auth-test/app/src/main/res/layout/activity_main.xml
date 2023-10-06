@@ -21,12 +21,12 @@
         android:text="Logout"
         android:id="@+id/logout">
     </Button>
-
     <Button
-        android:id="@+id/createpatient"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Create Patient" />
+        android:text="@string/manage_meals"
+        android:id="@+id/btn_goto_meal_management">
+    </Button>
 
     <Button
         android:id="@+id/goHome"
@@ -36,8 +36,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp">
+        android:layout_height="wrap_content">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/addCaretakerTextView"

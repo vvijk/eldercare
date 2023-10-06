@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,13 +23,14 @@ import com.google.firebase.messaging.FirebaseMessaging;
 public class MainActivity extends AppCompatActivity {
 
     FirebaseAuth auth;
-    Button button, homebutton;
-
-    Button createPatient, addCaretakerButton; //PLACEHOLDER
+    Button button;
+    Button addCaretakerButton;
     TextView textView;
     FirebaseUser user;
     TextInputEditText addCaretakerInputText;
     dbLibrary db;
+    
+    Button btn_mealManagement = null;
 
     final String TAG = "tcctag";
 
@@ -36,13 +38,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        
         auth = FirebaseAuth.getInstance();
         button = findViewById(R.id.logout);
-        homebutton = findViewById(R.id.goHome);
-        createPatient = findViewById(R.id.createpatient); //PLACEHOLDER
+
         textView = findViewById(R.id.user_details);
         user = auth.getCurrentUser();
+        
+        btn_mealManagement = findViewById(R.id.btn_goto_meal_management);
         addCaretakerButton = findViewById(R.id.addCaretakerToGiver);
         addCaretakerInputText = findViewById(R.id.addCaretakerTextView);
         db = new dbLibrary(MainActivity.this);
@@ -67,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
         createPatient.setOnClickListener(new View.OnClickListener(){ //PLACEHOLDER
            @Override
            public void onClick(View view) {
@@ -76,10 +80,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        homebutton.setOnClickListener(new View.OnClickListener(){ //PLACEHOLDER
+        btn_mealManagement.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), home_caregiver.class);
+                Intent intent = new Intent(getApplicationContext(), MealManagementActivity.class);
                 startActivity(intent);
             }
         });
@@ -88,11 +92,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String caretakerFromInput = String.valueOf(addCaretakerInputText.getText());
-
+                if (TextUtils.isEmpty(caretakerFromInput) || !android.util.Patterns.EMAIL_ADDRESS.matcher(caretakerFromInput).matches()) {
+                    Toast.makeText(MainActivity.this, "Ange epost i rätt format: test@test.com", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 db.getCaretakerUidByEmail(caretakerFromInput, new dbLibrary.UserUidCallback() {
                     @Override
                     public void onUserUidFound(String uid) {
-                        db.addCaretakerToGiver(db.getUserID(), caretakerFromInput, new dbLibrary.CaretakerAddCallback() {
+                        db.addCaretakerToGiver(db.getUserID(), uid, new dbLibrary.CaretakerAddCallback() {
                             @Override
                             public void onCaretakerAdded(String message) {
                                 Toast.makeText(MainActivity.this, "Användare: " + caretakerFromInput + " har lagts till i din patientlista!", Toast.LENGTH_SHORT).show();

@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
+        android:name=".util.GlobalApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -70,13 +71,23 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".CreatePatient"
-            android:exported="true"
-            android:theme="@style/Theme.Material3.Dark.NoActionBar" />
+
         <activity
             android:name=".MainActivity"
-            android:exported="true" />
+            android:exported="true">
+        </activity>
+
+        <activity
+            android:name=".MealManagementActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Material3.Dark.NoActionBar" />
+
+        <activity
+            android:name=".PatientMealActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Material3.Dark.NoActionBar">
+        </activity>
+
     </application>
 
 </manifest>
