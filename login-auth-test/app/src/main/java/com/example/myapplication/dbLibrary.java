@@ -112,7 +112,7 @@ public class dbLibrary {
                 callback.onUserUidNotFound();
             }
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
                 callback.onUserUidError(databaseError.getMessage());
             }
         });
