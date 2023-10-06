@@ -2,102 +2,27 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-
     <application
-        android:name=".util.GlobalApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
-        android:label="ElderCare"
+        android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Material3.Dark"
+        android:theme="@style/Theme.SimpleListViewDemo"
         tools:targetApi="31">
         <activity
-
-            android:name=".PatientProfile"
-            android:exported="true" />
-
-            android:name=".Settings"
-            android:exported="false" />
-
-        <service
-            android:name=".Notifications.FirebaseMessageService"
-            android:enabled="true"
+            android:name=".MainActivity"
             android:exported="true">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service> <!-- Skapar ett default channel id -->
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="@string/default_channel_id" /> <!-- Set custom default icon. This is used when no icon is set for incoming notification messages. -->
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/ic_notifications_active" />
-        <!--
- Set color used with incoming notification messages. This is used when no color is set for the incoming
-             notification message.
-        -->
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_color"
-            android:resource="@color/white" />
-
-        <service
-            android:name=".Notifications.FirebaseBackgroundService"
-            android:enabled="true"
-            android:exported="true" />
-
-        <activity
-            android:name=".Notifications.notifications_caregiver"
-            android:exported="false" />
-        <activity
-            android:name=".home_caregiver"
-            android:exported="false"
-            android:parentActivityName=".home_caregiver" />
-      
-        <activity
-            android:name=".ForgotPassword"
-            android:exported="false" />
-        <activity
-            android:name=".Register"
-            android:exported="false"
-            android:theme="@style/Theme.Material3.Dark.NoActionBar" />
-        <activity
-            android:name=".Login"
-            android:exported="true"
-            android:theme="@style/Theme.Material3.Dark.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".MainActivity"
-            android:exported="true"></activity>
-        <activity
-            android:name=".MealManagementActivity"
-            android:exported="true"
-            android:theme="@style/Theme.Material3.Dark.NoActionBar" />
-
-
-        <activity
-            android:name=".LogHistory"
-            android:exported="true"
-            android:theme="@style/Theme.Material3.Dark.NoActionBar"/>
-        
-      <activity
-            android:name=".DropdownAdapter"
-            android:exported="true"
-            android:theme="@style/Theme.Material3.Dark.NoActionBar"/>
-      <activity
-            android:name=".PatientMealActivity"
-            android:exported="true"
-            android:theme="@style/Theme.Material3.Dark.NoActionBar"></activity>
+        <activity android:name=".AlarmActivity"/>
+        <receiver android:name=".ReminderBroadcastReceiver"/>
     </application>
 
 </manifest>

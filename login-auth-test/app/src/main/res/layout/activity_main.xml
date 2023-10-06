@@ -1,56 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
     android:layout_height="match_parent"
-    tools:context=".Login"
-    android:padding="30dp">
+    android:background="@drawable/bubble_backgroundgreen"
+    tools:context=".MainActivity"
+    android:orientation="vertical"
+    android:padding="32dp">
+
 
     <TextView
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/user_details"
-        android:text="Hello">
-    </TextView>
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Logout"
-        android:id="@+id/logout">
-    </Button>
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/manage_meals"
-        android:id="@+id/btn_goto_meal_management">
-    </Button>
+        android:paddingBottom="16dp"
+        android:layout_gravity="center"
+        android:textStyle="bold"
+        android:text="Elder Care"
+        android:textColor="@color/black"
+        android:textSize="32sp"
+        android:layout_marginBottom="5dp"/>
 
-    <Button
-        android:id="@+id/goHome"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/home" />
-
-    <com.google.android.material.textfield.TextInputLayout
+    <ListView
+        android:id="@+id/listViewMeals"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="400dp"
+        />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/addCaretakerTextView"
-            android:hint="Lägg till Caretaker.."
-            android:textColorHint="@color/white"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"/>
-    </com.google.android.material.textfield.TextInputLayout>
     <Button
-        android:layout_width="wrap_content"
+        android:id="@+id/buttonAlarm"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Lägg till"
-        android:id="@+id/addCaretakerToGiver">
+        android:layout_marginTop="32dp"
+        android:text="LARMA"
+        android:textSize="32dp"
+        android:backgroundTint="@color/red"
+        >
     </Button>
-
 </LinearLayout>
