@@ -1,22 +1,17 @@
 package com.example.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.example.myapplication.util.GlobalApp;
-import com.example.myapplication.util.PatientMealStorage;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.ktx.Firebase;
+
+import java.util.Objects;
 
 
 public class PatientProfile extends AppCompatActivity {
@@ -45,34 +40,24 @@ public class PatientProfile extends AppCompatActivity {
         img_PatientAvatar      = findViewById(R.id.ImageViewPatientAvatar);
 
         /*Button to mealplan setup*/
-        btn_BackToMealPlan.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                /*
-                Intent intent = new Intent(getApplicationContext(), MealManagementActivity.class);
-                //intent.putExtra("caretakerId", patientId);
-                //intent.putExtra("caregiverId", currentCaregiverId); //TODO(Johan): Think this is needed for meal management to work correctly
-                startActivity(intent);
-                */
-
-                // NOTE(Emarioo): You can finish this activity to return to the the screen
-                //   where you see the patients meals (the previous activity).
-                finish();
-            }
-        });
+        btn_BackToMealPlan.setOnClickListener((View view) -> finish());
         btn_BackToMealPlan.setText(getString(R.string.str_BackToMealPlan));
 
         firebase = FirebaseAuth.getInstance();
-        dbRef = FirebaseDatabase.getInstance().getReference("users");
-
-        FirebaseFirestore store = FirebaseFirestore.getInstance();
+        dbRef = FirebaseDatabase.getInstance().getReference("users/caretakers");
 
         Intent intent = getIntent();
         caregiverUUID = intent.getStringExtra("caregiverUUID");
         caretakerUUID = intent.getStringExtra("caretakerUUID");
+
+        //Set patient preferences by grabbing from DB via UUID
+        if (caretakerUUID != null) {
+            dbRef.child(caretakerUUID).child("prefFood").get().addOnCompleteListener(task ->
+                    txt_PatientPreferences.setText(Objects.requireNonNull(task.getResult().getValue()).toString())
+            );
+        }
+
         // TODO(Emarioo): Now we have the uuid for the caretaker. Next thing would be to ask the
         //  database for some information about the caretaker (patient).
-
-        // Toast.makeText(this, "P: "+caretakerUUID, Toast.LENGTH_LONG).show(); // Here for debug purposes, you can remove this
     }
 }
