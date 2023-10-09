@@ -5,6 +5,7 @@ import static com.example.myapplication.Helpers.isStringInArray;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -14,7 +15,14 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 
 
 /* TODO:
@@ -28,14 +36,9 @@ import java.util.ArrayList;
 *         - Category
 *         - Meal
 *   Implement patient spinner, and filtering by patient.
-*   Polish checkbox behavior
-*       When all is checked, check all other checkboxes.
-*       When another checkbox is unchecked, uncheck all.
-*       Auto-refresh log when checkbox updates (Probably impossible to do without comprehensive refactor.)
 *   Add more log messages
 *       Consult with group for suggestions on these.
 *   Possibly add a sort by timestamp
-*
 *
 *   TODO: Thoroughly test when all is implemented.
 * */
@@ -43,12 +46,20 @@ import java.util.ArrayList;
 
 public class LogHistory extends AppCompatActivity {
     //Page for viewing Logs.
+
+    dbLibrary db;
+    String currentUser;
+
+
     Context context;
     Spinner categorySpinner, patientSpinner;
     Button refreshLog;
     LinearLayout logTextBox;
     ArrayList<DropdownItem> categoryDDIs, patientDDIs;
     ArrayList<LogItem> logs;
+
+    CareGiver caregiver;
+    ArrayList<CareTaker> patients;
 
     DropdownAdapter viewCategory;
     DropdownAdapter viewPatients;
@@ -57,6 +68,7 @@ public class LogHistory extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         context = getApplicationContext();
+
 
         setContentView(R.layout.activity_log_history);
         categorySpinner = findViewById(R.id.logCategorySpinner);
@@ -67,8 +79,13 @@ public class LogHistory extends AppCompatActivity {
         logs = generateDummyLogItems();
         logTextBox = findViewById(R.id.logItemBox);
 
+        initData();
+        initUI();
+
         populateCategorySpinner(categorySpinner);
-        //populatePatientSpinner(patientSpinner);
+        populatePatientSpinner(patientSpinner);
+
+
 
         setLogTextBox(logs);
 
@@ -79,6 +96,17 @@ public class LogHistory extends AppCompatActivity {
             }
         });
     }
+
+    private void initData(){
+        this.db = new dbLibrary(context);
+        this.caregiver = db.fetchCaregiver();
+        fetchPatients();
+        fetchLogs();
+    }
+    private void initUI(){
+
+    }
+
 
     /*TODO: PLACEHOLDER START
        Denna borde bytas ut mot en funktion som hämtar X antal loggar från databasen. "generateLogItems()"
@@ -117,23 +145,48 @@ public class LogHistory extends AppCompatActivity {
             DDI.setSelected(true);
             categoryDDIs.add(DDI);
         }
-        DropdownAdapter viewCategory = new DropdownAdapter(getApplicationContext(), 0, categoryDDIs);
+        DropdownAdapter viewCategory = new DropdownAdapter(context, 0, categoryDDIs);
         toPopulate.setAdapter(viewCategory);
     }
 
     private void populatePatientSpinner(Spinner toPopulate){
         ArrayList<String> patient_texts = new ArrayList<>();
         patient_texts.add(getString(R.string.log_patient_array_title));
-        patient_texts.add(getString(R.string.all));
-        ArrayList<String> fetched = fetchPatients();
-        patient_texts.addAll(fetched);
+        for (int i = 0; i < patients.size(); i++){
+            patient_texts.add(patients.get(i).getFullName());
+        }
+        patientDDIs = new ArrayList<>();
+        for (int i = 0; i < patient_texts.size(); i++){
+            DropdownItem DDI = new DropdownItem();
+            DDI.setText(patient_texts.get(i));
+            DDI.setSelected(true);
+            patientDDIs.add(DDI);
+        }
+        DropdownAdapter viewPatients = new DropdownAdapter(context,0, patientDDIs);
+        toPopulate.setAdapter(viewPatients);
     }
 
-    private ArrayList<String> fetchPatients(){
-        //fetches all patients that the signed in caregiver has. used for populating the patient spinner.
-        return null;
+    private void fetchPatients(){
+        //fetches all patients that the signed in caregiver has. used for populating the patient spinner and fetching logs.
+        List<String> caretakerIDs = this.caregiver.getCaretakers();
+        this.patients = new ArrayList<CareTaker>();
+        if (caretakerIDs != null) {
+            for (int i = 0; i < caretakerIDs.size(); i++){
+                this.patients.add(db.fetchCaretaker(caretakerIDs.get(i)));
+            }
+        }
     }
 
+    private void fetchLogs(){
+        this.logs = new ArrayList<>();
+        for (int i = 0; i < patients.size(); i++){
+            ArrayList<LogItem> patientLogs = patients.get(i).getLogs();
+            this.logs.addAll(patientLogs);
+        }
+    }
+    private void sortLogsByTimestamp(){
+        //TODO: implementera
+    }
 
     private String generateLogMessage(LogItem logItem) {
         String out = logItem.getFormattedTimestamp() + " ";

@@ -20,10 +20,10 @@ public class DropdownAdapter extends ArrayAdapter<DropdownItem> {
     private DropdownAdapter dropdownAdapter;
     private boolean isFromView = false;
 
-    public DropdownAdapter(Context context, int resource, List<DropdownItem> objects) {
+    public DropdownAdapter(Context context, int resource, ArrayList<DropdownItem> objects) {
         super(context, resource, objects);
         this.mContext = context;
-        this.listState = (ArrayList<DropdownItem>) objects;
+        this.listState = objects;
         this.dropdownAdapter = this;
     }
 

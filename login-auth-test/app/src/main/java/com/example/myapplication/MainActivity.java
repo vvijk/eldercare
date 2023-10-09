@@ -31,14 +31,11 @@ import java.util.Set;
 public class MainActivity extends AppCompatActivity {
 
     FirebaseAuth auth;
-    Button button;
-    Button addCaretakerButton;
+    Button logout, addCaretakerButton, btn_mealManagement, homeButton;
     TextView textView;
     FirebaseUser user;
     TextInputEditText addCaretakerInputText;
     dbLibrary db;
-    
-    Button btn_mealManagement = null;
 
     final String TAG = "tcctag";
 
@@ -48,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         
         auth = FirebaseAuth.getInstance();
-        button = findViewById(R.id.logout);
+        logout = findViewById(R.id.logout);
 
         textView = findViewById(R.id.user_details);
         user = auth.getCurrentUser();
@@ -56,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         btn_mealManagement = findViewById(R.id.btn_goto_meal_management);
         addCaretakerButton = findViewById(R.id.addCaretakerToGiver);
         addCaretakerInputText = findViewById(R.id.addCaretakerTextView);
+        homeButton = findViewById(R.id.goHome);
         db = new dbLibrary(MainActivity.this);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -68,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        button.setOnClickListener(new View.OnClickListener() {
+        logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 FirebaseAuth.getInstance().signOut();
@@ -82,6 +80,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), MealManagementActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        homeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), home_caregiver.class);
                 startActivity(intent);
             }
         });

@@ -8,7 +8,6 @@
 
     <string-array name="log_category_array">
         <item>Filtrera kategori</item>
-        <item>Alla</item>
         <item>Patient tillagd</item>
         <item>Patient modifierad</item>
         <item>Måltid avbockad</item>

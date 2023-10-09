@@ -191,6 +191,42 @@ public class dbLibrary {
         });
     }
 
+    public CareGiver fetchCaregiver(){
+        DatabaseReference uidRef = dbRef.child("caregivers").child(this.getUserID());
+        final CareGiver[] caregiver = new CareGiver[1];
+        ValueEventListener valueEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                caregiver[0] = dataSnapshot.getValue(CareGiver.class);
+                Log.d("TAG", caregiver[0].getFirstName());
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d("TAG", databaseError.getMessage()); //TODO: Don't ignore errors!
+            }
+        };
+        uidRef.addListenerForSingleValueEvent(valueEventListener);
+        return caregiver[0];
+    }
+
+    public CareTaker fetchCaretaker(String uid){
+        DatabaseReference uidRef = dbRef.child("caretakers").child(uid);
+        final CareTaker[] caretaker = new CareTaker[1];
+        ValueEventListener valueEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                caretaker[0] = dataSnapshot.getValue(CareTaker.class);
+                Log.d("TAG", caretaker[0].getFirstName());
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d("TAG", databaseError.getMessage()); //TODO: Don't ignore errors!
+            }
+        };
+        uidRef.addListenerForSingleValueEvent(valueEventListener);
+        return caretaker[0];
+    }
+
     public interface CaretakerAddCallback {
         void onCaretakerAdded(String message);
 

@@ -37,7 +37,7 @@ public class Login extends AppCompatActivity {
         // else caretaker
 
         if(currentUser != null){
-            Intent intent =  new Intent(getApplicationContext(), MainActivity.class);
+            Intent intent =  new Intent(getApplicationContext(), home_caregiver.class);
             startActivity(intent);
             finish();
         }
