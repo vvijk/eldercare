@@ -35,9 +35,33 @@ public class Login extends AppCompatActivity {
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
-            Intent intent =  new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(intent);
-            finish();
+            FirebaseUser user = mAuth.getCurrentUser();
+            db.isCaregiver(user.getUid(), new dbLibrary.CaregiverCheckCallback() {
+                @Override
+                public void onFound(boolean isCaregiver) {
+                    // Sign in success, update UI with the signed-in user's information
+                    Intent intent;
+                    if(isCaregiver){
+                        Toast.makeText(getApplicationContext(), "Successful pre.login as: caregiver!", Toast.LENGTH_SHORT).show();
+                        intent = new Intent(getApplicationContext(), home_caregiver.class);
+                    }else{
+                        Toast.makeText(getApplicationContext(), "Successful pre-login as: caretaker!", Toast.LENGTH_SHORT).show();
+                        intent = new Intent(getApplicationContext(), Home_caretaker.class);
+                    }
+                    startActivity(intent);
+                    finish();
+                }
+
+                @Override
+                public void onNotFound() {
+                    Log.d("dbtest", "Is neither a caretake nor caregiver");
+                }
+
+                @Override
+                public void onFoundError(String errorMessage) {
+                    Log.d("dbtest", "Database ERROR!!");
+                }
+            });
         }
     }
 
@@ -87,7 +111,7 @@ public class Login extends AppCompatActivity {
 
                                 db.isCaregiver(user.getUid(), new dbLibrary.CaregiverCheckCallback() {
                                     @Override
-                                    public void onFoundType(boolean isCaregiver) {
+                                    public void onFound(boolean isCaregiver) {
                                         if (task.isSuccessful()) {
                                             // Sign in success, update UI with the signed-in user's information
                                             Intent intent;
@@ -107,12 +131,12 @@ public class Login extends AppCompatActivity {
                                     }
 
                                     @Override
-                                    public void onIsCaregiverNotFound() {
+                                    public void onNotFound() {
                                         Log.d("dbtest", "Is neither a caretake nor caregiver");
                                     }
 
                                     @Override
-                                    public void onIsCaregiverError(String errorMessage) {
+                                    public void onFoundError(String errorMessage) {
                                         Log.d("dbtest", "Database ERROR!!");
                                     }
                                 });

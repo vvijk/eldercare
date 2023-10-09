@@ -207,7 +207,7 @@ public class dbLibrary {
             public void onDataChange(@NonNull DataSnapshot caregiverSnapshot) {
                 if (caregiverSnapshot.hasChild(uid)) {
                     // The UID exists in the caregivers node, indicating that the user is a caregiver
-                    callback.onFoundType(true);
+                    callback.onFound(true);
                 } else {
                     // The UID does not exist in the caregivers node, check the caretakers node
                     caretakersRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -215,18 +215,18 @@ public class dbLibrary {
                         public void onDataChange(@NonNull DataSnapshot caretakerSnapshot) {
                             if (caretakerSnapshot.hasChild(uid)) {
                                 // The UID exists in the caretakers node, indicating that the user is a caretaker
-                                callback.onFoundType(false);
+                                callback.onFound(false);
                             } else {
                                 // The UID does not exist in either caregivers or caretakers node
                                 // This could be handled as needed (e.g., not found or neither caregiver nor caretaker)
-                                callback.onIsCaregiverNotFound();
+                                callback.onNotFound();
                             }
                         }
 
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
                             // Handle any database errors for the caretakers node query
-                            callback.onIsCaregiverError(databaseError.getMessage());
+                            callback.onFoundError(databaseError.getMessage());
                         }
                     });
                 }
@@ -235,17 +235,17 @@ public class dbLibrary {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 // Handle any database errors for the caregivers node query
-                callback.onIsCaregiverError(databaseError.getMessage());
+                callback.onFoundError(databaseError.getMessage());
             }
         });
     }
 
     public interface CaregiverCheckCallback {
-        void onFoundType(boolean isCaregiver);
+        void onFound(boolean isCaregiver);
 
-        void onIsCaregiverNotFound();
+        void onNotFound();
 
-        void onIsCaregiverError(String errorMessage);
+        void onFoundError(String errorMessage);
     }
 
 }
