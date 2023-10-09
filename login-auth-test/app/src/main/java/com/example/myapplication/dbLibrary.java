@@ -14,7 +14,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class dbLibrary {
     private FirebaseAuth mAuth;
@@ -195,6 +194,58 @@ public class dbLibrary {
         void onCaretakerAdded(String message);
 
         void onCaretakerAddError(String errorMessage);
+    }
+
+    //Ta in UID, return true/false if caretaker or caregiver
+    public void isCaregiver(String uid, final CaregiverCheckCallback callback) {
+        DatabaseReference caregiversRef = dbRef.child("caregivers");
+        DatabaseReference caretakersRef = dbRef.child("caretakers");
+
+        // Check if the UID exists in the caregivers node
+        caregiversRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot caregiverSnapshot) {
+                if (caregiverSnapshot.hasChild(uid)) {
+                    // The UID exists in the caregivers node, indicating that the user is a caregiver
+                    callback.onFound(true);
+                } else {
+                    // The UID does not exist in the caregivers node, check the caretakers node
+                    caretakersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot caretakerSnapshot) {
+                            if (caretakerSnapshot.hasChild(uid)) {
+                                // The UID exists in the caretakers node, indicating that the user is a caretaker
+                                callback.onFound(false);
+                            } else {
+                                // The UID does not exist in either caregivers or caretakers node
+                                // This could be handled as needed (e.g., not found or neither caregiver nor caretaker)
+                                callback.onNotFound();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            // Handle any database errors for the caretakers node query
+                            callback.onFoundError(databaseError.getMessage());
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle any database errors for the caregivers node query
+                callback.onFoundError(databaseError.getMessage());
+            }
+        });
+    }
+
+    public interface CaregiverCheckCallback {
+        void onFound(boolean isCaregiver);
+
+        void onNotFound();
+
+        void onFoundError(String errorMessage);
     }
 
 }

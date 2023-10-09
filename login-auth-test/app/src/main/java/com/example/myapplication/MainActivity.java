@@ -1,19 +1,32 @@
 package com.example.myapplication;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
     
     Button btn_mealManagement = null;
 
+    final String TAG = "tcctag";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         
         auth = FirebaseAuth.getInstance();
         button = findViewById(R.id.logout);
+
         textView = findViewById(R.id.user_details);
         user = auth.getCurrentUser();
         
@@ -41,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
         addCaretakerButton = findViewById(R.id.addCaretakerToGiver);
         addCaretakerInputText = findViewById(R.id.addCaretakerTextView);
         db = new dbLibrary(MainActivity.this);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         if(user == null){
             Intent intent = new Intent(getApplicationContext(), Login.class);
@@ -49,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         }else{
             textView.setText(user.getEmail());
         }
+
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,5 +122,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // Handle the Up button click (e.g., navigate back)
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

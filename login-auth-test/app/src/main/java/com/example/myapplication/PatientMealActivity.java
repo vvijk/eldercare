@@ -28,7 +28,10 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
     LinearLayout scrolledLayout=null;
     TextView text_name=null;
     Button btn_back=null;
+    Button btn_info=null;
 
+    String curCaretakerUUID = null;
+    String curCaregiverUUID = null;
     int curCaretakerId = 0;
     int curCaregiverId = 0;
 
@@ -50,23 +53,32 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
         scrolledLayout = findViewById(R.id.week_scroll);
         text_name = findViewById(R.id.text_patient_name);
         btn_back = findViewById(R.id.manage_patient_back);
+        btn_info = findViewById(R.id.btn_patient_info);
         // layout_description = findViewById(R.id.meal_patient_description);
         btn_back.setOnClickListener(this);
+        btn_info.setOnClickListener(this);
 
         Intent intent = getIntent();
-        curCaregiverId = intent.getIntExtra("caregiverId", -1);
-        if(curCaregiverId == -1) {
+
+        curCaregiverUUID = intent.getStringExtra("caregiverUUID");
+        if(curCaregiverUUID != null) {
+            curCaregiverId = getMealStorage().idFromCaregiverUUID(curCaregiverUUID);
+        } else {
             // bad, throw error?
         }
-        curCaretakerId = intent.getIntExtra("caretakerId", -1);
-        // int mealPlanId = intent.getIntExtra("mealPlanId", 0);
-        if(curCaretakerId != -1) {
+        curCaretakerUUID = intent.getStringExtra("caretakerUUID");
+        if(curCaretakerUUID != null) {
+            curCaretakerId = getMealStorage().idFromCaretakerUUID(curCaretakerUUID);
             String name = getMealStorage().nameOfCaretaker(curCaretakerId);
             if (name != null) {
                 text_name.setText(name);
             } else {
+                // TODO(Emarioo): This may happen if the name of caretaker isn't cached.
+                //  PatientMealStorage will not fetch caretaker's name. If the name was fetched by
+                //  MealManagementActivity before you got to this activity things will be fine.
+                //  If not, you end up here.
                 // error?
-                text_name.setText("null");
+                text_name.setText("Missing name");
             }
         } else {
             // error?
@@ -105,6 +117,12 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
         } else if(replaceMeal_dayIndex != null) {
             saveAllMeals();
             getMealStorage().caretaker_replaceMealsWithTemplate(curCaretakerId, replaceMeal_dayIndex, curCaregiverId);
+        } else if(view == btn_info) {
+            saveAllMeals();
+            Intent intent = new Intent(getApplicationContext(), PatientProfile.class);
+            intent.putExtra("caretakerUUID", curCaretakerUUID);
+            intent.putExtra("caregiverUUID", curCaregiverUUID);
+            startActivity(intent);
         }
     }
 
@@ -133,7 +151,7 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
             int monthNumber = calendar.get(Calendar.MONTH)+1;
             int dayNumber = calendar.get(Calendar.DAY_OF_MONTH);
 
-            int weekDayIndex =  (7 + sunday_first_weekDayIndex - 1) % 7;
+            int weekDayIndex = (7 + sunday_first_weekDayIndex - 1) % 7;
 
             // item layout contains the name of the day (monday 3/5) and the meals that day (breakfast, lunch...).
             LinearLayout dayLayout = new LinearLayout(this);
@@ -186,22 +204,23 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
 
             calendar.add(Calendar.DAY_OF_YEAR, 1);
         }
+
     }
     void refreshMeals(LinearLayout mealLayout, int weekDayIndex) {
-        int mealCount = getMealStorage().caretaker_countOfMeals(curCaretakerId, weekDayIndex);
+        // int mealCount = getMealStorage().caretaker_countOfMeals(curCaretakerId, weekDayIndex);
 
-        int[] sortedMeals_index = new int[mealCount];
-        int[] sortedMeals_time = new int[mealCount];
-        int usedCount = 0;
-        for(int mealIndex=0;mealIndex<mealCount;mealIndex++) {
-            if(!getMealStorage().caretaker_isMealIndexValid(curCaretakerId, weekDayIndex, mealIndex))
-                continue;
-            int hour = getMealStorage().caretaker_hourOfMeal(curCaretakerId, weekDayIndex, mealIndex);
-            int minute = getMealStorage().caretaker_minuteOfMeal(curCaretakerId, weekDayIndex, mealIndex);
-            sortedMeals_time[usedCount] = hour*100+minute;
-            sortedMeals_index[usedCount] = mealIndex;
-            usedCount++;
-        }
+        int[] sortedMeals_index = getMealStorage().caretaker_sortedMealIndices(curCaretakerId, weekDayIndex);
+        int usedCount = sortedMeals_index.length;
+        // int[] sortedMeals_time = new int[mealCount];
+        // for(int mealIndex=0;mealIndex<mealCount;mealIndex++) {
+        //     if(!getMealStorage().caretaker_isMealIndexValid(curCaretakerId, weekDayIndex, mealIndex))
+        //         continue;
+        //     int hour = getMealStorage().caretaker_hourOfMeal(curCaretakerId, weekDayIndex, mealIndex);
+        //     int minute = getMealStorage().caretaker_minuteOfMeal(curCaretakerId, weekDayIndex, mealIndex);
+        //     sortedMeals_time[usedCount] = hour*100+minute;
+        //     sortedMeals_index[usedCount] = mealIndex;
+        //     usedCount++;
+        // }
         if(usedCount == 0){
             TextView textView = new TextView(this);
             textView.setText(getResources().getString(R.string.str_no_meals));
@@ -213,22 +232,22 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
             mealLayout.addView(textView);
         } else {
             // TODO(Emarioo): Don't use bubble sort, you are better than this
-            for(int i=0;i<usedCount;i++) {
-                boolean swapped = false;
-                for(int j=0;j<usedCount - 1 - i;j++) {
-                    if (sortedMeals_time[j+1] < sortedMeals_time[j]) {
-                        int tmp = sortedMeals_time[j];
-                        sortedMeals_time[j] = sortedMeals_time[j+1];
-                        sortedMeals_time[j+1] = tmp;
-                        tmp = sortedMeals_index[j];
-                        sortedMeals_index[j] = sortedMeals_index[j+1];
-                        sortedMeals_index[j+1] = tmp;
-                        swapped = true;
-                    }
-                }
-                if(!swapped)
-                    break;
-            }
+            // for(int i=0;i<usedCount;i++) {
+            //     boolean swapped = false;
+            //     for(int j=0;j<usedCount - 1 - i;j++) {
+            //         if (sortedMeals_time[j+1] < sortedMeals_time[j]) {
+            //             int tmp = sortedMeals_time[j];
+            //             sortedMeals_time[j] = sortedMeals_time[j+1];
+            //             sortedMeals_time[j+1] = tmp;
+            //             tmp = sortedMeals_index[j];
+            //             sortedMeals_index[j] = sortedMeals_index[j+1];
+            //             sortedMeals_index[j+1] = tmp;
+            //             swapped = true;
+            //         }
+            //     }
+            //     if(!swapped)
+            //         break;
+            // }
             for(int i=0;i<usedCount;i++) {
                 int mealIndex = sortedMeals_index[i];
                 if(!getMealStorage().caretaker_isMealIndexValid(curCaretakerId, weekDayIndex, mealIndex))
@@ -341,7 +360,7 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
             addButton.setBackground(shape);
             addButton.setTag(R.id.tag_add_meal_at_day, weekDayIndex);
             addButton.setOnClickListener(this);
-            addButton.setTextColor(getResources().getColor(R.color.white));
+            addButton.setTextColor(getResources().getColor(R.color.black));
             footLayout.addView(addButton);
         }
         {
@@ -358,9 +377,33 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
             replaceButton.setBackground(shape);
             replaceButton.setTag(R.id.tag_replace_template_meal, weekDayIndex);
             replaceButton.setOnClickListener(this);
-            replaceButton.setTextColor(getResources().getColor(R.color.white));
+            replaceButton.setTextColor(getResources().getColor(R.color.black));
             footLayout.addView(replaceButton);
         }
+//        LinearLayout bottomLayout = new LinearLayout(scrolledLayout.getContext());
+//        bottomLayout.setOrientation(LinearLayout.HORIZONTAL);
+//        bottomLayout.setGravity(Gravity.CENTER);
+//        bottomLayout.setLayoutParams(new ViewGroup.LayoutParams(
+//                ViewGroup.LayoutParams.MATCH_PARENT,
+//                ViewGroup.LayoutParams.WRAP_CONTENT));
+//        scrolledLayout.addView(bottomLayout);
+//
+//        Button replaceButton = new Button(bottomLayout.getContext());
+//        replaceButton.setAllCaps(false);
+//        replaceButton.setText(getResources().getString(R.string.btn));
+//        replaceButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18); // TODO(Emarioo): Don't hardcode text size
+//        replaceButton.setLayoutParams(new ViewGroup.LayoutParams(
+//                ViewGroup.LayoutParams.WRAP_CONTENT,
+//                ViewGroup.LayoutParams.WRAP_CONTENT));
+//        GradientDrawable shape = new GradientDrawable();
+//        shape.setCornerRadius(16);
+//        shape.setColor(getResources().getColor(R.color.purple));
+//        replaceButton.setBackground(shape);
+//        replaceButton.setOnClickListener(this);
+//        replaceButton.setTextColor(getResources().getColor(R.color.white));
+//        bottomLayout.addView(replaceButton);
+
+
     }
 
     void refreshMealHeader(LinearLayout headLayout, boolean editable, String mealName, String mealTime) {
@@ -406,7 +449,6 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT));
         headLayout.addView(view_mealName);
-
     }
     void saveAllMeals() {
         for(int i=0;i<scrolledLayout.getChildCount();i++) {
