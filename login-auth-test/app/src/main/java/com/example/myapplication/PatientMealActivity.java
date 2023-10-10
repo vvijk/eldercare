@@ -89,6 +89,17 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
                 refreshDays();
             }
         });
+
+        int caretakerId = getMealStorage().idFromCaretakerUUID(curCaretakerUUID);
+        getMealStorage().pushRefresher_caretaker(caretakerId, new Runnable() {
+            @Override
+            public void run() {
+                int count = getMealStorage().caretaker_countOfMeals(caretakerId, 4);
+                getMealStorage().caretaker_isMealIndexValid(caretakerId, 4, count-1);
+                String name = getMealStorage().caretaker_nameOfMeal(curCaretakerId, 4, 1);
+            }
+        });
+
     }
     @Override
     protected void onDestroy() {

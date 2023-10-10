@@ -70,6 +70,7 @@ public class PatientMealStorage {
         public int hour=12;
         public int minute=0;
         public String desc="";
+        public boolean eaten=false;
     }
     public class MealDay {
         ArrayList<Meal> meals = new ArrayList<>();
@@ -264,6 +265,9 @@ public class PatientMealStorage {
                     tmp = snapshot.child("desc").getValue(String.class);
                     if (tmp != null)
                         meal.desc = (String) tmp;
+                    tmp = snapshot.child("eaten").getValue(Boolean.class);
+                    if (tmp != null)
+                        meal.eaten = (Boolean) tmp;
 
     //                System.out.println("[Child listener] plan added "+name);
 
@@ -505,6 +509,9 @@ public class PatientMealStorage {
                         // pushRefresher takes caretakerId as argument which means that the caretaker exists and getCaretaker shouldn't return null.
                     }
 
+                    boolean[] days_to_remove = new boolean[7]; // Seven days in a week
+                    for(int i=0;i<days_to_remove.length;i++) days_to_remove[i] = true;
+
                     Iterator<DataSnapshot> day_iterator = snapshot.getChildren().iterator();
                     while(day_iterator.hasNext()) {
                         DataSnapshot daySnapshot = day_iterator.next();
@@ -513,10 +520,12 @@ public class PatientMealStorage {
                         MealDay mealDay = caretaker.getDay(weekDayIndex);
                         if(mealDay == null) {
                             throw new RuntimeException("Meal day was null, day index: "+weekDayIndex);
+                        } else {
+                            days_to_remove[weekDayIndex] = false;
                         }
 
                         // TODO: Optimize, don't clone meals
-                        ArrayList<Meal> temp_meals = (ArrayList<Meal>) mealDay.meals.clone();
+                        ArrayList<Meal> meals_to_remove = (ArrayList<Meal>) mealDay.meals.clone();
 
                         Iterator<DataSnapshot> iterator = daySnapshot.getChildren().iterator();
                         while (iterator.hasNext()) {
@@ -529,7 +538,7 @@ public class PatientMealStorage {
                                 meal.key = mealKey;
                                 mealDay.addMeal(meal);
                             } else {
-                                temp_meals.remove(meal);
+                                meals_to_remove.remove(meal);
                             }
                             Object tmp = childSnapshot.child("name").getValue(String.class);
                             if (tmp != null)
@@ -543,11 +552,19 @@ public class PatientMealStorage {
                             tmp = childSnapshot.child("minute").getValue(Integer.class);
                             if (tmp != null)
                                 meal.minute = (Integer) tmp;
+                            tmp = childSnapshot.child("eaten").getValue(Boolean.class);
+                            if (tmp != null)
+                                meal.eaten = (Boolean) tmp;
                         }
 
-                        for(Meal meal : temp_meals) {
+                        for(Meal meal : meals_to_remove) {
                             if(meal != null)
                                 mealDay.removeMeal(meal.key);
+                        }
+                    }
+                    for(int i=0;i<days_to_remove.length;i++) {
+                        if(days_to_remove[i]) {
+                            caretaker.setDay(i,null);
                         }
                     }
 
@@ -720,6 +737,9 @@ public class PatientMealStorage {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 db_meals.child(caretaker.uuid).child(dayref(dayIndex)).setValue(snapshot.getValue());
+                for(DataSnapshot snap : snapshot.getChildren()) {
+                    db_meals.child(caretaker.uuid).child(dayref(dayIndex)).child(snap.getKey()).child("eaten").setValue(false);
+                }
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -886,6 +906,18 @@ public class PatientMealStorage {
             return 0;
         return meal.minute;
     }
+    public boolean caretaker_eatenOfMeal(int caretakerId, int weekDay, int mealIndex) {
+        Caretaker caretaker = getCaretaker(caretakerId);
+        if(caretaker == null)
+            return false;
+        MealDay day = caretaker.days[weekDay];
+        if(day == null)
+            return false;
+        Meal meal = day.getMeal(mealIndex);
+        if(meal == null)
+            return false;
+        return meal.eaten;
+    }
     public String caretaker_descriptionOfMeal(int caretakerId, int weekDay, int mealIndex) {
         Caretaker caretaker = getCaretaker(caretakerId);
         if(caretaker == null)
@@ -921,6 +953,7 @@ public class PatientMealStorage {
             mealReference.child("hour").setValue(12);
             mealReference.child("minute").setValue(0);
             mealReference.child("desc").setValue("");
+            mealReference.child("eaten").setValue(false);
         }
     }
     public void caretaker_deleteMeal(int caretakerId, int weekDay, int mealIndex){
@@ -949,6 +982,20 @@ public class PatientMealStorage {
             if(meal == null)
                 return;
             db_meals.child(caretaker.uuid).child(dayref(weekDay)).child(meal.key).child("name").setValue(name);
+        }
+    }
+    public void caretaker_setEatenOfMeal(int caretakerId, int weekDay, int mealIndex, boolean eaten) {
+        if(useDatabase) {
+            Caretaker caretaker = getCaretaker(caretakerId);
+            if(caretaker == null)
+                return;
+            MealDay day = caretaker.days[weekDay];
+            if(day == null)
+                return;
+            Meal meal = day.getMeal(mealIndex);
+            if(meal == null)
+                return;
+            db_meals.child(caretaker.uuid).child(dayref(weekDay)).child(meal.key).child("eaten").setValue(eaten);
         }
     }
     public void caretaker_setHourOfMeal(int caretakerId, int weekDay, int mealIndex, int hour) {
