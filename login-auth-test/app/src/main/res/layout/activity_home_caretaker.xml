@@ -8,8 +8,8 @@
     android:background="@drawable/bubble_backgroundgreen"
     tools:context=".Home_caretaker"
     android:orientation="vertical"
-    android:padding="32dp">
-
+    android:id="@+id/layout_home_caretaker"
+    android:padding="5dp">
 
     <TextView
         android:id="@+id/textView"
@@ -23,6 +23,8 @@
         android:textSize="32sp"
         android:layout_marginBottom="5dp"/>
 
+    <tag android:id="@+id/tag_no_meals"></tag>
+
     <ListView
         android:id="@+id/listViewMeals"
         android:layout_width="match_parent"
@@ -34,7 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:text="LARMA"
+        android:text="@string/str_emergency_alert"
         android:textSize="32dp"
         android:backgroundTint="@color/red">
     </Button>
