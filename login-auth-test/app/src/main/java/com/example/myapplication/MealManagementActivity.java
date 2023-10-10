@@ -325,12 +325,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
                 headLayout.setGravity(Gravity.LEFT);
                 itemLayout.addView(headLayout);
 
-                String timeStr = "";
-                if (hour < 10) timeStr += "0";
-                timeStr += hour + ":";
-                if (minute < 10) timeStr += "0";
-                timeStr += minute;
-                refreshMealHeader(headLayout, true, name, timeStr);
+                refreshMealHeader(headLayout, true, name, Helpers.FormatTime(hour, minute));
 
                 itemLayout.setBackgroundColor(getResources().getColor(R.color.dry_green_brigher));
 

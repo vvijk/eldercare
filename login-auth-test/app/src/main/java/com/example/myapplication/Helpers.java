@@ -114,4 +114,17 @@ public class Helpers {
     private void showToast(String message) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
+
+    static public String FormatTime(int hour, int minute) {
+        String out="";
+        if(hour<10)
+            out+= "0";
+        out += hour;
+        out += ":";
+        if(minute<10)
+            out+= "0";
+        out += minute;
+        return out;
+
+    }
 }

@@ -107,4 +107,8 @@
 <!--    <string name="str_sunday">Sunday</string>-->
     <string name="str_BackToMealPlan">Tillbaka till måltidsplan</string>
 
+    <!--  Home for caretaker  -->
+    <string name="str_emergency_alert">LARMA</string>
+<!--    <string name="str_emergency_alert">ALERT</string> engelsk version -->
+
 </resources>
