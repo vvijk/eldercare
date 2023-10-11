@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.myapplication.util.GlobalApp;
 import com.example.myapplication.util.PatientMealStorage;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -44,7 +45,7 @@ public class Home_caretaker extends AppCompatActivity implements AdapterView.OnI
     ArrayList<MealEntry> meals = new ArrayList<>();
     MealAdapter mealAdapter;
     AlarmManager alarmManager;
-
+    Button logout_btn;
     String caretakerUUID;
     int caretakerId;
     PatientMealStorage getMealStorage() { return ((GlobalApp)getApplicationContext()).mealStorage; }
@@ -54,6 +55,7 @@ public class Home_caretaker extends AppCompatActivity implements AdapterView.OnI
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_caretaker);
         rootLayout = findViewById(R.id.layout_home_caretaker);
+        logout_btn = findViewById(R.id.caretakerLogOut);
 
         Intent intent = getIntent();
         caretakerUUID = intent.getStringExtra("caretakerUUID");
@@ -106,6 +108,16 @@ public class Home_caretaker extends AppCompatActivity implements AdapterView.OnI
                 Intent intent = new Intent(Home_caretaker.this, AlarmActivity.class);
                 startActivityForResult(intent, 1);
 
+            }
+        });
+
+        logout_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(getApplicationContext(), Login.class);
+                startActivity(intent);
+                finish();
             }
         });
     }

@@ -40,4 +40,13 @@
         android:textSize="32dp"
         android:backgroundTint="@color/red">
     </Button>
+
+    <Button
+        android:id="@+id/caretakerLogOut"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Logga ut"
+        android:layout_marginTop="40dp"
+        android:layout_gravity="center">
+    </Button>
 </LinearLayout>
