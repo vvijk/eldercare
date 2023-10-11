@@ -14,6 +14,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class dbLibrary {
     private FirebaseAuth mAuth;
@@ -44,6 +47,7 @@ public class dbLibrary {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
+                        assert user != null;
                         String uid = user.getUid();
 
                         if (isCareGiver) {
@@ -77,7 +81,7 @@ public class dbLibrary {
                                     });
                         }
                     } else {
-                        callback.onError("Authentication failed: " + task.getException().getMessage());
+                        callback.onError("Authentication failed: " + Objects.requireNonNull(task.getException()).getMessage());
                     }
                 });
     }
@@ -111,7 +115,7 @@ public class dbLibrary {
                 callback.onUserUidNotFound();
             }
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
                 callback.onUserUidError(databaseError.getMessage());
             }
         });
@@ -137,17 +141,19 @@ public class dbLibrary {
                     CareGiver caregiver = dataSnapshot.getValue(CareGiver.class);
                     if (caregiver != null) {
                         if (caregiver.getCaretakers() == null) {
-                            caregiver.setCaretakers(new ArrayList<>());
+                            caregiver.setCaretakers(new HashMap<String, Boolean>());
                         } else {
                             // Check if the caretakerUID is already in the list
-                            if (caregiver.getCaretakers().contains(caretakerUID)) {
+                            if (caregiver.getCaretakers().containsKey(caretakerUID)) {
                                 Log.d("dbtest", "Caretaker with UID: " + caretakerUID + " already exists.");
                                 callback.onCaretakerAddError("Caretaker with UID: " + caretakerUID + " already exists.");
                                 return;
                             }
                         }
                         // Add the caretakerUID to the caregiver's list of caretakers
-                        caregiver.getCaretakers().add(caretakerUID);
+                        //caregiver.getCaretakers().add(caretakerUID);
+                        // Add the caretakerUID as a key in the caregiver's map
+                        caregiver.getCaretakers().put(caretakerUID, true);
 
                         // Update the caregiver's data in the database
                         caregiversRef.setValue(caregiver)
