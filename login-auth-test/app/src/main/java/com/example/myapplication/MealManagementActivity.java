@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -253,6 +254,61 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
                 buttonLayout.addView(button);
             }
         }
+
+        EditText addCaretakerInputText = new EditText(this);
+        addCaretakerInputText.setHint("Skriv patientens namn här"); // En hinttext för att vägleda användaren
+        addCaretakerInputText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
+        addCaretakerInputText.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+        scrolledLayout.addView(addCaretakerInputText);
+
+        // Skapa knappen för att lägga till patient
+        Button addButton = new Button(this);
+        addButton.setText("Lägg till patient");
+        addButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
+        addButton.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String caretakerFromInput = String.valueOf(addCaretakerInputText.getText());
+                if (TextUtils.isEmpty(caretakerFromInput) || !android.util.Patterns.EMAIL_ADDRESS.matcher(caretakerFromInput).matches()) {
+                    Toast.makeText(MealManagementActivity.this, "Ange epost i rätt format: test@test.com", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                dbLibrary db = new dbLibrary(MealManagementActivity.this);
+                db.getCaretakerUidByEmail(caretakerFromInput, new dbLibrary.UserUidCallback() {
+                    @Override
+                    public void onUserUidFound(String uid) {
+                        db.addCaretakerToGiver(db.getUserID(), uid, new dbLibrary.CaretakerAddCallback() {
+                            @Override
+                            public void onCaretakerAdded(String message) {
+                                Toast.makeText(MealManagementActivity.this, "Användare: " + caretakerFromInput + " har lagts till i din patientlista!", Toast.LENGTH_SHORT).show();
+                            }
+                            @Override
+                            public void onCaretakerAddError(String errorMessage) {
+                                Toast.makeText(MealManagementActivity.this, "Användare: " + caretakerFromInput + " finns redan i din patientlista!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        addCaretakerInputText.setText("");
+                    }
+                    @Override
+                    public void onUserUidNotFound() {
+                        // Handle the case where no user with the specified email was found
+                        Toast.makeText(MealManagementActivity.this, "Användare: " + caretakerFromInput + " hittades inte bland vårdtagare!", Toast.LENGTH_SHORT).show();
+                    }
+                    @Override
+                    public void onUserUidError(String errorMessage) {
+                        Toast.makeText(MealManagementActivity.this, "ERROR, kolla onUserUidError()..", Toast.LENGTH_SHORT).show();
+                        // Handle the error
+                    }
+                });
+            }
+        });
+        scrolledLayout.addView(addButton);
+
     }
     void refreshMealPlan(){
         // btn_add.setText(R.string.str_add_meal_plan);
