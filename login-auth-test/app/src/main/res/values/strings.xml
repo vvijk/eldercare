@@ -74,7 +74,6 @@
     <string name="manage_meals">Hantera måltider</string>
     <string name="str_template_meals">Bas måltider</string>
     <string name="str_base_meals">Grundmåltider</string>
-    <string name="str_no_plan">Ingen plan</string>
     <string name="meal_time_bad_format">Inkorrekt format på tid för måltid</string>
     <string name="meal_time_missing_colon">Tid för måltid saknar kolon</string>
     <string name="patient_meals_edit">Ändra</string>
@@ -90,6 +89,7 @@
     <string name="str_delete">Ta bort</string>
     <string name="str_patient_info">Info</string>
     <string name="str_no_meals">Inga måltider</string>
+    <string name="str_no_patients">Inga patienter</string>
     <string name="str_no_description">Ingen beskrivning</string>
     <string name="str_monday">Måndag</string>
     <string name="str_tuesday">Tisdag</string>

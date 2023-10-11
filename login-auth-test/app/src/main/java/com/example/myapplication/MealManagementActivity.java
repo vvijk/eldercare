@@ -75,7 +75,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
         caregiverUUID = intent.getStringExtra("caregiverUUID");
         if(caregiverUUID == null) {
             Toast.makeText(this, getResources().getString(R.string.str_caregiverUUID_was_null),Toast.LENGTH_LONG).show();
-            caregiverUUID = "Zn1pRMgS8qeVYXYwJgTHxl1VKAI3"; // TODO: Don't hardcode
+            caregiverUUID = "0GOIORHtHQRvqWAhib6svaTGBHp1"; // TODO: Don't hardcode
             currentCaregiverId = getMealStorage().idFromCaregiverUUID(caregiverUUID);
         } else {
             currentCaregiverId = getMealStorage().idFromCaregiverUUID(caregiverUUID);
@@ -199,47 +199,59 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
         //   Another optimization would be to hide the list instead of removing and recreating them.
         scrolledLayout.removeAllViews();
         int patientCount = getMealStorage().caretakerCountOfCaregiver(currentCaregiverId);
-        for(int i=0;i<patientCount;i++) {
-            int caretakerId = getMealStorage().caretakerIdFromIndex(currentCaregiverId,i);
-            String name = getMealStorage().nameOfCaretaker(caretakerId);
 
-            LinearLayout itemLayout = new LinearLayout(this);
-            itemLayout.setOrientation(LinearLayout.VERTICAL);
-            itemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            scrolledLayout.addView(itemLayout);
-
-            LinearLayout headLayout = new LinearLayout(this);
-            headLayout.setOrientation(LinearLayout.HORIZONTAL);
-            headLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            itemLayout.addView(headLayout);
-
-            TextView textview = new TextView(this);
-            textview.setText(name);
-            textview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30); // TODO(Emarioo): Don't hardcode text size
-            textview.setLayoutParams(new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
+        if(patientCount == 0){
+            TextView textView = new TextView(this);
+            textView.setText(getResources().getString(R.string.str_no_patients));
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25); // TODO(Emarioo): Don't hardcode text size
+            textView.setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT));
+            textView.setGravity(Gravity.CENTER);
+            scrolledLayout.addView(textView);
+        } else {
+            for (int i = 0; i < patientCount; i++) {
+                int caretakerId = getMealStorage().caretakerIdFromIndex(currentCaregiverId, i);
+                String name = getMealStorage().nameOfCaretaker(caretakerId);
 
-            headLayout.addView(textview);
+                LinearLayout itemLayout = new LinearLayout(this);
+                itemLayout.setOrientation(LinearLayout.VERTICAL);
+                itemLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                scrolledLayout.addView(itemLayout);
 
-            LinearLayout buttonLayout = new LinearLayout(this);
-            buttonLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            buttonLayout.setGravity(Gravity.RIGHT);
+                LinearLayout headLayout = new LinearLayout(this);
+                headLayout.setOrientation(LinearLayout.HORIZONTAL);
+                headLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                itemLayout.addView(headLayout);
 
-            headLayout.addView(buttonLayout);
+                TextView textview = new TextView(this);
+                textview.setText(name);
+                textview.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30); // TODO(Emarioo): Don't hardcode text size
+                textview.setLayoutParams(new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT));
 
-            Button button = new Button(this);
-            button.setText(">");
-            // button.setText(R.string.patient_meals_edit);
-            button.setAllCaps(false);
-            button.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20); // TODO(Emarioo): Don't hardcode text size
-            button.setLayoutParams(new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT));
-            button.setTag(R.id.tag_patientId, caretakerId);
-            button.setOnClickListener(this);
+                headLayout.addView(textview);
 
-            buttonLayout.addView(button);
+                LinearLayout buttonLayout = new LinearLayout(this);
+                buttonLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                buttonLayout.setGravity(Gravity.RIGHT);
+
+                headLayout.addView(buttonLayout);
+
+                Button button = new Button(this);
+                button.setText(">");
+                // button.setText(R.string.patient_meals_edit);
+                button.setAllCaps(false);
+                button.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20); // TODO(Emarioo): Don't hardcode text size
+                button.setLayoutParams(new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT));
+                button.setTag(R.id.tag_patientId, caretakerId);
+                button.setOnClickListener(this);
+
+                buttonLayout.addView(button);
+            }
         }
     }
     void refreshMealPlan(){
@@ -254,21 +266,8 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
         scrolledLayout.removeAllViews();
 
         int[] sortedMeals_index = getMealStorage().caregiver_template_sortedMealIndices(currentCaregiverId);
-        int usedCount = sortedMeals_index.length;
 
-        // int mealCount = getMealStorage().caregiver_template_countOfMeals(currentCaregiverId);
-        // int[] sortedMeals_index = new int[mealCount];
-        // int[] sortedMeals_time = new int[mealCount];
-        // for(int mealIndex=0;mealIndex<mealCount;mealIndex++) {
-        //     if(!getMealStorage().caregiver_template_isMealIndexValid(currentCaregiverId, mealIndex))
-        //         continue;
-        //     int hour = getMealStorage().caregiver_template_hourOfMeal(currentCaregiverId, mealIndex);
-        //     int minute = getMealStorage().caregiver_template_minuteOfMeal(currentCaregiverId, mealIndex);
-        //     sortedMeals_time[usedCount] = hour*100+minute;
-        //     sortedMeals_index[usedCount] = mealIndex;
-        //     usedCount++;
-        // }
-        if(usedCount == 0){
+        if(sortedMeals_index.length == 0){
             TextView textView = new TextView(this);
             textView.setText(getResources().getString(R.string.str_no_meals));
             textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25); // TODO(Emarioo): Don't hardcode text size
@@ -278,30 +277,10 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
             textView.setGravity(Gravity.CENTER);
             scrolledLayout.addView(textView);
         } else {
-            // // TODO(Emarioo): Don't use bubble sort, you are better than this
-            // for (int i = 0; i < usedCount; i++) {
-            //     boolean swapped = false;
-            //     for (int j = 0; j < usedCount - 1 - i; j++) {
-            //         if (sortedMeals_time[j + 1] < sortedMeals_time[j]) {
-            //             int tmp = sortedMeals_time[j];
-            //             sortedMeals_time[j] = sortedMeals_time[j + 1];
-            //             sortedMeals_time[j + 1] = tmp;
-            //             tmp = sortedMeals_index[j];
-            //             sortedMeals_index[j] = sortedMeals_index[j + 1];
-            //             sortedMeals_index[j + 1] = tmp;
-            //             swapped = true;
-            //         }
-            //     }
-            //     if (!swapped)
-            //         break;
-            // }
-            for (int i = 0; i < usedCount; i++) {
+            for (int i = 0; i < sortedMeals_index.length; i++) {
                 int mealIndex = sortedMeals_index[i];
                 if (!getMealStorage().caregiver_template_isMealIndexValid(currentCaregiverId, mealIndex))
                     continue;
-                // for(int mealIndex=0;mealIndex<mealCount;mealIndex++) {
-                //     if(!getMealStorage().caregiver_template_isMealIndexValid(currentCaregiverId, mealIndex))
-                //         continue;
 
                 String name = getMealStorage().caregiver_template_nameOfMeal(currentCaregiverId, mealIndex);
                 int hour = getMealStorage().caregiver_template_hourOfMeal(currentCaregiverId, mealIndex);

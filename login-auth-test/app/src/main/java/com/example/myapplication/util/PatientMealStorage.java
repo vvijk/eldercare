@@ -344,56 +344,68 @@ public class PatientMealStorage {
             refresher.listener_child = refresher.ref.addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                    String caregiver_uuid = snapshot.getRef().getParent().getParent().getKey();
-                    if(caregiver_uuid == null) return;
-                    // String caretaker_index = snapshot.getKey();
-                    String caretaker_uuid = snapshot.getValue(String.class);
-                    if(caretaker_uuid == null) return;
-                    Caregiver caregiver = getCaregiver(caregiver_uuid);
-                    if (caregiver == null) {
-                        int id = addCaregiver(caregiver_uuid);
-                        caregiver = getCaregiver(id);
-                    }
-
-                    Caretaker caretaker = getCaretaker(caretaker_uuid);
-                    int caretaker_id = 0;
-                    if (caretaker == null) {
-                        caretaker_id = addCaretaker(caretaker_uuid);
-                        caretaker = getCaretaker(caretaker_id);
-                        caregiver.addCaretaker(caretaker_id);
-                        db_caretakers.child(caretaker_uuid).addListenerForSingleValueEvent(new ValueListener(caretaker) {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                String firstname = snapshot.child("firstName").getValue(String.class);
-                                String lastname = snapshot.child("lastName").getValue(String.class);
-                                Caretaker caretaker = (Caretaker)extraData;
-                                caretaker.name = firstname + " "+lastname;
-
-                                if (refreshers.size() != 0)
-                                    refreshers.get(refreshers.size() - 1).runnable.run();
-                            }
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-                                if (refreshers.size() != 0)
-                                    refreshers.get(refreshers.size() - 1).runnable.run();
-                            }
-                        });
-                        // NOTE(Emarioo): As I have understood it, addListenerForSingeValueEvent does not need to be removed.
-                        //   It will be called once and then deleted. If not then this is a memory leak of listeners.
-                    } else {
-                        caretaker_id = idFromCaretaker(caretaker);
-                        caregiver.addCaretaker(caretaker_id);
-                        if (refreshers.size() != 0)
-                            refreshers.get(refreshers.size() - 1).runnable.run();
-                    }
+                    onChildChanged(snapshot, previousChildName);
+                    // String caregiver_uuid = snapshot.getRef().getParent().getParent().getKey();
+                    // if(caregiver_uuid == null) return;
+                    // String caretaker_uuid = snapshot.getKey();
+                    // Boolean isValid = snapshot.getValue(Boolean.class);
+                    // // NOTE(Emarioo): isValid refers to the boolean in caregivers/<uuid>/caretakers/<uuid>:boolean
+                    // //  true means that the caregiver can see caretaker, false means the opposite. UUID not being in
+                    // //  the list also means that caregiver can't see the caretaker.
+                    //
+                    // if(caretaker_uuid == null) return;
+                    // Caregiver caregiver = getCaregiver(caregiver_uuid);
+                    // if (caregiver == null) {
+                    //     int id = addCaregiver(caregiver_uuid);
+                    //     caregiver = getCaregiver(id);
+                    // }
+                    //
+                    // Caretaker caretaker = getCaretaker(caretaker_uuid);
+                    // int caretaker_id = 0;
+                    // if (caretaker == null && isValid) {
+                    //     caretaker_id = addCaretaker(caretaker_uuid);
+                    //     caretaker = getCaretaker(caretaker_id);
+                    //     caregiver.addCaretaker(caretaker_id);
+                    //     db_caretakers.child(caretaker_uuid).addListenerForSingleValueEvent(new ValueListener(caretaker) {
+                    //         @Override
+                    //         public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    //             String firstname = snapshot.child("firstName").getValue(String.class);
+                    //             String lastname = snapshot.child("lastName").getValue(String.class);
+                    //             Caretaker caretaker = (Caretaker)extraData;
+                    //             caretaker.name = firstname + " "+lastname;
+                    //
+                    //             if (refreshers.size() != 0)
+                    //                 refreshers.get(refreshers.size() - 1).runnable.run();
+                    //         }
+                    //         @Override
+                    //         public void onCancelled(@NonNull DatabaseError error) {
+                    //             if (refreshers.size() != 0)
+                    //                 refreshers.get(refreshers.size() - 1).runnable.run();
+                    //         }
+                    //     });
+                    //     // NOTE(Emarioo): As I have understood it, addListenerForSingeValueEvent does not need to be removed.
+                    //     //   It will be called once and then deleted. If not then this is a memory leak of listeners.
+                    // } else {
+                    //     caretaker_id = idFromCaretaker(caretaker);
+                    //     if(isValid) {
+                    //         caregiver.removeCaretaker(caretaker_id);
+                    //     } else {
+                    //         caregiver.addCaretaker(caretaker_id);
+                    //     }
+                    //     if (refreshers.size() != 0)
+                    //         refreshers.get(refreshers.size() - 1).runnable.run();
+                    // }
                 }
 
                 @Override
                 public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                     String caregiver_uuid = snapshot.getRef().getParent().getParent().getKey();
                     if(caregiver_uuid == null) return;
-                    // String caretaker_index = snapshot.getKey();
-                    String caretaker_uuid = snapshot.getValue(String.class);
+                    String caretaker_uuid = snapshot.getKey();
+                    // NOTE(Emarioo): isValid refers to the boolean in caregivers/<uuid>/caretakers/<uuid>:boolean
+                    //  true means that the caregiver can see caretaker, false means the opposite. UUID not being in
+                    //  the list also means that caregiver can't see the caretaker.
+                    Boolean isValid = snapshot.getValue(Boolean.class);
                     if(caretaker_uuid == null) return;
                     Caregiver caregiver = getCaregiver(caregiver_uuid);
                     if (caregiver == null) {
@@ -403,7 +415,7 @@ public class PatientMealStorage {
 
                     Caretaker caretaker = getCaretaker(caretaker_uuid);
                     int caretaker_id = 0;
-                    if (caretaker == null) {
+                    if (caretaker == null && isValid) {
                         caretaker_id = addCaretaker(caretaker_uuid);
                         caretaker = getCaretaker(caretaker_id);
                         caregiver.addCaretaker(caretaker_id);
@@ -428,7 +440,11 @@ public class PatientMealStorage {
                         //   It will be called once and then deleted. If not then this is a memory leak of listeners.
                     } else {
                         caretaker_id = idFromCaretaker(caretaker);
-                        caregiver.addCaretaker(caretaker_id);
+                        if(isValid) {
+                            caregiver.addCaretaker(caretaker_id);
+                        } else {
+                            caregiver.removeCaretaker(caretaker_id);
+                        }
                         if (refreshers.size() != 0)
                             refreshers.get(refreshers.size() - 1).runnable.run();
                     }
@@ -439,7 +455,8 @@ public class PatientMealStorage {
                     String caregiver_uuid = snapshot.getRef().getParent().getParent().getKey();
                     if(caregiver_uuid == null) return;
                     // String caretaker_index = snapshot.getKey();
-                    String caretaker_uuid = snapshot.getValue(String.class);
+                    String caretaker_uuid = snapshot.getKey();
+                    Boolean isValid = snapshot.getValue(Boolean.class);
                     if(caretaker_uuid == null) return;
                     Caregiver caregiver = getCaregiver(caregiver_uuid);
                     if (caregiver == null) {
