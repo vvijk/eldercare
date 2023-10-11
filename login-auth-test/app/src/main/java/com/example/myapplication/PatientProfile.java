@@ -1,15 +1,24 @@
 package com.example.myapplication;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.protobuf.Value;
 
 import java.util.Objects;
 
@@ -26,6 +35,8 @@ public class PatientProfile extends AppCompatActivity {
 
     String caregiverUUID = "";
     String caretakerUUID = "";
+
+    CareTaker patient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,14 +61,20 @@ public class PatientProfile extends AppCompatActivity {
         caregiverUUID = intent.getStringExtra("caregiverUUID");
         caretakerUUID = intent.getStringExtra("caretakerUUID");
 
-        //Set patient preferences by grabbing from DB via UUID
-        if (caretakerUUID != null) {
-            dbRef.child(caretakerUUID).child("prefFood").get().addOnCompleteListener(task ->
-                    txt_PatientPreferences.setText(Objects.requireNonNull(task.getResult().getValue()).toString())
-            );
-        }
+        dbRef.child(caretakerUUID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                patient = snapshot.getValue(CareTaker.class);
+                txt_PatientPreferences.setText(patient.getPrefFood());
+                txt_PatientAddress.setText(patient.getPhoneNr());
+                txt_PatientName.setText(patient.getFullName());
+            }
 
-        // TODO(Emarioo): Now we have the uuid for the caretaker. Next thing would be to ask the
-        //  database for some information about the caretaker (patient).
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 }
