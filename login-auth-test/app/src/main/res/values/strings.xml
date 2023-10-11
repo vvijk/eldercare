@@ -111,6 +111,9 @@
 
     <!--  Home for caretaker  -->
     <string name="str_emergency_alert">LARMA</string>
-<!--    <string name="str_emergency_alert">ALERT</string> engelsk version -->
+    <string name="missing_alarm_permission">Kan inte sätta alarm på grund av obehörig rättighet</string>
+    <string name="channel_meals_name">Måltider</string>
+    <string name="channel_meals_desc">Notifikation om måltider</string>
+    <string name="meal_marked_too_early">Måltiden måste ha passerat för att markera den</string>
 
 </resources>

@@ -1,11 +1,9 @@
 package com.example.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Intent;
 import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,19 +15,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import com.example.myapplication.util.FocusOnNewLine;
-import com.example.myapplication.util.GlobalApp;
-import com.example.myapplication.util.PatientMealStorage.MealDay;
-import com.example.myapplication.util.PatientMealStorage.Meal;
-import com.example.myapplication.util.PatientMealStorage.Caregiver;
 import com.example.myapplication.util.PatientMealStorage;
 import com.example.myapplication.util.TimeFixer;
 
@@ -43,7 +32,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
     View.OnClickListener btn_listener = null;
 
     PatientMealStorage getMealStorage() {
-        return ((GlobalApp) getApplicationContext()).mealStorage;
+        return ((MealApp) getApplicationContext()).mealStorage;
     }
 
     Runnable saveCallback = new Runnable() {
