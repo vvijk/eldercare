@@ -256,7 +256,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
         }
 
         EditText addCaretakerInputText = new EditText(this);
-        addCaretakerInputText.setHint("Skriv patientens namn här"); // En hinttext för att vägleda användaren
+        addCaretakerInputText.setHint("Skriv patientens epost här");
         addCaretakerInputText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
         addCaretakerInputText.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
