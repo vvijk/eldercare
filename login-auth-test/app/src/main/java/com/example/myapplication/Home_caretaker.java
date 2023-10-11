@@ -1,9 +1,15 @@
 package com.example.myapplication;
 
+import static android.Manifest.permission.POST_NOTIFICATIONS;
+
 import android.app.AlarmManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -16,18 +22,16 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
-import com.example.myapplication.util.GlobalApp;
 import com.example.myapplication.util.PatientMealStorage;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 class MealEntry {
     String name;
@@ -35,6 +39,7 @@ class MealEntry {
     int hour;
     int minute;
     boolean eaten;
+    String key;
 }
 
 public class Home_caretaker extends AppCompatActivity implements AdapterView.OnItemClickListener {
@@ -45,9 +50,24 @@ public class Home_caretaker extends AppCompatActivity implements AdapterView.OnI
     MealAdapter mealAdapter;
     AlarmManager alarmManager;
 
+    int weekDayIndex = 0;
     String caretakerUUID;
     int caretakerId;
-    PatientMealStorage getMealStorage() { return ((GlobalApp)getApplicationContext()).mealStorage; }
+    PatientMealStorage getMealStorage() { return ((MealApp)getApplicationContext()).mealStorage; }
+
+    private ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    // Permission is granted. Continue the action or workflow in your
+                    // app.
+                } else {
+                    // Explain to the user that the feature is unavailable because the
+                    // feature requires a permission that the user has denied. At the
+                    // same time, respect the user's decision. Don't link to system
+                    // settings in an effort to convince the user to change their
+                    // decision.
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,24 +90,34 @@ public class Home_caretaker extends AppCompatActivity implements AdapterView.OnI
             @Override
             public void run() {
                 int weekDayIndex = getMealStorage().todaysDayIndex();
+                Home_caretaker.this.weekDayIndex = weekDayIndex;
 
                 int[] sortedMealIndices = getMealStorage().caretaker_sortedMealIndices(caretakerId, weekDayIndex);
+
+                Calendar calendar = Calendar.getInstance();
 
                 meals.clear();
                 for(int mealIndex : sortedMealIndices) {
                     if(!getMealStorage().caretaker_isMealIndexValid(caretakerId, weekDayIndex, mealIndex))
                         continue;
+
                     MealEntry entry = new MealEntry();
                     entry.name = getMealStorage().caretaker_nameOfMeal(caretakerId, weekDayIndex, mealIndex);
                     entry.desc = getMealStorage().caretaker_descriptionOfMeal(caretakerId, weekDayIndex, mealIndex);
                     entry.hour = getMealStorage().caretaker_hourOfMeal(caretakerId, weekDayIndex, mealIndex);
                     entry.minute = getMealStorage().caretaker_minuteOfMeal(caretakerId, weekDayIndex, mealIndex);
-                    entry.eaten = false; // getMealStorage().caretaker_eatenOfMeal(caretakerId, weekDayIndex, mealIndex);
-                    // TODO: Eaten should be reset when we move on to the next week.
+                    entry.key = getMealStorage().caretaker_keyOfMeal(caretakerId, weekDayIndex, mealIndex);
+                    entry.eaten = getMealStorage().caretaker_eatenOfMeal(caretakerId, weekDayIndex, mealIndex);
+
+                    if(entry.hour * 100 + entry.minute > calendar.get(Calendar.HOUR_OF_DAY)*100 + calendar.get(Calendar.MINUTE)) {
+                        getMealStorage().caretaker_setEatenOfMeal(caretakerId, weekDayIndex, mealIndex, false);
+                    }
                     meals.add(entry);
                 }
                 enableNoMealsText(meals.size()==0);
                 mealAdapter.notifyDataSetChanged();
+
+                refreshAlarmsForMeals();
             }
         });
 
@@ -108,31 +138,47 @@ public class Home_caretaker extends AppCompatActivity implements AdapterView.OnI
 
             }
         });
+        if (ActivityCompat.checkSelfPermission(this, POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionLauncher.launch(POST_NOTIFICATIONS);
+        }
     }
+    private void refreshAlarmsForMeals(){
+        if(!alarmManager.canScheduleExactAlarms()) {
+            Toast.makeText(this, getResources().getString(R.string.missing_alarm_permission),Toast.LENGTH_LONG).show();
+        } else {
+            for (int index = 2;index < meals.size();index++) {
+                MealEntry meal = meals.get(index);
 
-    private void setAlarmForMeals(){
-        // TODO: If we call setAlarmForMeals twice then the previous alarms should be replaced by new ones.
-        //  Currently we just add new alarms every time this function is called. The user will end up with tons of alarms.
-        for(MealEntry meal : meals){
-            //Sätt tiden för påminelsen
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(calendar.HOUR_OF_DAY, meal.hour);
-            calendar.set(calendar.MINUTE, meal.minute);
-            // calendar.set(calendar.SECOND, 0); // probably not needed because it's 0 by default?
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(Calendar.HOUR_OF_DAY, meal.hour);
+                calendar.set(Calendar.MINUTE, meal.minute);
+                calendar.set(Calendar.SECOND, 0);
 
-            //Skapa intent för BroadcastReceiver
-            Intent intent = new Intent(this, ReminderBroadcastReceiver.class);
-            intent.putExtra("meal", meal.name);
+                // System.out.println(calendar.getTimeInMillis() - System.currentTimeMillis());
 
-            // NOTE(Emarioo): What is this, is it important? It comes from a previous version of this code.
-            // ArrayList<Integer> clickedMealList = new ArrayList<>(clickedPositions);
-            // intent.putExtra("clickedMeals", clickedMealList);
+                long nowTime = System.currentTimeMillis();
+                long mealTime = calendar.getTimeInMillis();
 
-            //Skapar en pendingIntent
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+                if(mealTime > nowTime && !meal.eaten) {
+                    Intent intent = new Intent(this, ReminderBroadcastReceiver.class);
+                    intent.putExtra("name", meal.name);
+                    intent.putExtra("time",Helpers.FormatTime(meal.hour,meal.minute));
+                    intent.putExtra("desc", meal.desc);
+                    intent.putExtra("caretakerUUID", caretakerUUID);
+                    intent.putExtra("dayIndex", weekDayIndex);
+                    intent.putExtra("mealKey", meal.key);
+                    // TODO: There should be a reminder that tells you to it without buttons
+                    //   Then a reminder with buttons where you tell the app whether you ate or not (45 minutes after first one)
+                    //   There one or two more reminders in case you missed the previous reminders.
+                    intent.putExtra("withActions", true);
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(this, index, intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_CANCEL_CURRENT);
 
-            //Sätt påminelsen
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                    // alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, 4000, pendingIntent); // debug purposes
+                } else {
+                    // meal time has already passsed
+                }
+            }
         }
     }
 
@@ -148,21 +194,25 @@ public class Home_caretaker extends AppCompatActivity implements AdapterView.OnI
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        // När en list-item klickas på.
-        // String meal = meals[position];
-        String meal = meals.get(position).name;
+        MealEntry meal = meals.get(position);
+        int mealIndex = position;
 
-        // Toast.makeText(Home_caretaker.this, "Clicked: " + meal, Toast.LENGTH_SHORT).show();
+        Calendar calendar = Calendar.getInstance();
+        if(meal.hour * 100 + meal.minute > calendar.get(Calendar.HOUR_OF_DAY)*100 + calendar.get(Calendar.MINUTE)) {
+            Toast.makeText(this,getResources().getString(R.string.meal_marked_too_early),Toast.LENGTH_LONG).show();
+            return;
+        }
 
-        meals.get(position).eaten = !meals.get(position).eaten;
+        getMealStorage().caretaker_setEatenOfMeal(caretakerId, weekDayIndex, mealIndex, !meals.get(position).eaten);
+        // meals.get(position).eaten = !meals.get(position).eaten;
 
-        //Stäng av påminelsen för maten
         Intent intent = new Intent(this, BroadcastReceiver.class);
-        intent.putExtra("meal", meal);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent,PendingIntent.FLAG_IMMUTABLE);
-        alarmManager.cancel(pendingIntent);
-
-        mealAdapter.notifyDataSetChanged(); // Uppdatera listan för att reflektera ändringarna i clickedPositions-setet.
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, mealIndex, intent,PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_NO_CREATE);
+        if(pendingIntent != null) {
+            alarmManager.cancel(pendingIntent);
+        }
+        // mealAdapter is updated when database is written to, refresher is called and UI updates.
+        // mealAdapter.notifyDataSetChanged(); // Uppdatera listan för att reflektera ändringarna i clickedPositions-setet.
     }
 
     public void enableNoMealsText(boolean show) {

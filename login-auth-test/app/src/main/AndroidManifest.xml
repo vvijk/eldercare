@@ -4,9 +4,11 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
     <application
-        android:name=".util.GlobalApp"
+        android:name=".MealApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -99,6 +101,7 @@
         <activity android:name=".AlarmActivity" />
 
         <receiver android:name=".ReminderBroadcastReceiver" />
+        <receiver android:name=".MealBroadcast" />
     </application>
 
 </manifest>
