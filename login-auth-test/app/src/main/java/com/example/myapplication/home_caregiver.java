@@ -140,7 +140,7 @@ public class home_caregiver extends AppCompatActivity{
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), MealManagementActivity.class);
                 startActivity(intent);
-                finish();
+                // finish();
             }
         });
 
