@@ -99,8 +99,6 @@ public class MyNotificationManager{
                 for(DataSnapshot patientSnapshot : snapshot.getChildren()){
                     for(int i=0; i < caretakerUIDs.size(); i++){
                         if(patientSnapshot.getKey().equals(caretakerUIDs.get(i))){//jämför och kollar så att caretakern finns med i meals.
-
-                            //Log.d("larss", patientSnapshot.getKey());
                             //kollar så vi går in på rätt dag
                             checkDay(patientSnapshot.getKey(), mealsRef);
                         }
