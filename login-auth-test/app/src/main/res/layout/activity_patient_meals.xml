@@ -14,6 +14,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingBottom="5dp"
         android:orientation="horizontal">
 
         <Button
@@ -56,8 +57,10 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="12dp"
-        android:background="@color/purple_dark">
+        android:layout_weight="100"
+        >
+<!--        android:padding="12dp"-->
+<!--        android:background="@color/purple_dark"-->
 
         <LinearLayout
             android:id="@+id/week_scroll"
@@ -72,5 +75,38 @@
             <tag android:id="@+id/tag_replace_template_meal" ></tag>
         </LinearLayout>
     </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+        >
+        <Button
+            android:id="@+id/btn_patient_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:backgroundTint="@color/purple_dark"
+            android:padding="0dp"
+            android:text="@string/str_patient_info"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="23sp"
+            app:cornerRadius="2dp"/>
+        <Button
+            android:id="@+id/btn_home_patient"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:backgroundTint="@color/purple_dark"
+            android:padding="0dp"
+            android:text="home patient"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="23sp"
+            app:cornerRadius="2dp"/>
+        <!-- SAVE BUTTON? stuff is currently auto-saved so maybe not needed? -->
+    </LinearLayout>
 
 </LinearLayout>

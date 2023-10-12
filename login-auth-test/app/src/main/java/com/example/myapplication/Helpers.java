@@ -4,12 +4,16 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
+
 public class Helpers {
     private Context context;
     public Helpers(Context context) {
         this.context = context;
     }
-    private static String[] segmentString(String str, int lowerLimit) {
+    public static String[] segmentString(String str, int lowerLimit) {
         /* Splits string into segments of lowerLimit length + remaining characters on the current word. (so as to not cut string mid-sentance.) */
         String[] stringSegments = new String[99];
         int stepper;
@@ -38,7 +42,7 @@ public class Helpers {
         return out;
     }
 
-    private static String shaveLeadingWhitespace(String toShave){
+    public static String shaveLeadingWhitespace(String toShave){
         //Returns the string, after removing leading whitespace.
         String out;
         for (int i = 0; i < toShave.length(); i++){
@@ -50,13 +54,13 @@ public class Helpers {
         return "ERROR IN Helpers.shaveLeadingWhitespace";
     }
 
-    private static String cutoffString(String toCut, int cutoff){
+    public static String cutoffString(String toCut, int cutoff){
         //Cuts the string toCut off at cutoff, and appending trailing dots "...".
         if (toCut.length() <= cutoff){ return toCut + "...";}
         return toCut.substring(0, cutoff) + "...";
     }
 
-    private static String linebreakString(String str, int lowerLimit){
+    public static String linebreakString(String str, int lowerLimit){
         //Inserts linebreaks in a string after every lowerLimit characters (end of word).
         String[] strs = segmentString(str, lowerLimit);
         String out = "";
@@ -66,6 +70,24 @@ public class Helpers {
         shaveLeadingWhitespace(out);
         return out;
     }
+
+    public static boolean isStringInArray(String str, String[] arr){
+        for (String s : arr) {
+            if (Objects.equals(s, str)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public static boolean isStringInArray(String str, ArrayList<String> arr){
+        for (String s : arr) {
+            if (Objects.equals(s, str)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public boolean isValidUserInput(String email, String password, String firstname, String lastname, String phoneNr, String personNummer) {
         if (TextUtils.isEmpty(email) || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
@@ -91,5 +113,18 @@ public class Helpers {
     }
     private void showToast(String message) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+    }
+
+    static public String FormatTime(int hour, int minute) {
+        String out="";
+        if(hour<10)
+            out+= "0";
+        out += hour;
+        out += ":";
+        if(minute<10)
+            out+= "0";
+        out += minute;
+        return out;
+
     }
 }

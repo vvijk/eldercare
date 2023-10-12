@@ -11,18 +11,25 @@ public class CareTaker extends User {
         this.PIN = PIN;
         this.handler = handler;
     }
+
+    public CareTaker() {}
+
     public void setPrefFood(String prefFood) {
         this.prefFood = prefFood;
     }
+
     public void setPIN(String PIN) {
         this.PIN = PIN;
     }
+
     public String getPrefFood() {
         return prefFood;
     }
+
     public String getPIN() {
         return PIN;
     }
+
     public String getHandler() {
         return handler;
     }

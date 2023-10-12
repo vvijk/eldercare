@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bubble_backgroundgreen"
+    tools:context=".Home_caretaker"
+    android:orientation="vertical"
+    android:id="@+id/layout_home_caretaker"
+    android:padding="5dp">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="16dp"
+        android:layout_gravity="center"
+        android:textStyle="bold"
+        android:text="Elder Care"
+        android:textColor="@color/black"
+        android:textSize="32sp"
+        android:layout_marginBottom="5dp"/>
+
+    <tag android:id="@+id/tag_no_meals"></tag>
+
+    <ListView
+        android:id="@+id/listViewMeals"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        />
+
+    <Button
+        android:id="@+id/buttonAlarm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="@string/str_emergency_alert"
+        android:textSize="32dp"
+        android:backgroundTint="@color/red">
+    </Button>
+
+    <Button
+        android:id="@+id/caretakerLogOut"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Logga ut"
+        android:layout_marginTop="40dp"
+        android:layout_gravity="center">
+    </Button>
+</LinearLayout>

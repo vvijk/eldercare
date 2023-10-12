@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
     <application
-        android:name=".util.GlobalApp"
+        android:name=".MealApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -15,7 +17,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Material3.Dark"
-        tools:targetApi="31">
+        tools:targetApi="31" >
+        <activity
+            android:name=".Home_caretaker"
+            android:exported="true" />
+        <activity
+            android:name=".PatientProfile"
+            android:exported="true" />
         <activity
             android:name=".Settings"
             android:exported="false" />
@@ -23,7 +31,7 @@
         <service
             android:name=".Notifications.FirebaseMessageService"
             android:enabled="true"
-            android:exported="true">
+            android:exported="true" >
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
@@ -53,7 +61,8 @@
         <activity
             android:name=".home_caregiver"
             android:exported="false"
-            android:parentActivityName=".home_caregiver" />
+            android:parentActivityName=".home_caregiver"
+            android:theme="@style/Theme.Material3.Dark.NoActionBar"/>
         <activity
             android:name=".ForgotPassword"
             android:exported="false" />
@@ -64,30 +73,36 @@
         <activity
             android:name=".Login"
             android:exported="true"
-            android:theme="@style/Theme.Material3.Dark.NoActionBar">
+            android:theme="@style/Theme.Material3.Dark.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".MainActivity"
-            android:exported="true">
-        </activity>
-
+            android:exported="true" />
         <activity
             android:name=".MealManagementActivity"
             android:exported="true"
             android:theme="@style/Theme.Material3.Dark.NoActionBar" />
-
+        <activity
+            android:name=".LogHistory"
+            android:exported="true"
+            android:theme="@style/Theme.Material3.Dark.NoActionBar" />
+        <activity
+            android:name=".DropdownAdapter"
+            android:exported="true"
+            android:theme="@style/Theme.Material3.Dark.NoActionBar" />
         <activity
             android:name=".PatientMealActivity"
             android:exported="true"
-            android:theme="@style/Theme.Material3.Dark.NoActionBar">
-        </activity>
+            android:theme="@style/Theme.Material3.Dark.NoActionBar" />
+        <activity android:name=".AlarmActivity" />
 
+        <receiver android:name=".ReminderBroadcastReceiver" />
+        <receiver android:name=".MealBroadcast" />
     </application>
 
 </manifest>
