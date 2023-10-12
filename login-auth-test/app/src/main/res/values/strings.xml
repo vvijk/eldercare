@@ -117,5 +117,7 @@
     <string name="channel_meals_name">Måltider</string>
     <string name="channel_meals_desc">Notifikation om måltider</string>
     <string name="meal_marked_too_early">Måltiden måste ha passerat för att markera den</string>
+    <string name="notif_eaten">Jag har ätit</string>
+    <string name="notif_not_eaten">Jag har inte ätit än</string>
 
 </resources>
