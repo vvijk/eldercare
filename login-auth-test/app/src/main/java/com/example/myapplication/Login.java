@@ -35,8 +35,7 @@ public class Login extends AppCompatActivity {
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
-            FirebaseUser user = mAuth.getCurrentUser();
-            db.isCaregiver(user.getUid(), new dbLibrary.CaregiverCheckCallback() {
+            db.isCaregiver(currentUser.getUid(), new dbLibrary.CaregiverCheckCallback() {
                 @Override
                 public void onFound(boolean isCaregiver) {
                     // Sign in success, update UI with the signed-in user's information
@@ -108,38 +107,44 @@ public class Login extends AppCompatActivity {
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 progressBar.setVisibility(View.GONE);
                                 FirebaseUser user = mAuth.getCurrentUser();
-
-                                db.isCaregiver(user.getUid(), new dbLibrary.CaregiverCheckCallback() {
-                                    @Override
-                                    public void onFound(boolean isCaregiver) {
-                                        if (task.isSuccessful()) {
-                                            // Sign in success, update UI with the signed-in user's information
-                                            Intent intent;
-                                            if(isCaregiver){
-                                                Toast.makeText(getApplicationContext(), "Successful login as: caregiver!", Toast.LENGTH_SHORT).show();
-                                                intent = new Intent(getApplicationContext(), home_caregiver.class);
-                                            }else{
-                                                Toast.makeText(getApplicationContext(), "Successful login as: caretaker!", Toast.LENGTH_SHORT).show();
-                                                intent = new Intent(getApplicationContext(), Home_caretaker.class);
+                                if(user == null) {
+                                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.invalid_user_login),Toast.LENGTH_LONG).show();
+                                    Log.d("dbtest", "Is neither a caretake nor caregiver");
+                                } else {
+                                    db.isCaregiver(user.getUid(), new dbLibrary.CaregiverCheckCallback() {
+                                        @Override
+                                        public void onFound(boolean isCaregiver) {
+                                            if (task.isSuccessful()) {
+                                                // Sign in success, update UI with the signed-in user's information
+                                                Intent intent;
+                                                if (isCaregiver) {
+                                                    Toast.makeText(getApplicationContext(), "Successful login as: caregiver!", Toast.LENGTH_SHORT).show();
+                                                    intent = new Intent(getApplicationContext(), home_caregiver.class);
+                                                } else {
+                                                    Toast.makeText(getApplicationContext(), "Successful login as: caretaker!", Toast.LENGTH_SHORT).show();
+                                                    intent = new Intent(getApplicationContext(), Home_caretaker.class);
+                                                }
+                                                startActivity(intent);
+                                                finish();
+                                            } else {
+                                                // If sign-in fails, display a message to the user.
+                                                Toast.makeText(Login.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                                             }
-                                            startActivity(intent);
-                                            finish();
-                                        } else {
-                                            // If sign-in fails, display a message to the user.
-                                            Toast.makeText(Login.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                                         }
-                                    }
 
-                                    @Override
-                                    public void onNotFound() {
-                                        Log.d("dbtest", "Is neither a caretake nor caregiver");
-                                    }
+                                        @Override
+                                        public void onNotFound() {
+                                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.something_went_wrong),Toast.LENGTH_LONG).show();
+                                            Log.d("dbtest", "Is neither a caretake nor caregiver");
+                                        }
 
-                                    @Override
-                                    public void onFoundError(String errorMessage) {
-                                        Log.d("dbtest", "Database ERROR!!");
-                                    }
-                                });
+                                        @Override
+                                        public void onFoundError(String errorMessage) {
+                                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.something_went_wrong),Toast.LENGTH_LONG).show();
+                                            Log.d("dbtest", "Database ERROR!!");
+                                        }
+                                    });
+                                }
                             }
                         });
             }

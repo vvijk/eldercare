@@ -3,7 +3,6 @@ package com.example.myapplication;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -20,7 +19,6 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import com.example.myapplication.util.FocusOnNewLine;
-import com.example.myapplication.util.GlobalApp;
 import com.example.myapplication.util.PatientMealStorage;
 import com.example.myapplication.util.TimeFixer;
 
@@ -29,6 +27,8 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
     TextView text_name=null;
     Button btn_back=null;
     Button btn_info=null;
+
+    Button btn_patient=null; // temporary
 
     String curCaretakerUUID = null;
     String curCaregiverUUID = null;
@@ -43,7 +43,7 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
     };
 
     PatientMealStorage getMealStorage() {
-        return ((GlobalApp) getApplicationContext()).mealStorage;
+        return ((MealApp) getApplicationContext()).mealStorage;
     }
 
     @Override
@@ -54,9 +54,11 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
         text_name = findViewById(R.id.text_patient_name);
         btn_back = findViewById(R.id.manage_patient_back);
         btn_info = findViewById(R.id.btn_patient_info);
-        // layout_description = findViewById(R.id.meal_patient_description);
         btn_back.setOnClickListener(this);
         btn_info.setOnClickListener(this);
+
+        btn_patient = findViewById(R.id.btn_home_patient); // temporary
+        btn_patient.setOnClickListener(this);// temporary
 
         Intent intent = getIntent();
 
@@ -103,6 +105,15 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
         Integer deleteMeal = (Integer)view.getTag(R.id.tag_deleteMeal);
         Integer dayIndex = (Integer)view.getTag(R.id.tag_dayIndex);
         Integer replaceMeal_dayIndex = (Integer)view.getTag(R.id.tag_replace_template_meal);
+
+        // temporary
+        if(view == btn_patient) {
+            saveAllMeals();
+            Intent intent = new Intent(getApplicationContext(), Home_caretaker.class);
+            intent.putExtra("caretakerUUID", curCaretakerUUID);
+            intent.putExtra("caregiverUUID", curCaregiverUUID);
+            startActivity(intent);
+        }
 
         if(view == btn_back) {
             Button button = (Button)view;
@@ -159,12 +170,12 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
             dayLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             dayLayout.setOnClickListener(this);
             dayLayout.setTag(R.id.tag_dayIndex, weekDayIndex);
-            dayLayout.setPadding(0,0,0,10);  // TODO(Emarioo): don't hardcode padding?
+            dayLayout.setPadding(0,0,0,20);  // TODO(Emarioo): don't hardcode padding?
             scrolledLayout.addView(dayLayout);
 
             LinearLayout headLayout = new LinearLayout(dayLayout.getContext());
             headLayout.setOrientation(LinearLayout.HORIZONTAL);
-            headLayout.setBackgroundColor(getResources().getColor(R.color.purple_normal));
+            headLayout.setBackgroundColor(getResources().getColor(R.color.purple_dark));
             headLayout.setPadding(25,8,25,8); // TODO(Emarioo): don't hardcode padding
             headLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             headLayout.setOnClickListener(this);
@@ -193,7 +204,7 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
             LinearLayout mealLayout = new LinearLayout(dayLayout.getContext());
             mealLayout.setOrientation(LinearLayout.VERTICAL);
             // mealLayout.setBackgroundColor(getResources().getColor(R.color.dry_green));
-            mealLayout.setBackgroundColor(getResources().getColor(R.color.purple_normal));
+            mealLayout.setBackgroundColor(getResources().getColor(R.color.purple_dark));
             mealLayout.setPadding(25,8,25,8); // TODO(Emarioo): don't hardcode padding
             mealLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             mealLayout.setOnClickListener(this);
@@ -210,18 +221,7 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
         // int mealCount = getMealStorage().caretaker_countOfMeals(curCaretakerId, weekDayIndex);
 
         int[] sortedMeals_index = getMealStorage().caretaker_sortedMealIndices(curCaretakerId, weekDayIndex);
-        int usedCount = sortedMeals_index.length;
-        // int[] sortedMeals_time = new int[mealCount];
-        // for(int mealIndex=0;mealIndex<mealCount;mealIndex++) {
-        //     if(!getMealStorage().caretaker_isMealIndexValid(curCaretakerId, weekDayIndex, mealIndex))
-        //         continue;
-        //     int hour = getMealStorage().caretaker_hourOfMeal(curCaretakerId, weekDayIndex, mealIndex);
-        //     int minute = getMealStorage().caretaker_minuteOfMeal(curCaretakerId, weekDayIndex, mealIndex);
-        //     sortedMeals_time[usedCount] = hour*100+minute;
-        //     sortedMeals_index[usedCount] = mealIndex;
-        //     usedCount++;
-        // }
-        if(usedCount == 0){
+        if(sortedMeals_index.length == 0){
             TextView textView = new TextView(this);
             textView.setText(getResources().getString(R.string.str_no_meals));
             textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30); // TODO(Emarioo): Don't hardcode text size
@@ -231,24 +231,7 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
             textView.setGravity(Gravity.CENTER);
             mealLayout.addView(textView);
         } else {
-            // TODO(Emarioo): Don't use bubble sort, you are better than this
-            // for(int i=0;i<usedCount;i++) {
-            //     boolean swapped = false;
-            //     for(int j=0;j<usedCount - 1 - i;j++) {
-            //         if (sortedMeals_time[j+1] < sortedMeals_time[j]) {
-            //             int tmp = sortedMeals_time[j];
-            //             sortedMeals_time[j] = sortedMeals_time[j+1];
-            //             sortedMeals_time[j+1] = tmp;
-            //             tmp = sortedMeals_index[j];
-            //             sortedMeals_index[j] = sortedMeals_index[j+1];
-            //             sortedMeals_index[j+1] = tmp;
-            //             swapped = true;
-            //         }
-            //     }
-            //     if(!swapped)
-            //         break;
-            // }
-            for(int i=0;i<usedCount;i++) {
+            for(int i=0;i<sortedMeals_index.length;i++) {
                 int mealIndex = sortedMeals_index[i];
                 if(!getMealStorage().caretaker_isMealIndexValid(curCaretakerId, weekDayIndex, mealIndex))
                     continue;
@@ -275,12 +258,7 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
                 headLayout.setGravity(Gravity.LEFT);
                 itemLayout.addView(headLayout);
 
-                String timeStr = "";
-                if(hour < 10) timeStr += "0";
-                timeStr += hour + ":";
-                if(minute < 10) timeStr += "0";
-                timeStr += minute;
-                refreshMealHeader(headLayout, true, name, timeStr);
+                refreshMealHeader(headLayout, true, name, Helpers.FormatTime(hour, minute));
 
                 itemLayout.setBackgroundColor(getResources().getColor(R.color.dry_green_brigher));
 
