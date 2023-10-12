@@ -61,7 +61,8 @@
         <activity
             android:name=".home_caregiver"
             android:exported="false"
-            android:parentActivityName=".home_caregiver" />
+            android:parentActivityName=".home_caregiver"
+            android:theme="@style/Theme.Material3.Dark.NoActionBar"/>
         <activity
             android:name=".ForgotPassword"
             android:exported="false" />

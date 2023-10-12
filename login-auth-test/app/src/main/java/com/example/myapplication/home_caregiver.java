@@ -26,28 +26,16 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.messaging.FirebaseMessaging;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-
-
-
-
-
 public class home_caregiver extends AppCompatActivity{
 
     Button patients_btn, settings_btn, logout_btn, home_bottom_btn, history_btn;
     TextView eldercare_text;
     dbLibrary db;
-
-
-
     FirebaseUser user;
     FirebaseAuth auth;
-
     private DatabaseReference itemRef;
-
     private static final String TAG = "MainActivity";
-
     String registrationToken;
-
 
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
@@ -58,8 +46,6 @@ public class home_caregiver extends AppCompatActivity{
                 }
             });
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,9 +55,6 @@ public class home_caregiver extends AppCompatActivity{
         settings_btn = findViewById(R.id.settings_btn);
         logout_btn = findViewById(R.id.logout_home_btn);
         history_btn = findViewById(R.id.historylog_btn);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-
 
         FirebaseApp.initializeApp(this);
 
@@ -213,20 +196,6 @@ public class home_caregiver extends AppCompatActivity{
     }
 
  */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                Intent intent = new Intent(getApplicationContext(), home_caregiver.class);
-                startActivity(intent);
-                onBackPressed();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-
     private void askNotificationPermission() {
         // This is only necessary for API Level > 33 (TIRAMISU)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -256,8 +225,4 @@ public class home_caregiver extends AppCompatActivity{
         // Response is a message ID string.
         System.out.println("Successfully sent message: " + response);
     }*/
-
-
-
-
 }
