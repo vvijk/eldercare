@@ -57,6 +57,7 @@ public class home_caregiver extends AppCompatActivity{
         history_btn = findViewById(R.id.historylog_btn);
 
         FirebaseApp.initializeApp(this);
+        MyNotificationManager myNotificationManager = MyNotificationManager.getInstance(this);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // Create channel to show notifications.
@@ -68,56 +69,6 @@ public class home_caregiver extends AppCompatActivity{
                     channelName, NotificationManager.IMPORTANCE_LOW));
         }
 
-        FirebaseMessaging.getInstance().getToken()
-                .addOnCompleteListener(new OnCompleteListener<String>() {
-                    @Override
-                    public void onComplete(@NonNull Task<String> task) {
-                        if (!task.isSuccessful()) {
-                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
-                            return;
-                        }
-
-                        // Get new FCM registration token
-                        String token = task.getResult();
-                        registrationToken = token;
-                        // Log and toast
-                        String msg = getString(R.string.msg_token_fmt, token);
-                        Log.d(TAG, msg);
-                        Toast.makeText(home_caregiver.this, msg, Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-
-     /*   FirebaseAuth auth = FirebaseAuth.getInstance();
-        String user = db.getUserID();
-        Log.d("test", user);
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        itemRef = database.getReference("users/caretakers/"+user+"/eaten");
-
-
-        itemRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method will be called whenever the data at the specified location changes
-                // You can retrieve the updated data from the dataSnapshot object
-                // dataSnapshot.getChildren() will give you the list of eaten items for the caretaker
-                makeNotification();
-                for (DataSnapshot itemSnapshot : dataSnapshot.getChildren()) {
-                    String eatenItem = itemSnapshot.getKey();
-                    // Process the eaten item as needed
-                    // You can access the eaten item's data using itemSnapshot.getValue()
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Handle any errors that occur during the listener setup or while retrieving data
-                Log.e("FirebaseListener", "Error: " + databaseError.getMessage());
-            }
-        });
-
-
-      */
         patients_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -157,45 +108,9 @@ public class home_caregiver extends AppCompatActivity{
         });
 
         askNotificationPermission();
+        myNotificationManager.notificationListener();
     }
 
-   /* private void makeNotification() {
-        String channelID = "CHANNEL_ID_NOTIFICATION";
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), channelID);
-        builder.setSmallIcon(R.drawable.ic_notifications_active);
-        builder.setContentTitle("TItleTest");
-        builder.setContentText("Hej niu testar jag lite här");
-        builder.setAutoCancel(true)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-        Intent intent = new Intent(getApplicationContext(), notifications_caregiver.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.putExtra("data", "Some value");
-
-        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(),
-                0, intent, PendingIntent.FLAG_MUTABLE);
-        builder.setContentIntent(pendingIntent);
-
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        NotificationChannel notificationChannel = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            notificationChannel = notificationManager.getNotificationChannel(channelID);
-            if (notificationChannel == null) {
-                int importance = NotificationManager.IMPORTANCE_HIGH;
-                notificationChannel = new NotificationChannel(channelID, "some description", importance);
-                notificationChannel.setLightColor(Color.GREEN);
-                notificationChannel.enableVibration(true);
-                notificationManager.createNotificationChannel(notificationChannel);
-
-            }
-        }
-
-        notificationManager.notify(0, builder.build());
-    }
-
- */
     private void askNotificationPermission() {
         // This is only necessary for API Level > 33 (TIRAMISU)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
