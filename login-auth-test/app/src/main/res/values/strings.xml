@@ -1,4 +1,5 @@
 <resources>
+    <string name="app_name">ElderCare</string>
     <string name="login">Logga in</string>
     <string name="register">Skapa konto</string>
     <string name="email">Epostadress</string>
