@@ -55,6 +55,7 @@ public class MyNotificationManager{
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference careGiverTakerReference = database.getReference("users/caregivers/" + currentUser + "/caretakers");
         DatabaseReference mealsRef = database.getReference("meals");
+        DatabaseReference caretakersRef = database.getReference("users/caretakers");
 
         ArrayList<String> patients = new ArrayList<>();
         ArrayList<String> patientsInMeal;
@@ -89,6 +90,7 @@ public class MyNotificationManager{
         return caretakerUIDs;
     }
 
+    //returnerar en lista på currentUser (caregivers) alla patienter.
     public ArrayList<String> checkPatientMealPatient(DatabaseReference mealsRef, ArrayList<String>caretakerUIDs){
         ArrayList<String> patientsInMeal = new ArrayList<>();
 
