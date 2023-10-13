@@ -17,6 +17,7 @@
     <string name="forgotPassword">Forgot Password</string>
     <string name="invalid_user_login">You need to register first</string>
     <string name="something_went_wrong">Something went wrong with the database. Contact the administrator or try again.</string>
+    <string name="write_patient_name">Write patients email</string>
 
     <string name="careTaker">Care Recipient</string>
     <string name="careGiver">Caregiver</string>
