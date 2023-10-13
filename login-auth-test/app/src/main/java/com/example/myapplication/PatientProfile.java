@@ -33,8 +33,8 @@ public class PatientProfile extends AppCompatActivity {
     FirebaseAuth firebase;
     DatabaseReference dbRef;
 
-    String caregiverUUID = "";
-    String caretakerUUID = "";
+    String caregiverUID = "";
+    String recipientUID = "";
 
     CareTaker patient;
 
@@ -58,10 +58,10 @@ public class PatientProfile extends AppCompatActivity {
         dbRef = FirebaseDatabase.getInstance().getReference("users/caretakers");
 
         Intent intent = getIntent();
-        caregiverUUID = intent.getStringExtra("caregiverUUID");
-        caretakerUUID = intent.getStringExtra("caretakerUUID");
+        caregiverUID = intent.getStringExtra("caregiverUID");
+        recipientUID = intent.getStringExtra("recipientUID");
 
-        dbRef.child(caretakerUUID).addListenerForSingleValueEvent(new ValueEventListener() {
+        dbRef.child(recipientUID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 patient = snapshot.getValue(CareTaker.class);

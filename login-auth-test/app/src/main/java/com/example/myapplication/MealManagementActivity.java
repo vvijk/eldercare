@@ -19,19 +19,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.myapplication.util.FocusOnNewLine;
-import com.example.myapplication.util.PatientMealStorage;
+import com.example.myapplication.util.MealStorage;
 import com.example.myapplication.util.TimeFixer;
 
 public class MealManagementActivity extends AppCompatActivity implements View.OnClickListener {
 
     LinearLayout scrolledLayout=null;
     Button btn_mealPlan = null;
-    Button btn_patients = null;
+    Button btn_recipients = null;
     Button btn_back = null;
 
     View.OnClickListener btn_listener = null;
 
-    PatientMealStorage getMealStorage() {
+    MealStorage getMealStorage() {
         return ((MealApp) getApplicationContext()).mealStorage;
     }
 
@@ -44,7 +44,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
 
     boolean showingPatients = true;
 
-    String caregiverUUID = "";
+    String caregiverUID = "";
     int currentCaregiverId = -1;
 
     @Override
@@ -53,30 +53,33 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
         setContentView(R.layout.activity_meal_manage);
         scrolledLayout = findViewById(R.id.meal_scroll);
         btn_mealPlan = findViewById(R.id.btn_meal_plan);
-        btn_patients = findViewById(R.id.btn_patients);
+        btn_recipients = findViewById(R.id.btn_recipients);
         btn_back = findViewById(R.id.btn_back);
 
         btn_back.setOnClickListener(this);
 
         getMealStorage().initDBConnection();
 
-        Intent intent = getIntent();
-        // The activity that created meal management activity should pass caregiverUUID
-        caregiverUUID = intent.getStringExtra("caregiverUUID");
-        if(caregiverUUID == null) {
-            Toast.makeText(this, getResources().getString(R.string.str_caregiverUUID_was_null),Toast.LENGTH_LONG).show();
-            caregiverUUID = "0GOIORHtHQRvqWAhib6svaTGBHp1"; // TODO: Don't hardcode
-            currentCaregiverId = getMealStorage().idFromCaregiverUUID(caregiverUUID);
-        } else {
-            currentCaregiverId = getMealStorage().idFromCaregiverUUID(caregiverUUID);
+        dbLibrary lib = new dbLibrary(this);
+        caregiverUID = lib.getUserID();
+
+        if(caregiverUID == null) {
+            Intent intent = getIntent();
+            // The activity that created meal management activity should pass caregiverUID
+            caregiverUID = intent.getStringExtra("caregiverUID");
+            if (caregiverUID == null) {
+                Toast.makeText(this, getResources().getString(R.string.str_caregiverUID_was_null), Toast.LENGTH_LONG).show();
+                caregiverUID = "0GOIORHtHQRvqWAhib6svaTGBHp1"; // TODO: Don't hardcode
+            }
         }
+        currentCaregiverId = getMealStorage().idFromCaregiverUID(caregiverUID);
 
         btn_listener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(view == btn_mealPlan) {
                     refreshMealPlan();
-                } else if (view == btn_patients){
+                } else if (view == btn_recipients){
                     if(!showingPatients)
                         saveAllMeals();
                     refreshPatients();
@@ -84,7 +87,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
             }
         };
         btn_mealPlan.setOnClickListener(btn_listener);
-        btn_patients.setOnClickListener(btn_listener);
+        btn_recipients.setOnClickListener(btn_listener);
         getMealStorage().pushRefresher_caregiver(currentCaregiverId, new Runnable() {
             @Override
             public void run() {
@@ -104,20 +107,20 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
     @Override
     public void onClick(View view) {
         Integer deleteMealIndex = (Integer)view.getTag(R.id.clicked_deleteMeal);
-        Integer patientId = (Integer)view.getTag(R.id.tag_patientId);
+        Integer recipientId = (Integer)view.getTag(R.id.tag_recipientId);
         Boolean addMeal = (Boolean)view.getTag(R.id.tag_template_add_meal);
 
         if(deleteMealIndex != null) {
             saveAllMeals();
             getMealStorage().caregiver_template_deleteMeal(currentCaregiverId,deleteMealIndex);
     //            refreshMeals();
-        } else if(patientId != null) {
+        } else if(recipientId != null) {
             // Button button = (Button) view;
-//            System.out.println("Press " + getMealStorage().nameOfPatient(patientId));
+//            System.out.println("Press " + getMealStorage().nameOfPatient(recipientId));
 
-            Intent intent = new Intent(getApplicationContext(), PatientMealActivity.class);
-            intent.putExtra("caretakerUUID", getMealStorage().uuidOfCaretaker(patientId));
-            intent.putExtra("caregiverUUID", getMealStorage().uuidOfCaregiver(currentCaregiverId));
+            Intent intent = new Intent(getApplicationContext(), MealActivity.class);
+            intent.putExtra("recipientUID", getMealStorage().UIDOfCaretaker(recipientId));
+            intent.putExtra("caregiverUID", getMealStorage().UIDOfCaregiver(currentCaregiverId));
             startActivity(intent);
             refreshPatients();
         } else if(addMeal != null) {
@@ -180,19 +183,19 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
         showingPatients = true;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             btn_mealPlan.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.almost_black)));
-            btn_patients.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.purple_dark)));
+            btn_recipients.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.purple_dark)));
         } else {
             // Colors won't work
         }
-        // btn_add.setText(R.string.str_add_patient);
+        // btn_add.setText(R.string.str_add_recipient);
         // TODO(Emarioo): Optimize by reusing view instead of removing them?
         //   Another optimization would be to hide the list instead of removing and recreating them.
         scrolledLayout.removeAllViews();
-        int patientCount = getMealStorage().caretakerCountOfCaregiver(currentCaregiverId);
+        int recipientCount = getMealStorage().caretakerCountOfCaregiver(currentCaregiverId);
 
-        if(patientCount == 0){
+        if(recipientCount == 0){
             TextView textView = new TextView(this);
-            textView.setText(getResources().getString(R.string.str_no_patients));
+            textView.setText(getResources().getString(R.string.str_no_recipients));
             textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25); // TODO(Emarioo): Don't hardcode text size
             textView.setLayoutParams(new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
@@ -200,7 +203,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
             textView.setGravity(Gravity.CENTER);
             scrolledLayout.addView(textView);
         } else {
-            for (int i = 0; i < patientCount; i++) {
+            for (int i = 0; i < recipientCount; i++) {
                 int caretakerId = getMealStorage().caretakerIdFromIndex(currentCaregiverId, i);
                 String name = getMealStorage().nameOfCaretaker(caretakerId);
 
@@ -231,13 +234,13 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
 
                 Button button = new Button(this);
                 button.setText(">");
-                // button.setText(R.string.patient_meals_edit);
+                // button.setText(R.string.recipient_meals_edit);
                 button.setAllCaps(false);
                 button.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20); // TODO(Emarioo): Don't hardcode text size
                 button.setLayoutParams(new ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.WRAP_CONTENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT));
-                button.setTag(R.id.tag_patientId, caretakerId);
+                button.setTag(R.id.tag_recipientId, caretakerId);
                 button.setOnClickListener(this);
 
                 buttonLayout.addView(button);
@@ -245,16 +248,16 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
         }
 
         EditText addCaretakerInputText = new EditText(this);
-        addCaretakerInputText.setHint(getString(R.string.write_patient_name));
+        addCaretakerInputText.setHint(getString(R.string.write_recipient_name));
         addCaretakerInputText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
         addCaretakerInputText.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT));
         scrolledLayout.addView(addCaretakerInputText);
 
-        // Skapa knappen för att lägga till patient
+        // Skapa knappen för att lägga till recipient
         Button addButton = new Button(this);
-        addButton.setText(getString(R.string.str_add_patient));
+        addButton.setText(getString(R.string.str_add_recipient));
         addButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
         addButton.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -274,11 +277,11 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
                         db.addCaretakerToGiver(db.getUserID(), uid, new dbLibrary.CaretakerAddCallback() {
                             @Override
                             public void onCaretakerAdded(String message) {
-                                Toast.makeText(MealManagementActivity.this, "Användare: " + caretakerFromInput + " har lagts till i din patientlista!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MealManagementActivity.this, "Användare: " + caretakerFromInput + " har lagts till i din recipientlista!", Toast.LENGTH_SHORT).show();
                             }
                             @Override
                             public void onCaretakerAddError(String errorMessage) {
-                                Toast.makeText(MealManagementActivity.this, "Användare: " + caretakerFromInput + " finns redan i din patientlista!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MealManagementActivity.this, "Användare: " + caretakerFromInput + " finns redan i din recipientlista!", Toast.LENGTH_SHORT).show();
                             }
                         });
                         addCaretakerInputText.setText("");
@@ -304,7 +307,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
         showingPatients = false;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             btn_mealPlan.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.purple_dark)));
-            btn_patients.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.almost_black)));
+            btn_recipients.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.almost_black)));
         } else {
             // Colors won't work
         }
@@ -362,10 +365,10 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
                         ViewGroup.LayoutParams.WRAP_CONTENT));
                 itemLayout.addView(subLayout);
 
-                // NOTE(Emarioo): Disabling editing of description when you click in on a patient.
+                // NOTE(Emarioo): Disabling editing of description when you click in on a recipient.
                 //  This is because you would modify the meal plan and thus changing the meals
-                //  for other patients too. We could allow you to edit description if each
-                //  patient has some kind of individual plan which wouldn't affect other patients.
+                //  for other recipients too. We could allow you to edit description if each
+                //  recipient has some kind of individual plan which wouldn't affect other recipients.
                 TextView editText = null;
                 // if(curPatientId!=0){
                 //     editText = new TextView(itemLayout.getContext());

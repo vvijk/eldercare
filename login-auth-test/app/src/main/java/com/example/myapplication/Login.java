@@ -45,7 +45,7 @@ public class Login extends AppCompatActivity {
                         intent = new Intent(getApplicationContext(), home_caregiver.class);
                     }else{
                         Toast.makeText(getApplicationContext(), "Successful pre-login as: caretaker!", Toast.LENGTH_SHORT).show();
-                        intent = new Intent(getApplicationContext(), Home_caretaker.class);
+                        intent = new Intent(getApplicationContext(), RecipientHome.class);
                     }
                     startActivity(intent);
                     finish();
@@ -122,7 +122,7 @@ public class Login extends AppCompatActivity {
                                                     intent = new Intent(getApplicationContext(), home_caregiver.class);
                                                 } else {
                                                     Toast.makeText(getApplicationContext(), "Successful login as: caretaker!", Toast.LENGTH_SHORT).show();
-                                                    intent = new Intent(getApplicationContext(), Home_caretaker.class);
+                                                    intent = new Intent(getApplicationContext(), RecipientHome.class);
                                                 }
                                                 startActivity(intent);
                                                 finish();

@@ -6,9 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bubble_backgroundgreen"
-    tools:context=".Home_caretaker"
+    tools:context=".RecipientHome"
     android:orientation="vertical"
-    android:id="@+id/layout_home_caretaker"
+    android:id="@+id/layout_recipient_home"
     android:padding="5dp">
 
     <TextView
@@ -42,10 +42,10 @@
     </Button>
 
     <Button
-        android:id="@+id/caretakerLogOut"
+        android:id="@+id/recipientLogOut"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Logga ut"
+        android:text="@string/logout"
         android:layout_marginTop="40dp"
         android:layout_gravity="center">
     </Button>

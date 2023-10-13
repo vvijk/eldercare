@@ -28,7 +28,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import com.example.myapplication.util.PatientMealStorage;
+import com.example.myapplication.util.MealStorage;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ class MealEntry {
     String key;
 }
 
-public class Home_caretaker extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class RecipientHome extends AppCompatActivity implements AdapterView.OnItemClickListener {
     LinearLayout rootLayout;
     ListView listViewMeals;
 
@@ -52,9 +52,9 @@ public class Home_caretaker extends AppCompatActivity implements AdapterView.OnI
     AlarmManager alarmManager;
     Button logout_btn;
     int weekDayIndex = 0;
-    String caretakerUUID;
+    String recipientUID;
     int caretakerId;
-    PatientMealStorage getMealStorage() { return ((MealApp)getApplicationContext()).mealStorage; }
+    MealStorage getMealStorage() { return ((MealApp)getApplicationContext()).mealStorage; }
 
     private ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
@@ -73,18 +73,18 @@ public class Home_caretaker extends AppCompatActivity implements AdapterView.OnI
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home_caretaker);
-        rootLayout = findViewById(R.id.layout_home_caretaker);
-        logout_btn = findViewById(R.id.caretakerLogOut);
+        setContentView(R.layout.activity_home_recipient);
+        rootLayout = findViewById(R.id.layout_recipient_home);
+        logout_btn = findViewById(R.id.recipientLogOut);
 
         Intent intent = getIntent();
-        caretakerUUID = intent.getStringExtra("caretakerUUID");
-        if(caretakerUUID == null) {
-            Toast.makeText(this, getResources().getString(R.string.str_caretakerUUID_was_null),Toast.LENGTH_LONG).show();
-            caretakerUUID = "kVz12RGTK1W9kaBd7b5imbh3mWg2"; // TODO(Emarioo): Don't hardcode
-            caretakerId = getMealStorage().idFromCaretakerUUID(caretakerUUID);
+        recipientUID = intent.getStringExtra("recipientUID");
+        if(recipientUID == null) {
+            Toast.makeText(this, getResources().getString(R.string.str_recipientUID_was_null),Toast.LENGTH_LONG).show();
+            recipientUID = "kVz12RGTK1W9kaBd7b5imbh3mWg2"; // TODO(Emarioo): Don't hardcode
+            caretakerId = getMealStorage().idFromCaretakerUID(recipientUID);
         } else {
-            caretakerId = getMealStorage().idFromCaretakerUUID(caretakerUUID);
+            caretakerId = getMealStorage().idFromCaretakerUID(recipientUID);
         }
 
         getMealStorage().initDBConnection(); // initialize getMealStorage in case it's not
@@ -92,7 +92,7 @@ public class Home_caretaker extends AppCompatActivity implements AdapterView.OnI
             @Override
             public void run() {
                 int weekDayIndex = getMealStorage().todaysDayIndex();
-                Home_caretaker.this.weekDayIndex = weekDayIndex;
+                RecipientHome.this.weekDayIndex = weekDayIndex;
 
                 int[] sortedMealIndices = getMealStorage().caretaker_sortedMealIndices(caretakerId, weekDayIndex);
 
@@ -135,7 +135,7 @@ public class Home_caretaker extends AppCompatActivity implements AdapterView.OnI
         buttonAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Home_caretaker.this, AlarmActivity.class);
+                Intent intent = new Intent(RecipientHome.this, AlarmActivity.class);
                 startActivityForResult(intent, 1);
 
             }
@@ -182,7 +182,7 @@ public class Home_caretaker extends AppCompatActivity implements AdapterView.OnI
                     intent.putExtra("name", meal.name);
                     intent.putExtra("time",Helpers.FormatTime(meal.hour,meal.minute));
                     intent.putExtra("desc", meal.desc);
-                    intent.putExtra("caretakerUUID", caretakerUUID);
+                    intent.putExtra("recipientUID", recipientUID);
                     intent.putExtra("dayIndex", weekDayIndex);
                     intent.putExtra("mealKey", meal.key);
                     intent.putExtra("noticeCount",0); // 0 is for the initial notification, no buttons. 1+ will have eaten or not eaten

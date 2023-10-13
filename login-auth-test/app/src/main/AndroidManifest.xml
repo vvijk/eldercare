@@ -19,7 +19,7 @@
         android:theme="@style/Theme.Material3.Dark"
         tools:targetApi="31" >
         <activity
-            android:name=".Home_caretaker"
+            android:name=".RecipientHome"
             android:exported="true" />
         <activity
             android:name=".PatientProfile"
@@ -96,7 +96,7 @@
             android:exported="true"
             android:theme="@style/Theme.Material3.Dark.NoActionBar" />
         <activity
-            android:name=".PatientMealActivity"
+            android:name=".MealActivity"
             android:exported="true"
             android:theme="@style/Theme.Material3.Dark.NoActionBar" />
         <activity android:name=".AlarmActivity" />
