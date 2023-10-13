@@ -16,6 +16,7 @@
     <string name="forgotPassword">Glömt lösenord</string>
     <string name="invalid_user_login">Du måste registrera dig först</string>
     <string name="something_went_wrong">Något med databasen gick fel. Kontakta ansvarig eller försök igen.</string>
+    <string name="write_patient_name">Skriv patientens epost här</string>
 
     <string name="careTaker">Vårdtagare</string>
     <string name="careGiver">Vårdgivare</string>

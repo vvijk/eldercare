@@ -245,7 +245,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
         }
 
         EditText addCaretakerInputText = new EditText(this);
-        addCaretakerInputText.setHint("Skriv patientens epost här");
+        addCaretakerInputText.setHint(getString(R.string.write_patient_name));
         addCaretakerInputText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
         addCaretakerInputText.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -254,7 +254,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
 
         // Skapa knappen för att lägga till patient
         Button addButton = new Button(this);
-        addButton.setText("Lägg till patient");
+        addButton.setText(getString(R.string.str_add_patient));
         addButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
         addButton.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
