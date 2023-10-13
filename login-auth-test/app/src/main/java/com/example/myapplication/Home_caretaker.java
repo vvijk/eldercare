@@ -172,6 +172,12 @@ public class Home_caretaker extends AppCompatActivity implements AdapterView.OnI
                 long mealTime = calendar.getTimeInMillis();
 
                 if(mealTime > nowTime && !meal.eaten) {
+                    int requestCode = index;
+
+                    long time = calendar.getTimeInMillis();
+
+                    // time = System.currentTimeMillis() + 4000; // debug purpose
+
                     Intent intent = new Intent(this, ReminderBroadcastReceiver.class);
                     intent.putExtra("name", meal.name);
                     intent.putExtra("time",Helpers.FormatTime(meal.hour,meal.minute));
@@ -179,14 +185,12 @@ public class Home_caretaker extends AppCompatActivity implements AdapterView.OnI
                     intent.putExtra("caretakerUUID", caretakerUUID);
                     intent.putExtra("dayIndex", weekDayIndex);
                     intent.putExtra("mealKey", meal.key);
-                    // TODO: There should be a reminder that tells you to it without buttons
-                    //   Then a reminder with buttons where you tell the app whether you ate or not (45 minutes after first one)
-                    //   There one or two more reminders in case you missed the previous reminders.
-                    intent.putExtra("withActions", true);
-                    PendingIntent pendingIntent = PendingIntent.getBroadcast(this, index, intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_CANCEL_CURRENT);
+                    intent.putExtra("noticeCount",0); // 0 is for the initial notification, no buttons. 1+ will have eaten or not eaten
+                    intent.putExtra("requestCode",requestCode); // 0 is for the initial notification, no buttons. 1+ will have eaten or not eaten
+                    intent.putExtra("alarmAtMillis", time);
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
-                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
-                    // alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, 4000, pendingIntent); // debug purposes
+                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, pendingIntent);
                 } else {
                     // meal time has already passsed
                 }
@@ -207,7 +211,7 @@ public class Home_caretaker extends AppCompatActivity implements AdapterView.OnI
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         MealEntry meal = meals.get(position);
-        int mealIndex = position;
+        int requestCode = position;
 
         Calendar calendar = Calendar.getInstance();
         if(meal.hour * 100 + meal.minute > calendar.get(Calendar.HOUR_OF_DAY)*100 + calendar.get(Calendar.MINUTE)) {
@@ -215,11 +219,11 @@ public class Home_caretaker extends AppCompatActivity implements AdapterView.OnI
             return;
         }
 
-        getMealStorage().caretaker_setEatenOfMeal(caretakerId, weekDayIndex, mealIndex, !meals.get(position).eaten);
+        getMealStorage().caretaker_setEatenOfMeal(caretakerId, weekDayIndex, position, !meals.get(position).eaten);
         // meals.get(position).eaten = !meals.get(position).eaten;
 
         Intent intent = new Intent(this, BroadcastReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, mealIndex, intent,PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_NO_CREATE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent,PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_NO_CREATE);
         if(pendingIntent != null) {
             alarmManager.cancel(pendingIntent);
         }

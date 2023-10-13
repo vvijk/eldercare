@@ -1,5 +1,7 @@
 package com.example.myapplication;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -19,8 +21,9 @@ public class MealBroadcast extends BroadcastReceiver {
         int weekDayIndex = intent.getIntExtra("dayIndex", 0);
         String caretakerUUID = intent.getStringExtra("caretakerUUID");
         int id = intent.getIntExtra("notificationId",0);
+        int requestCode = intent.getIntExtra("nextAlarmsRequestCode",0);
 
-        System.out.println("MEAL BROAD " + mealKey);
+        // System.out.println("MEAL BROADCAST " + mealKey);
         PatientMealStorage storage = new PatientMealStorage();
         storage.initDBConnection();
 
@@ -31,6 +34,17 @@ public class MealBroadcast extends BroadcastReceiver {
             NotificationManagerCompat manager = NotificationManagerCompat.from(context);
             manager.cancel(id);
         }
+
+        if(haveEaten) {
+            // Stop reminder if you pressed "eaten", we don't need to ask caretaker anymore.
+            Intent old_intent = new Intent(context, BroadcastReceiver.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestCode, old_intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_NO_CREATE);
+            if (pendingIntent != null) {
+                AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                alarmManager.cancel(pendingIntent);
+            }
+        }
+
         // int caretakerId = storage.idFromCaretakerUUID(caretakerUUID);
         // System.out.println("caretaker id  " + caretakerId);
         // storage.pushRefresher_caretaker(caretakerId, new Runnable() {

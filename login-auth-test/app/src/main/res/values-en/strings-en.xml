@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ElderCare</string>
+    <string name="login">Log In</string>
+    <string name="register">Create Account</string>
+    <string name="email">Email Address</string>
+    <string name="password">Password</string>
+    <string name="click_to_login">Click here to log in</string>
+    <string name="click_to_register">Click here to create an account</string>
+    <string name="user_details"></string>
+    <string name="logout">Click to logout</string>
+    <string name="lastName">Last Name</string>
+    <string name="phoneNumber">Phone Number</string>
+    <string name="firstName">First Name</string>
+    <string name="password2">Confirm Password</string>
+    <string name="idNumber">Personal Identification Number (12 digits)</string>
+    <string name="forgotPassword">Forgot Password</string>
+    <string name="invalid_user_login">You need to register first</string>
+    <string name="something_went_wrong">Something went wrong with the database. Contact the administrator or try again.</string>
+
+    <string name="careTaker">Care Recipient</string>
+    <string name="careGiver">Caregiver</string>
+
+    <!--STRINGS FOR CREATE PATIENT-->
+    <string name="address">Address</string>
+    <string name="city">City</string>
+    <string name="county">County</string>
+    <string name="preferences">Preferences</string>
+    <string name="restrictions">Allergies</string>
+    <string name="PIN">PIN Code</string>
+    <string name="confirmPIN">Confirm PIN Code</string>
+    <string name="createPatient">Create Patient</string>
+
+    <!--ERROR MESSAGES, CREATE PATIENT-->
+    <string name="createPatientSuccess">Patient added! (TODO)</string>
+    <string name="createPatientErrorDefault">Enter input error</string>
+    <string name="createPatientErrorForename">Enter first name</string>
+    <string name="createPatientErrorSurname">Enter last name</string>
+    <string name="createPatientErrorPhone">Enter phone number (10 digits)</string>
+    <string name="createPatientErrorAddress">Enter address</string>
+    <string name="createPatientErrorCity">Enter city</string>
+    <string name="createPatientErrorCounty">Enter county</string>
+    <string name="createPatientErrorPreferences">No preferences entered</string>
+    <string name="createPatientErrorRestrictions">No allergies entered</string>
+    <string name="createPatientErrorPIN">Enter PIN Code (4 digits)</string>
+    <string name="createPatientErrorConfirmPIN">Confirm PIN code</string>
+
+    <string name="title_activity_drop_down">dropDown</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+
+    <!-- WILLES -->
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="settings">Settings</string>
+    <string name="home">Home</string>
+    <string name="patients">Patients</string>
+    <string name="profile">Profile</string>
+    <string name="menu_drawer_open">Drawer Open</string>
+    <string name="menu_drawer_closed">Drawer Closed</string>
+    <string name="notifications">Notifications</string>
+    <string name="notis">Notification</string>
+    <string name="logout_home">Log Out</string>
+    <string name="name">Name</string>
+    <string name="time">Time</string>
+    <string name="default_channel_id">1337</string>
+    <string name="default_channel_name">caregiver_channel</string>
+    <string name="languageText">Choose Language</string>
+    <string name="swedish">Swedish</string>
+    <string name="english">English</string>
+    <string name="msg_token_fmt" translatable="false">FCM registration Token: %s</string>
+
+    <string name="historylog">History</string>
+
+    <!-- Meal management -->
+    <string name="manage_meals">Manage Meals</string>
+    <string name="str_template_meals">Base Meals</string>
+    <string name="str_base_meals">Basic Meals</string>
+    <string name="meal_time_bad_format">Incorrect meal time format</string>
+    <string name="meal_time_missing_colon">Meal time is missing a colon</string>
+    <string name="patient_meals_edit">Edit</string>
+    <string name="btn_replace_template_meal">Replace with base meal</string>
+    <string name="str_add_patient">Add Patient</string>
+    <string name="str_add_meal">Add Meal</string>
+    <string name="str_patients">Patients</string>
+    <string name="str_back">Back</string>
+    <string name="default_meal_name">Name</string>
+    <string name="str_caregiverUUID_was_null">Caregiver UUID is null</string>
+    <string name="str_caretakerUUID_was_null">Caretaker UUID is null</string>
+    <string name="str_delete">Delete</string>
+    <string name="str_patient_info">Info</string>
+    <string name="str_no_meals">No meals</string>
+    <string name="str_no_patients">No patients</string>
+    <string name="str_no_description">No description</string>
+    <string name="str_monday">Monday</string>
+    <string name="str_tuesday">Tuesday</string>
+    <string name="str_wednesday">Wednesday</string>
+    <string name="str_thursday">Thursday</string>
+    <string name="str_friday">Friday</string>
+    <string name="str_saturday">Saturday</string>
+    <string name="str_sunday">Sunday</string>
+    <string name="str_BackToMealPlan">Back to Meal Plan</string>
+
+    <!-- Home for caretaker -->
+    <string name="str_emergency_alert">EMERGENCY ALERT</string>
+    <string name="missing_alarm_permission">Cannot set alarm due to unauthorized permission</string>
+    <string name="channel_meals_name">Meals</string>
+    <string name="channel_meals_desc">Meal notifications</string>
+    <string name="meal_marked_too_early">Meal must have passed to mark it</string>
+    <string name="notif_eaten">I have eaten</string>
+    <string name="notif_not_eaten">I have not eaten yet</string>
+</resources>
