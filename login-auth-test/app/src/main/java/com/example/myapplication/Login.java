@@ -109,7 +109,6 @@ public class Login extends AppCompatActivity {
                                 FirebaseUser user = mAuth.getCurrentUser();
                                 if(user == null) {
                                     Toast.makeText(getApplicationContext(), getResources().getString(R.string.invalid_user_login),Toast.LENGTH_LONG).show();
-                                    Log.d("dbtest", "Is neither a caretake nor caregiver");
                                 } else {
                                     db.isCaregiver(user.getUid(), new dbLibrary.CaregiverCheckCallback() {
                                         @Override
@@ -118,10 +117,8 @@ public class Login extends AppCompatActivity {
                                                 // Sign in success, update UI with the signed-in user's information
                                                 Intent intent;
                                                 if (isCaregiver) {
-                                                    Toast.makeText(getApplicationContext(), "Successful login as: caregiver!", Toast.LENGTH_SHORT).show();
                                                     intent = new Intent(getApplicationContext(), home_caregiver.class);
                                                 } else {
-                                                    Toast.makeText(getApplicationContext(), "Successful login as: caretaker!", Toast.LENGTH_SHORT).show();
                                                     intent = new Intent(getApplicationContext(), RecipientHome.class);
                                                 }
                                                 startActivity(intent);

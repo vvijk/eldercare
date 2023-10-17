@@ -18,6 +18,9 @@
     <string name="invalid_user_login">You need to register first</string>
     <string name="something_went_wrong">Something went wrong with the database. Contact the administrator or try again.</string>
     <string name="write_recipient_name">Write recipient\'s email</string>
+    <string name="Ja">Yes</string>
+    <string name="Nej">No</string>
+    <string name="sureLogOut">Are you sure you want to log out?</string>
 
     <string name="careTaker">Care Recipient</string>
     <string name="careGiver">Caregiver</string>

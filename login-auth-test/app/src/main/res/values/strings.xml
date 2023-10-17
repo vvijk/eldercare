@@ -7,7 +7,7 @@
     <string name="click_to_login">Tryck här för att logga in</string>
     <string name="click_to_register">Tryck här för att skapa ett konto</string>
     <string name="user_details"></string>
-    <string name="logout">Click to logout</string>
+    <string name="logout">Logga ut</string>
     <string name="lastName">Efternamn</string>
     <string name="phoneNumber">Telefonnummer</string>
     <string name="firstName">Förnamn</string>
@@ -17,6 +17,9 @@
     <string name="invalid_user_login">Du måste registrera dig först</string>
     <string name="something_went_wrong">Något med databasen gick fel. Kontakta ansvarig eller försök igen.</string>
     <string name="write_recipient_name">Skriv vårdtagarens epost här</string>
+    <string name="Ja">Ja</string>
+    <string name="Nej">Nej</string>
+    <string name="sureLogOut">Är du säker på att du vill logga ut?</string>
 
     <string name="careTaker">Vårdtagare</string>
     <string name="careGiver">Vårdgivare</string>
