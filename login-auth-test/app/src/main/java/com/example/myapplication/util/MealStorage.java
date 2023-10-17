@@ -66,7 +66,7 @@ public class MealStorage {
             this.minute = minute;
         }
         public Meal() {} // default
-        String key;
+        public String key;
         public String name=""; // lunch, breakfast...
         public int hour=12;
         public int minute=0;
@@ -845,6 +845,15 @@ public class MealStorage {
         if(day == null)
             return new int[0];
         return getSortedMealIndexList(day);
+    }
+    public Meal caretaker_getMeal(int caretakerId, int weekDay, int mealIndex) {
+        Caretaker caretaker = getCaretaker(caretakerId);
+        if(caretaker == null)
+            return null;
+        MealDay day = caretaker.days[weekDay];
+        if(day == null)
+            return null;
+        return day.meals.get(mealIndex);
     }
     public boolean caretaker_isMealIndexValid(int caretakerId, int weekDay, int mealIndex) {
         Caretaker caretaker = getCaretaker(caretakerId);

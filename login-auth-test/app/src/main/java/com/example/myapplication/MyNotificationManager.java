@@ -180,7 +180,8 @@ public class MyNotificationManager{
                     LocalTime currTime = LocalTime.now();
                     if(currentTime.isAfter(targetTime)){
                         Log.d("larss","har inte ätit efter tiden: ");
-                        makeNotification();
+                        // NOTE(Emarioo): Turning this off because it's annoying.
+                        // makeNotification();
                     } else{
                         Log.d("larss", "tiden är före:" + targetTime);
                     }
@@ -202,7 +203,6 @@ public class MyNotificationManager{
     }
 
     public void makeNotification() {
-
         String channelID = "CHANNEL_ID_NOTIFICATION";
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context,
                 channelID);
