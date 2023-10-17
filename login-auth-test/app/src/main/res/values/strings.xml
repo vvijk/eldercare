@@ -14,7 +14,7 @@
     <string name="password2">Bekräfta lösenord</string>
     <string name="idNumber">Personnummer (12 siffror)</string>
     <string name="forgotPassword">Glömt lösenord</string>
-    <string name="invalid_user_login">Du måste registrera dig först</string>
+    <string name="invalid_user_login">Fel användarnamn eller lösenord</string>
     <string name="something_went_wrong">Något med databasen gick fel. Kontakta ansvarig eller försök igen.</string>
     <string name="write_recipient_name">Skriv vårdtagarens epost här</string>
     <string name="Ja">Ja</string>

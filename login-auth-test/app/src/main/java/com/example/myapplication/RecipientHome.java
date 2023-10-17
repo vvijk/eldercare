@@ -186,41 +186,84 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
         if(!alarmManager.canScheduleExactAlarms()) {
             Toast.makeText(this, getResources().getString(R.string.missing_alarm_permission),Toast.LENGTH_LONG).show();
         } else {
-            for (int index = 2;index < meals.size();index++) {
-                MealEntry meal = meals.get(index);
+            int dayCount = 2;
+            for (int j=0;j<dayCount;j++){
+                if(j == 0) {
+                    for (int index = 0;index < meals.size();index++) {
+                        MealEntry meal = meals.get(index);
 
-                Calendar calendar = Calendar.getInstance();
-                calendar.set(Calendar.HOUR_OF_DAY, meal.hour);
-                calendar.set(Calendar.MINUTE, meal.minute);
-                calendar.set(Calendar.SECOND, 0);
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.set(Calendar.HOUR_OF_DAY, meal.hour);
+                        calendar.set(Calendar.MINUTE, meal.minute);
+                        calendar.set(Calendar.SECOND, 0);
 
-                // System.out.println(calendar.getTimeInMillis() - System.currentTimeMillis());
+                        // System.out.println(calendar.getTimeInMillis() - System.currentTimeMillis());
 
-                long nowTime = System.currentTimeMillis();
-                long mealTime = calendar.getTimeInMillis();
+                        long nowTime = System.currentTimeMillis();
+                        long mealTime = calendar.getTimeInMillis();
 
-                if(mealTime > nowTime && !meal.eaten) {
-                    int requestCode = index;
+                        if (mealTime > nowTime && !meal.eaten) {
+                            int requestCode = index + j*10; // TODO: 10 will collide meals if there are 10
 
-                    long time = calendar.getTimeInMillis();
+                            long time = calendar.getTimeInMillis();
 
-                    // time = System.currentTimeMillis() + 4000; // debug purpose
+                            // time = System.currentTimeMillis() + 4000; // debug purpose
 
-                    Intent intent = new Intent(this, ReminderBroadcastReceiver.class);
-                    intent.putExtra("name", meal.name);
-                    intent.putExtra("time",Helpers.FormatTime(meal.hour,meal.minute));
-                    intent.putExtra("desc", meal.desc);
-                    intent.putExtra("recipientUID", recipientUID);
-                    intent.putExtra("dayIndex", weekDayIndex);
-                    intent.putExtra("mealKey", meal.key);
-                    intent.putExtra("noticeCount",0); // 0 is for the initial notification, no buttons. 1+ will have eaten or not eaten
-                    intent.putExtra("requestCode",requestCode); // 0 is for the initial notification, no buttons. 1+ will have eaten or not eaten
-                    intent.putExtra("alarmAtMillis", time);
-                    PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+                            Intent intent = new Intent(this, ReminderBroadcastReceiver.class);
+                            intent.putExtra("name", meal.name);
+                            intent.putExtra("time", Helpers.FormatTime(meal.hour, meal.minute));
+                            intent.putExtra("desc", meal.desc);
+                            intent.putExtra("recipientUID", recipientUID);
+                            intent.putExtra("dayIndex", weekDayIndex);
+                            intent.putExtra("mealKey", meal.key);
+                            intent.putExtra("noticeCount", 0); // 0 is for the initial notification, no buttons. 1+ will have eaten or not eaten
+                            intent.putExtra("requestCode", requestCode); // 0 is for the initial notification, no buttons. 1+ will have eaten or not eaten
+                            intent.putExtra("alarmAtMillis", time);
+                            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
-                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+                            alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+                        } else {
+                            // meal time has already passsed
+                        }
+                    }
                 } else {
-                    // meal time has already passsed
+//                    int mealCount = getMealStorage().caretaker_countOfMeals(caretakerId, );
+//                    MealEntry meal = meals.get(0);
+//
+//
+//                    Calendar calendar = Calendar.getInstance();
+//                    calendar.set(Calendar.HOUR_OF_DAY, meal.hour);
+//                    calendar.set(Calendar.MINUTE, meal.minute);
+//                    calendar.set(Calendar.SECOND, 0);
+//
+//                    // System.out.println(calendar.getTimeInMillis() - System.currentTimeMillis());
+//
+//                    long nowTime = System.currentTimeMillis();
+//                    long mealTime = calendar.getTimeInMillis();
+//
+//                    if (mealTime > nowTime && !meal.eaten) {
+//                        int requestCode = index + j*10; // TODO: 10 will collide meals if there are 10
+//
+//                        long time = calendar.getTimeInMillis();
+//
+//                        // time = System.currentTimeMillis() + 4000; // debug purpose
+//
+//                        Intent intent = new Intent(this, ReminderBroadcastReceiver.class);
+//                        intent.putExtra("name", meal.name);
+//                        intent.putExtra("time", Helpers.FormatTime(meal.hour, meal.minute));
+//                        intent.putExtra("desc", meal.desc);
+//                        intent.putExtra("caretakerUUID", caretakerUUID);
+//                        intent.putExtra("dayIndex", weekDayIndex);
+//                        intent.putExtra("mealKey", meal.key);
+//                        intent.putExtra("noticeCount", 0); // 0 is for the initial notification, no buttons. 1+ will have eaten or not eaten
+//                        intent.putExtra("requestCode", requestCode); // 0 is for the initial notification, no buttons. 1+ will have eaten or not eaten
+//                        intent.putExtra("alarmAtMillis", time);
+//                        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+//
+//                        alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+//                    } else {
+//                        // meal time has already passsed
+//                    }
                 }
             }
         }
