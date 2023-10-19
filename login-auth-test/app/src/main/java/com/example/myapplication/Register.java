@@ -45,7 +45,7 @@ public class Register extends AppCompatActivity {
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
-            Intent intent =  new Intent(getApplicationContext(), MainActivity.class);
+            Intent intent =  new Intent(getApplicationContext(), home_caregiver.class);
             startActivity(intent);
             finish();
         }
@@ -131,8 +131,8 @@ public class Register extends AppCompatActivity {
                         public void onSuccess(String message) {
                             progressBar.setVisibility(View.GONE);
                             Toast.makeText(Register.this, message, Toast.LENGTH_SHORT).show();
-                            // Skicka användaren till MainAcitivity sidan.
-                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                            // Skicka användaren till home_caregiver sidan.
+                            Intent intent = new Intent(getApplicationContext(), home_caregiver.class);
                             startActivity(intent);
                             finish();
                         }
