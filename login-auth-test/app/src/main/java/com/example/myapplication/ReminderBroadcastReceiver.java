@@ -48,7 +48,7 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, nextNotice, pendingIntent);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, nextNotice, pendingIntent);
         }
 
         // Toast.makeText(context, "Reminder broadcast yay " + meal, Toast.LENGTH_SHORT).show();
@@ -71,13 +71,7 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
 
             manager.createNotificationChannel(channel);
         }
-        // TODO: What to do with intent?
-        // Create an explicit intent for an Activity in your app.
-        // Intent intent = new Intent(this, AlertDetails.class);
-        // intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        // PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 
-        // TODO: Notification with buttons to specify whether you have eaten or not.
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notifications)
                 .setContentTitle(name + " " + time)

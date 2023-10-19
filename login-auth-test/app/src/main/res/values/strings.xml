@@ -14,7 +14,7 @@
     <string name="password2">Bekräfta lösenord</string>
     <string name="idNumber">Personnummer (12 siffror)</string>
     <string name="forgotPassword">Glömt lösenord</string>
-    <string name="invalid_user_login">Du måste registrera dig först</string>
+    <string name="invalid_user_login">Fel användarnamn eller lösenord</string>
     <string name="something_went_wrong">Något med databasen gick fel. Kontakta ansvarig eller försök igen.</string>
     <string name="write_recipient_name">Skriv vårdtagarens epost här</string>
     <string name="Ja">Ja</string>
@@ -90,9 +90,10 @@
     <string name="str_add_recipient">Lägg till vårdtagare</string>
     <string name="str_add_meal">Lägg till måltid</string>
     <string name="str_recipients">Vårdtagare</string>
+    <string name="str_recipient">Vårdtagare</string>
     <string name="str_back">Tillbaka</string>
     <!--    <string name="str_back">&lt</string> &lt;!&ndash; &lt is converted to the character '<' &ndash;&gt;-->
-    <string name="default_meal_name">Namn</string>
+    <string name="default_meal_name">Namnlös</string>
     <string name="str_caregiverUID_was_null">UID för vårdgivare är null</string>
     <string name="str_recipientUID_was_null">UID för vårdtagare är null</string>
     <string name="str_delete">Ta bort</string>

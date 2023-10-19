@@ -128,6 +128,12 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
             getMealStorage().caregiver_template_addMeal(currentCaregiverId, getResources().getString(R.string.default_meal_name));
         } else if(btn_back != null) {
             saveAllMeals();
+
+            if(isTaskRoot()) {
+                Intent intent = new Intent(getApplicationContext(), Login.class);
+                startActivity(intent);
+            }
+
             finish();
         }
     }

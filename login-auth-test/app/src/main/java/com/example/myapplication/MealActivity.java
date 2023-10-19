@@ -358,30 +358,6 @@ public class MealActivity extends AppCompatActivity implements View.OnClickListe
             replaceButton.setTextColor(getResources().getColor(R.color.black));
             footLayout.addView(replaceButton);
         }
-//        LinearLayout bottomLayout = new LinearLayout(scrolledLayout.getContext());
-//        bottomLayout.setOrientation(LinearLayout.HORIZONTAL);
-//        bottomLayout.setGravity(Gravity.CENTER);
-//        bottomLayout.setLayoutParams(new ViewGroup.LayoutParams(
-//                ViewGroup.LayoutParams.MATCH_PARENT,
-//                ViewGroup.LayoutParams.WRAP_CONTENT));
-//        scrolledLayout.addView(bottomLayout);
-//
-//        Button replaceButton = new Button(bottomLayout.getContext());
-//        replaceButton.setAllCaps(false);
-//        replaceButton.setText(getResources().getString(R.string.btn));
-//        replaceButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18); // TODO(Emarioo): Don't hardcode text size
-//        replaceButton.setLayoutParams(new ViewGroup.LayoutParams(
-//                ViewGroup.LayoutParams.WRAP_CONTENT,
-//                ViewGroup.LayoutParams.WRAP_CONTENT));
-//        GradientDrawable shape = new GradientDrawable();
-//        shape.setCornerRadius(16);
-//        shape.setColor(getResources().getColor(R.color.purple));
-//        replaceButton.setBackground(shape);
-//        replaceButton.setOnClickListener(this);
-//        replaceButton.setTextColor(getResources().getColor(R.color.white));
-//        bottomLayout.addView(replaceButton);
-
-
     }
 
     void refreshMealHeader(LinearLayout headLayout, boolean editable, String mealName, String mealTime) {

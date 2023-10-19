@@ -89,8 +89,9 @@
     <string name="str_add_recipient">Add recipient</string>
     <string name="str_add_meal">Add meal</string>
     <string name="str_recipients">Recipients</string>
+    <string name="str_recipient">Recipient</string>
     <string name="str_back">Back</string>
-    <string name="default_meal_name">Name</string>
+    <string name="default_meal_name">Unnamed</string>
     <string name="str_delete">Delete</string>
     <string name="str_recipient_info">Info</string>
     <string name="str_no_meals">No meals</string>
