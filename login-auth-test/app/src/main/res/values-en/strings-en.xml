@@ -21,6 +21,8 @@
     <string name="Ja">Yes</string>
     <string name="Nej">No</string>
     <string name="sureLogOut">Are you sure you want to log out?</string>
+    <string name="choose">You must choose caregiver or caretaker!</string>
+    <string name="dontMatch">Passwords dont match!</string>
 
     <string name="careTaker">Care Recipient</string>
     <string name="careGiver">Caregiver</string>

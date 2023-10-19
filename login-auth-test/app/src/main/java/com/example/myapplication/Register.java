@@ -115,12 +115,12 @@ public class Register extends AppCompatActivity {
                 prefFood = String.valueOf(editTextPrefFood.getText());
 
                 if (checkedRadioButtonId == -1) {
-                    Toast.makeText(Register.this, "Du måste välja vårdtagare eller vårdgivare!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Register.this, R.string.choose, Toast.LENGTH_SHORT).show();
                     progressBar.setVisibility(View.GONE);
                     return;
                 }
                 if (!password.equals(password2)) {
-                    Toast.makeText(Register.this, "Lösenorden matchar inte!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Register.this, R.string.dontMatch, Toast.LENGTH_SHORT).show();
                     progressBar.setVisibility(View.GONE);
                     return;
                 }

@@ -20,6 +20,8 @@
     <string name="Ja">Ja</string>
     <string name="Nej">Nej</string>
     <string name="sureLogOut">Är du säker på att du vill logga ut?</string>
+    <string name="choose">Du måste välja vårdtagare eller vårdgivare!</string>
+    <string name="dontMatch">Lösenorden matchar inte!</string>
 
     <string name="careTaker">Vårdtagare</string>
     <string name="careGiver">Vårdgivare</string>
