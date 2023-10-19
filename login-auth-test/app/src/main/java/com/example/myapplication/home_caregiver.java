@@ -37,6 +37,8 @@ public class home_caregiver extends AppCompatActivity{
     private static final String TAG = "MainActivity";
     String registrationToken;
 
+    MyNotificationManager myNotificationManager;
+
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
@@ -57,7 +59,7 @@ public class home_caregiver extends AppCompatActivity{
         history_btn = findViewById(R.id.historylog_btn);
 
         FirebaseApp.initializeApp(this);
-        MyNotificationManager myNotificationManager = MyNotificationManager.getInstance(this);
+        myNotificationManager = MyNotificationManager.getInstance(this);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // Create channel to show notifications.
