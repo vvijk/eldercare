@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.telephony.SmsManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -21,6 +22,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 public class AlarmActivity extends AppCompatActivity {
 
 
@@ -36,10 +41,11 @@ public class AlarmActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm);
 
-        recipientUID = getIntent().getStringExtra("recipientUID");
+        
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        recipientUID = auth.getCurrentUser().getUid();
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         caretakersRef = database.getReference("users/caretakers");
-
         TextView countDownTextView = findViewById(R.id.CountDown);
 
         caretakersRef.child(recipientUID).child("larm").addValueEventListener(new ValueEventListener() {

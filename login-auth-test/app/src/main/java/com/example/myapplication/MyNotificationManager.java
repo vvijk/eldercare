@@ -61,7 +61,7 @@ public class MyNotificationManager{
         ArrayList<String> patientsInMeal;
 
         patients = getPatientFromGiver(careGiverTakerReference);
-       // checkPatientMealPatient(mealsRef, patients);
+        checkPatientMealPatient(mealsRef, patients);
         checkLarm(caretakersRef, patients);
 
 
@@ -86,8 +86,9 @@ public class MyNotificationManager{
                                         Log.d("lars", "hitta caretaker: " + larmSnapshot.getValue());
                                         if (larmSnapshot.getKey().equals("larm") && larmSnapshot.getValue(boolean.class)){
 
-                                                String msg =  finalCaretakersRef.child("name").toString();
+                                                String msg =  "lasse larmar";
                                                 String title = "Larm";
+                                                finalCaretakersRef.child("larm").setValue(false);
                                                 makeNotification(title, msg);
                                         }
                                     }
@@ -168,7 +169,7 @@ public class MyNotificationManager{
         // Format the date to display the first three letters of the day (e.g., "Mon")
         SimpleDateFormat sdf = new SimpleDateFormat("EEE", Locale.getDefault());
         String todaysDay = sdf.format(currentDate);
-        String day = ("fri");
+        String day = (todaysDay);
 
         DatabaseReference finalMealsRef = mealsRef.child(patientSnapshot).child(day);
 
@@ -228,8 +229,12 @@ public class MyNotificationManager{
                 if(!checkEaten[0]){                                                                                       LocalTime currentTime = LocalTime.now();
                     LocalTime targetTime = LocalTime.of(hourInt[0], minuteInt[0]).plusHours(1).plusMinutes(30);
                     LocalTime currTime = LocalTime.now();
-                    if(currentTime.isAfter(targetTime)){ //om klockan är efter tiden
-                        makeNotification(title, msg);
+
+                    if(currentTime.isAfter(targetTime)){
+                        Log.d("larss","har inte ätit efter tiden: ");
+                        // NOTE(Emarioo): Turning this off because it's annoying.
+                        // makeNotification(title, msg);
+
                     } else{
 
                     }
@@ -250,6 +255,7 @@ public class MyNotificationManager{
         return calendar.get(Calendar.HOUR_OF_DAY) == 12 && calendar.get(Calendar.MINUTE) == 0;
     }
 
+                                          
     public void makeNotification(String title, String msg) {
 
         String channelID = "CHANNEL_ID_NOTIFICATION";
