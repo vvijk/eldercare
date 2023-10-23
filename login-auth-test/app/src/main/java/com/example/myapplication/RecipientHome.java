@@ -81,8 +81,11 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
         rootLayout = findViewById(R.id.layout_recipient_home);
         logout_btn = findViewById(R.id.recipientLogOut);
 
-        Intent intent = getIntent();
-        recipientUID = intent.getStringExtra("recipientUID");
+        dbLibrary lib = new dbLibrary(this);
+        recipientUID = lib.getUserID();
+
+        // Intent intent = getIntent();
+        // recipientUID = intent.getStringExtra("recipientUID");
         if(recipientUID == null) {
             Toast.makeText(this, getResources().getString(R.string.str_recipientUID_was_null),Toast.LENGTH_LONG).show();
             recipientUID = "kVz12RGTK1W9kaBd7b5imbh3mWg2"; // TODO(Emarioo): Don't hardcode
@@ -140,6 +143,7 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(RecipientHome.this, AlarmActivity.class);
+                intent.putExtra("recipientUID", recipientUID);
                 startActivityForResult(intent, 1);
 
             }
