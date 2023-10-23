@@ -36,19 +36,53 @@
             android:hint="@string/password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPassword"/>
+            android:inputType="textPassword"
+            android:visibility="gone"/>
     </com.google.android.material.textfield.TextInputLayout>
 
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editTextPin"
+            android:hint="@string/PIN"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberPassword"
+            android:visibility="gone"/>
+    </com.google.android.material.textfield.TextInputLayout>
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/radioGroupLogin">
+
+        <RadioButton
+            android:id="@+id/radioButtonPin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="50dp"
+            android:text="@string/PIN"
+            android:textSize="17dp">
+        </RadioButton>
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/password"
+            android:id="@+id/radioButtonPassword"
+            android:textSize="17dp">
+        </RadioButton>
+    </RadioGroup>
+
     <TextView
+        android:id="@+id/forgotPasswordBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/forgotPassword"
-        android:textStyle="italic"
-        android:gravity="right"
-        android:textSize="17dp"
         android:layout_marginTop="10dp"
-        android:id="@+id/forgotPasswordBtn">
-    </TextView>
+        android:gravity="right"
+        android:text="@string/forgotPassword"
+        android:textSize="17dp"
+        android:textStyle="italic"></TextView>
 
     <ProgressBar
         android:layout_width="wrap_content"
