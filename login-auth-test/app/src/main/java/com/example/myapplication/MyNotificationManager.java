@@ -61,7 +61,7 @@ public class MyNotificationManager{
         ArrayList<String> patientsInMeal;
 
         patients = getPatientFromGiver(careGiverTakerReference);
-       // checkPatientMealPatient(mealsRef, patients);
+        checkPatientMealPatient(mealsRef, patients);
         checkLarm(caretakersRef, patients);
 
 
