@@ -33,6 +33,8 @@ public class AlarmActivity extends AppCompatActivity {
     String recipientUID;
 
     boolean isAlarmActive;
+    
+    static final int SECONDS_UNTIL_ALARM=10;
 
     CountDownTimer countDownTimer;
 
@@ -94,7 +96,7 @@ public class AlarmActivity extends AppCompatActivity {
 
         if(countDownTimer != null)
             countDownTimer.cancel();
-        countDownTimer = new CountDownTimer(5000, 1000) {
+        countDownTimer = new CountDownTimer(SECONDS_UNTIL_ALARM, 1000) {
             @Override
             public void onTick(long l) {
                 if(!isAlarmActive) {
