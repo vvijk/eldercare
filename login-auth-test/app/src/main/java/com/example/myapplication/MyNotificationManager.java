@@ -62,7 +62,54 @@ public class MyNotificationManager{
 
         patients = getPatientFromGiver(careGiverTakerReference);
         checkPatientMealPatient(mealsRef, patients);
+        checkLarm(caretakersRef, patients);
 
+
+    }
+
+    public void checkLarm(DatabaseReference caretakersRef, ArrayList<String>caretakerUIDs){
+
+        caretakersRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String caretakerUID = snapshot.getKey();  // Retrieve the caretaker UID
+                    for(int i=0; i < caretakerUIDs.size(); i++){
+                        if(snapshot.getKey().equals(caretakerUIDs.get(i))){
+                            DatabaseReference finalCaretakersRef = caretakersRef.child(snapshot.getKey());
+                            finalCaretakersRef.addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    for(DataSnapshot larmSnapshot : snapshot.getChildren()) {
+                                        Log.d("lars", "hitta caretaker: " + larmSnapshot.getValue());
+                                        if (larmSnapshot.getKey().equals("larm") && larmSnapshot.getValue(boolean.class)){
+
+                                                String msg =  "lasse larmar";
+                                                String title = "Larm";
+                                                finalCaretakersRef.child("larm").setValue(false);
+                                                makeNotification(title, msg);
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Handle errors
+            }
+        });
 
     }
 
@@ -122,7 +169,7 @@ public class MyNotificationManager{
         // Format the date to display the first three letters of the day (e.g., "Mon")
         SimpleDateFormat sdf = new SimpleDateFormat("EEE", Locale.getDefault());
         String todaysDay = sdf.format(currentDate);
-        String day = ("fri");
+        String day = (todaysDay);
 
         DatabaseReference finalMealsRef = mealsRef.child(patientSnapshot).child(day);
 
@@ -154,8 +201,11 @@ public class MyNotificationManager{
         final int[] minuteInt = new int[1];
         final boolean[] checkEaten = new boolean[1];
         DatabaseReference mealTypeRef = mealRef.child(mealType);
+        String title ="Har inte ätit";
+        String msg = "lasse har inte ätit";
 
         mealTypeRef.addValueEventListener(new ValueEventListener() {
+
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -175,15 +225,18 @@ public class MyNotificationManager{
                        checkEaten[0] = mealSnapshot.getValue(Boolean.class);
                    }
                 }
-                if(!checkEaten[0]){                                                                                           LocalTime currentTime = LocalTime.now();
+                //om den inte har ätit
+                if(!checkEaten[0]){                                                                                       LocalTime currentTime = LocalTime.now();
                     LocalTime targetTime = LocalTime.of(hourInt[0], minuteInt[0]).plusHours(1).plusMinutes(30);
                     LocalTime currTime = LocalTime.now();
+
                     if(currentTime.isAfter(targetTime)){
                         Log.d("larss","har inte ätit efter tiden: ");
                         // NOTE(Emarioo): Turning this off because it's annoying.
-                        // makeNotification();
+                        // makeNotification(title, msg);
+
                     } else{
-                        Log.d("larss", "tiden är före:" + targetTime);
+
                     }
                 }
             }
@@ -202,13 +255,15 @@ public class MyNotificationManager{
         return calendar.get(Calendar.HOUR_OF_DAY) == 12 && calendar.get(Calendar.MINUTE) == 0;
     }
 
-    public void makeNotification() {
+                                          
+    public void makeNotification(String title, String msg) {
+
         String channelID = "CHANNEL_ID_NOTIFICATION";
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context,
                 channelID);
         builder.setSmallIcon(R.drawable.ic_notifications_active);
-        builder.setContentTitle("TItleTest");
-        builder.setContentText("Hej niu testar jag lite här");
+        builder.setContentTitle(title);
+        builder.setContentText(msg);
         builder.setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 

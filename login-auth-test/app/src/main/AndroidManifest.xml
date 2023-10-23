@@ -51,14 +51,6 @@
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/white" />
 
-        <service
-            android:name=".Notifications.FirebaseBackgroundService"
-            android:enabled="true"
-            android:exported="true" />
-
-        <activity
-            android:name=".Notifications.notifications_caregiver"
-            android:exported="false" />
         <activity
             android:name=".home_caregiver"
             android:exported="false"
