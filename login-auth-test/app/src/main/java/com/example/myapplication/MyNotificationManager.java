@@ -86,8 +86,9 @@ public class MyNotificationManager{
                                         Log.d("lars", "hitta caretaker: " + larmSnapshot.getValue());
                                         if (larmSnapshot.getKey().equals("larm") && larmSnapshot.getValue(boolean.class)){
 
-                                                String msg =  finalCaretakersRef.child("name").toString();
+                                                String msg =  "lasse larmar";
                                                 String title = "Larm";
+                                                finalCaretakersRef.child("larm").setValue(false);
                                                 makeNotification(title, msg);
                                         }
                                     }
@@ -168,7 +169,7 @@ public class MyNotificationManager{
         // Format the date to display the first three letters of the day (e.g., "Mon")
         SimpleDateFormat sdf = new SimpleDateFormat("EEE", Locale.getDefault());
         String todaysDay = sdf.format(currentDate);
-        String day = ("fri");
+        String day = (todaysDay);
 
         DatabaseReference finalMealsRef = mealsRef.child(patientSnapshot).child(day);
 
