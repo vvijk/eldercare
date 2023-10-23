@@ -23,8 +23,6 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.messaging.FirebaseMessaging;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class home_caregiver extends AppCompatActivity{
 
@@ -76,7 +74,7 @@ public class home_caregiver extends AppCompatActivity{
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), MealManagementActivity.class);
                 startActivity(intent);
-                // finish();
+//                finish();
             }
         });
 

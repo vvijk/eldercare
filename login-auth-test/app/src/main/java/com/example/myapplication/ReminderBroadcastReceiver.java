@@ -35,7 +35,7 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
 
         String mealKey = intent.getStringExtra("mealKey");
         int weekDayIndex = intent.getIntExtra("dayIndex", 0);
-        String caretakerUUID = intent.getStringExtra("caretakerUUID");
+        String recipientUID = intent.getStringExtra("recipientUID");
 
         if(noticeCount < 2) { // 1 initial reminder, 2 reminders of the reminder
             // setup the next notification 45 minutes later
@@ -48,16 +48,16 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, nextNotice, pendingIntent);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, nextNotice, pendingIntent);
         }
 
         // Toast.makeText(context, "Reminder broadcast yay " + meal, Toast.LENGTH_SHORT).show();
 
-        createNotification(context, name, time, desc, mealKey, weekDayIndex, caretakerUUID, noticeCount > 0, requestCode);
+        createNotification(context, name, time, desc, mealKey, weekDayIndex, recipientUID, noticeCount > 0, requestCode);
     }
 
     private void createNotification(Context context, String name, String time, String desc, String mealKey, int weekDayIndex,
-                                    String caretakerUUID, boolean withActions, int alarmRequestCode) {
+                                    String recipientUID, boolean withActions, int alarmRequestCode) {
         final String CHANNEL_ID = "meals_channel";
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -71,13 +71,7 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
 
             manager.createNotificationChannel(channel);
         }
-        // TODO: What to do with intent?
-        // Create an explicit intent for an Activity in your app.
-        // Intent intent = new Intent(this, AlertDetails.class);
-        // intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        // PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 
-        // TODO: Notification with buttons to specify whether you have eaten or not.
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notifications)
                 .setContentTitle(name + " " + time)
@@ -93,7 +87,7 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
             intent.putExtra("notificationId", NOTIFICATION_ID);
             intent.putExtra("nextAlarmsRequestCode", alarmRequestCode);
             intent.putExtra("haveEaten", true);
-            intent.putExtra("caretakerUUID", caretakerUUID);
+            intent.putExtra("recipientUID", recipientUID);
             intent.putExtra("dayIndex", weekDayIndex);
             intent.putExtra("mealKey", mealKey);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context, REQUEST_CODE_EATEN, intent, PendingIntent.FLAG_IMMUTABLE|PendingIntent.FLAG_UPDATE_CURRENT);
@@ -103,7 +97,7 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
             intent_not.putExtra("notificationId", NOTIFICATION_ID);
             intent_not.putExtra("nextAlarmsRequestCode", alarmRequestCode);
             intent_not.putExtra("haveEaten",false);
-            intent_not.putExtra("caretakerUUID", caretakerUUID);
+            intent_not.putExtra("recipientUID", recipientUID);
             intent_not.putExtra("dayIndex", weekDayIndex);
             intent_not.putExtra("mealKey", mealKey);
             PendingIntent pendingIntent_not = PendingIntent.getBroadcast(context, REQUEST_CODE_NOT_EATEN, intent_not, PendingIntent.FLAG_IMMUTABLE|PendingIntent.FLAG_UPDATE_CURRENT);

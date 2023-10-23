@@ -229,8 +229,12 @@ public class MyNotificationManager{
                 if(!checkEaten[0]){                                                                                       LocalTime currentTime = LocalTime.now();
                     LocalTime targetTime = LocalTime.of(hourInt[0], minuteInt[0]).plusHours(1).plusMinutes(30);
                     LocalTime currTime = LocalTime.now();
-                    if(currentTime.isAfter(targetTime)){ //om klockan är efter tiden
-                        makeNotification(title, msg);
+
+                    if(currentTime.isAfter(targetTime)){
+                        Log.d("larss","har inte ätit efter tiden: ");
+                        // NOTE(Emarioo): Turning this off because it's annoying.
+                        // makeNotification(title, msg);
+
                     } else{
 
                     }
@@ -251,6 +255,7 @@ public class MyNotificationManager{
         return calendar.get(Calendar.HOUR_OF_DAY) == 12 && calendar.get(Calendar.MINUTE) == 0;
     }
 
+                                          
     public void makeNotification(String title, String msg) {
 
         String channelID = "CHANNEL_ID_NOTIFICATION";

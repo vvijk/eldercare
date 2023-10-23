@@ -11,7 +11,7 @@ import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
 
-import com.example.myapplication.util.PatientMealStorage;
+import com.example.myapplication.util.MealStorage;
 
 public class MealBroadcast extends BroadcastReceiver {
     @Override
@@ -19,16 +19,16 @@ public class MealBroadcast extends BroadcastReceiver {
         boolean haveEaten = intent.getBooleanExtra("haveEaten", false);
         String mealKey = intent.getStringExtra("mealKey");
         int weekDayIndex = intent.getIntExtra("dayIndex", 0);
-        String caretakerUUID = intent.getStringExtra("caretakerUUID");
+        String recipientUID = intent.getStringExtra("recipientUID");
         int id = intent.getIntExtra("notificationId",0);
         int requestCode = intent.getIntExtra("nextAlarmsRequestCode",0);
 
         // System.out.println("MEAL BROADCAST " + mealKey);
-        PatientMealStorage storage = new PatientMealStorage();
+        MealStorage storage = new MealStorage();
         storage.initDBConnection();
 
         // Using firebase directly instead of pushRefresher because it does a lot of unnecessary stuff for a simple write operation.
-        storage.db_meals.child(caretakerUUID).child(storage.dayref(weekDayIndex)).child(mealKey).child("eaten").setValue(haveEaten);
+        storage.db_meals.child(recipientUID).child(storage.dayref(weekDayIndex)).child(mealKey).child("eaten").setValue(haveEaten);
 
         if(id != 0) {
             NotificationManagerCompat manager = NotificationManagerCompat.from(context);
@@ -45,7 +45,7 @@ public class MealBroadcast extends BroadcastReceiver {
             }
         }
 
-        // int caretakerId = storage.idFromCaretakerUUID(caretakerUUID);
+        // int caretakerId = storage.idFromCaretakerUID(recipientUID);
         // System.out.println("caretaker id  " + caretakerId);
         // storage.pushRefresher_caretaker(caretakerId, new Runnable() {
         //     @Override

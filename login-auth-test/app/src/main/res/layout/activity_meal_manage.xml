@@ -22,27 +22,27 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textSize="25sp"
+            android:textSize="22sp"
             android:backgroundTint="@color/almost_black"
             android:insetTop="0dp"
             android:insetBottom="0dp"
-            android:text="@string/str_base_meals"
+            android:text="@string/str_template_meals"
             android:textAlignment="center"
             android:textColor="@color/white"
             app:cornerRadius="0dp"/>
 
         <Button
-            android:id="@+id/btn_patients"
+            android:id="@+id/btn_recipients"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textSize="25sp"
+            android:textSize="22sp"
             android:backgroundTint="@color/purple_dark"
             android:insetTop="0dp"
             android:insetLeft="0dp"
             android:insetRight="0dp"
             android:insetBottom="0dp"
-            android:text="@string/str_patients"
+            android:text="@string/str_recipients"
             android:textAlignment="center"
             android:textColor="@color/white"
             app:cornerRadius="0dp"/>
@@ -63,7 +63,7 @@
 
             <tag android:id="@+id/tag_template_add_meal" ></tag>
             <tag android:id="@+id/template_mealIndex" ></tag>
-            <tag android:id="@+id/tag_patientId" ></tag>
+            <tag android:id="@+id/tag_recipientId" ></tag>
             <tag android:id="@+id/clicked_deleteMeal" ></tag>
         </LinearLayout>
     </ScrollView>

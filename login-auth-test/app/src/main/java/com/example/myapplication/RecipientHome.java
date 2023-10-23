@@ -10,6 +10,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -28,11 +29,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import com.example.myapplication.util.PatientMealStorage;
+import com.example.myapplication.util.MealStorage;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+
 
 class MealEntry {
     String name;
@@ -43,7 +47,7 @@ class MealEntry {
     String key;
 }
 
-public class Home_caretaker extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class RecipientHome extends AppCompatActivity implements AdapterView.OnItemClickListener {
     LinearLayout rootLayout;
     ListView listViewMeals;
 
@@ -52,9 +56,9 @@ public class Home_caretaker extends AppCompatActivity implements AdapterView.OnI
     AlarmManager alarmManager;
     Button logout_btn;
     int weekDayIndex = 0;
-    String caretakerUUID;
+    String recipientUID;
     int caretakerId;
-    PatientMealStorage getMealStorage() { return ((MealApp)getApplicationContext()).mealStorage; }
+    MealStorage getMealStorage() { return ((MealApp)getApplicationContext()).mealStorage; }
 
     private ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
@@ -73,18 +77,18 @@ public class Home_caretaker extends AppCompatActivity implements AdapterView.OnI
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home_caretaker);
-        rootLayout = findViewById(R.id.layout_home_caretaker);
-        logout_btn = findViewById(R.id.caretakerLogOut);
+        setContentView(R.layout.activity_home_recipient);
+        rootLayout = findViewById(R.id.layout_recipient_home);
+        logout_btn = findViewById(R.id.recipientLogOut);
 
         Intent intent = getIntent();
-        caretakerUUID = intent.getStringExtra("caretakerUUID");
-        if(caretakerUUID == null) {
-            Toast.makeText(this, getResources().getString(R.string.str_caretakerUUID_was_null),Toast.LENGTH_LONG).show();
-            caretakerUUID = "kVz12RGTK1W9kaBd7b5imbh3mWg2"; // TODO(Emarioo): Don't hardcode
-            caretakerId = getMealStorage().idFromCaretakerUUID(caretakerUUID);
+        recipientUID = intent.getStringExtra("recipientUID");
+        if(recipientUID == null) {
+            Toast.makeText(this, getResources().getString(R.string.str_recipientUID_was_null),Toast.LENGTH_LONG).show();
+            recipientUID = "kVz12RGTK1W9kaBd7b5imbh3mWg2"; // TODO(Emarioo): Don't hardcode
+            caretakerId = getMealStorage().idFromCaretakerUID(recipientUID);
         } else {
-            caretakerId = getMealStorage().idFromCaretakerUUID(caretakerUUID);
+            caretakerId = getMealStorage().idFromCaretakerUID(recipientUID);
         }
 
         getMealStorage().initDBConnection(); // initialize getMealStorage in case it's not
@@ -92,7 +96,7 @@ public class Home_caretaker extends AppCompatActivity implements AdapterView.OnI
             @Override
             public void run() {
                 int weekDayIndex = getMealStorage().todaysDayIndex();
-                Home_caretaker.this.weekDayIndex = weekDayIndex;
+                RecipientHome.this.weekDayIndex = weekDayIndex;
 
                 int[] sortedMealIndices = getMealStorage().caretaker_sortedMealIndices(caretakerId, weekDayIndex);
 
@@ -135,7 +139,7 @@ public class Home_caretaker extends AppCompatActivity implements AdapterView.OnI
         buttonAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Home_caretaker.this, AlarmActivity.class);
+                Intent intent = new Intent(RecipientHome.this, AlarmActivity.class);
                 startActivityForResult(intent, 1);
 
             }
@@ -144,57 +148,132 @@ public class Home_caretaker extends AppCompatActivity implements AdapterView.OnI
         logout_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                /*
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(getApplicationContext(), Login.class);
+                startActivity(intent);
+                finish();
+                */
+                showLogoutConfirmationDialog();
+            }
+        });
+
+        if (ActivityCompat.checkSelfPermission(this, POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionLauncher.launch(POST_NOTIFICATIONS);
+        }
+    }
+    private void showLogoutConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.sureLogOut);
+        builder.setPositiveButton(R.string.Ja, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
                 FirebaseAuth.getInstance().signOut();
                 Intent intent = new Intent(getApplicationContext(), Login.class);
                 startActivity(intent);
                 finish();
             }
         });
-        if (ActivityCompat.checkSelfPermission(this, POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissionLauncher.launch(POST_NOTIFICATIONS);
-        }
+        builder.setNegativeButton(R.string.Nej, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
     private void refreshAlarmsForMeals(){
-        if(!alarmManager.canScheduleExactAlarms()) {
-            Toast.makeText(this, getResources().getString(R.string.missing_alarm_permission),Toast.LENGTH_LONG).show();
-        } else {
-            for (int index = 2;index < meals.size();index++) {
-                MealEntry meal = meals.get(index);
+        int firstRequestCode = 9929;
+        int nextRequestCode = firstRequestCode;
+        int dayCount = 2;
+        for (int dayOffset=0;dayOffset<dayCount;dayOffset++){
+            if(dayOffset == 0) {
+                for (int index = 0;index < meals.size();index++) {
+                    MealEntry meal = meals.get(index);
 
-                Calendar calendar = Calendar.getInstance();
-                calendar.set(Calendar.HOUR_OF_DAY, meal.hour);
-                calendar.set(Calendar.MINUTE, meal.minute);
-                calendar.set(Calendar.SECOND, 0);
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(Calendar.HOUR_OF_DAY, meal.hour);
+                    calendar.set(Calendar.MINUTE, meal.minute);
+                    calendar.set(Calendar.SECOND, 0);
 
-                // System.out.println(calendar.getTimeInMillis() - System.currentTimeMillis());
+                    long nowTime = System.currentTimeMillis();
+                    long mealTime = calendar.getTimeInMillis();
 
-                long nowTime = System.currentTimeMillis();
-                long mealTime = calendar.getTimeInMillis();
+                    if (mealTime > nowTime && !meal.eaten) {
+                        int requestCode = nextRequestCode++; // TODO: 10 will collide meals if there are 10
 
-                if(mealTime > nowTime && !meal.eaten) {
-                    int requestCode = index;
+                        long time = calendar.getTimeInMillis();
 
-                    long time = calendar.getTimeInMillis();
+                        // time = System.currentTimeMillis() + 4000; // debug purpose
+                        // System.out.println(meal.name +", time left: "+ ((calendar.getTimeInMillis() - System.currentTimeMillis()) / (60.f*60*1000)));
 
-                    // time = System.currentTimeMillis() + 4000; // debug purpose
+                        Intent intent = new Intent(this, ReminderBroadcastReceiver.class);
+                        intent.putExtra("name", meal.name);
+                        intent.putExtra("time", Helpers.FormatTime(meal.hour, meal.minute));
+                        intent.putExtra("desc", meal.desc);
+                        intent.putExtra("recipientUID", recipientUID);
+                        intent.putExtra("dayIndex", weekDayIndex);
+                        intent.putExtra("mealKey", meal.key);
+                        intent.putExtra("noticeCount", 0); // 0 is for the initial notification, no buttons. 1+ will have eaten or not eaten
+                        intent.putExtra("requestCode", requestCode); // 0 is for the initial notification, no buttons. 1+ will have eaten or not eaten
+                        intent.putExtra("alarmAtMillis", time);
+                        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
-                    Intent intent = new Intent(this, ReminderBroadcastReceiver.class);
-                    intent.putExtra("name", meal.name);
-                    intent.putExtra("time",Helpers.FormatTime(meal.hour,meal.minute));
-                    intent.putExtra("desc", meal.desc);
-                    intent.putExtra("caretakerUUID", caretakerUUID);
-                    intent.putExtra("dayIndex", weekDayIndex);
-                    intent.putExtra("mealKey", meal.key);
-                    intent.putExtra("noticeCount",0); // 0 is for the initial notification, no buttons. 1+ will have eaten or not eaten
-                    intent.putExtra("requestCode",requestCode); // 0 is for the initial notification, no buttons. 1+ will have eaten or not eaten
-                    intent.putExtra("alarmAtMillis", time);
-                    PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+                        alarmManager.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+                    } else {
+                        // meal time has already passsed
+                    }
+                }
+            } else {
+                int weekDay = (weekDayIndex + dayOffset) % 7;
+                int mealCount = getMealStorage().caretaker_countOfMeals(caretakerId, weekDay);
+                for (int index = 0;index < mealCount;index++) {
+                    MealStorage.Meal meal = getMealStorage().caretaker_getMeal(caretakerId, weekDay, index);
 
-                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, pendingIntent);
-                } else {
-                    // meal time has already passsed
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.add(Calendar.DAY_OF_YEAR, dayOffset);
+                    calendar.set(Calendar.HOUR_OF_DAY, meal.hour);
+                    calendar.set(Calendar.MINUTE, meal.minute);
+                    calendar.set(Calendar.SECOND, 0);
+
+                    long nowTime = System.currentTimeMillis();
+                    long mealTime = calendar.getTimeInMillis();
+
+                    if (mealTime > nowTime && !meal.eaten) {
+                        int requestCode = nextRequestCode++; // TODO: 10 will collide meals if there are 10
+
+                        long time = calendar.getTimeInMillis();
+
+                        // time = System.currentTimeMillis() + 4000; // debug purpose
+                        // System.out.println(meal.name +", time left: "+ ((calendar.getTimeInMillis() - System.currentTimeMillis()) / (60.f*60*1000)));
+
+                        Intent intent = new Intent(this, ReminderBroadcastReceiver.class);
+                        intent.putExtra("name", meal.name);
+                        intent.putExtra("time", Helpers.FormatTime(meal.hour, meal.minute));
+                        intent.putExtra("desc", meal.desc);
+                        intent.putExtra("recipientUID", recipientUID);
+                        intent.putExtra("dayIndex", weekDayIndex);
+                        intent.putExtra("mealKey", meal.key);
+                        intent.putExtra("noticeCount", 0); // 0 is for the initial notification, no buttons. 1+ will have eaten or not eaten
+                        intent.putExtra("requestCode", requestCode); // 0 is for the initial notification, no buttons. 1+ will have eaten or not eaten
+                        intent.putExtra("alarmAtMillis", time);
+                        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+
+                        alarmManager.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+                    } else {
+                        // meal time has already passsed
+                    }
                 }
             }
+        }
+        // The purpose of this is to remove alarms for meals that have been deleted from the database.
+        // Those meals should not cause a reminder anymore.
+        int lastRequestCode = firstRequestCode + 100;
+        for(int rq=nextRequestCode;rq<=lastRequestCode;rq++) {
+            Intent intent = new Intent(this, ReminderBroadcastReceiver.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, rq, intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+            alarmManager.cancel(pendingIntent);
         }
     }
 
@@ -220,7 +299,6 @@ public class Home_caretaker extends AppCompatActivity implements AdapterView.OnI
         }
 
         getMealStorage().caretaker_setEatenOfMeal(caretakerId, weekDayIndex, position, !meals.get(position).eaten);
-        // meals.get(position).eaten = !meals.get(position).eaten;
 
         Intent intent = new Intent(this, BroadcastReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent,PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_NO_CREATE);
@@ -228,7 +306,6 @@ public class Home_caretaker extends AppCompatActivity implements AdapterView.OnI
             alarmManager.cancel(pendingIntent);
         }
         // mealAdapter is updated when database is written to, refresher is called and UI updates.
-        // mealAdapter.notifyDataSetChanged(); // Uppdatera listan för att reflektera ändringarna i clickedPositions-setet.
     }
 
     public void enableNoMealsText(boolean show) {

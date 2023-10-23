@@ -45,7 +45,7 @@ public class Login extends AppCompatActivity {
                         intent = new Intent(getApplicationContext(), home_caregiver.class);
                     }else{
                         Toast.makeText(getApplicationContext(), "Successful pre-login as: caretaker!", Toast.LENGTH_SHORT).show();
-                        intent = new Intent(getApplicationContext(), Home_caretaker.class);
+                        intent = new Intent(getApplicationContext(), RecipientHome.class);
                     }
                     startActivity(intent);
                     finish();
@@ -122,7 +122,7 @@ public class Login extends AppCompatActivity {
                                                     intent = new Intent(getApplicationContext(), home_caregiver.class);
                                                 } else {
                                                     Toast.makeText(getApplicationContext(), "Successful login as: caretaker!", Toast.LENGTH_SHORT).show();
-                                                    intent = new Intent(getApplicationContext(), Home_caretaker.class);
+                                                    intent = new Intent(getApplicationContext(), RecipientHome.class);
                                                 }
                                                 startActivity(intent);
                                                 finish();
@@ -132,21 +132,21 @@ public class Login extends AppCompatActivity {
                                             }
                                         }
 
-                                        @Override
-                                        public void onNotFound() {
-                                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.something_went_wrong),Toast.LENGTH_LONG).show();
-                                            Log.d("dbtest", "Is neither a caretake nor caregiver");
-                                        }
+                                    @Override
+                                    public void onNotFound() {
+                                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.something_went_wrong),Toast.LENGTH_LONG).show();
+                                        Log.d("dbtest", "Is neither a caretake nor caregiver");
+                                    }
 
-                                        @Override
-                                        public void onFoundError(String errorMessage) {
-                                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.something_went_wrong),Toast.LENGTH_LONG).show();
-                                            Log.d("dbtest", "Database ERROR!!");
-                                        }
-                                    });
-                                }
+                                    @Override
+                                    public void onFoundError(String errorMessage) {
+                                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.something_went_wrong),Toast.LENGTH_LONG).show();
+                                        Log.d("dbtest", "Database ERROR!!");
+                                    }
+                                });
                             }
-                        });
+                        }
+                    });
             }
         });
 

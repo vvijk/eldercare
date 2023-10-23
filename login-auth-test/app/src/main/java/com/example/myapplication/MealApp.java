@@ -6,7 +6,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Build;
 
-import com.example.myapplication.util.PatientMealStorage;
+import com.example.myapplication.util.MealStorage;
 
 /*
     Stuff in this class can be accessed from any activity with (App)getApplicationContext().
@@ -20,7 +20,7 @@ public class MealApp extends Application {
         // initNotifications();
     }
 
-    public PatientMealStorage mealStorage = new PatientMealStorage();
+    public MealStorage mealStorage = new MealStorage();
 
     // public void initNotifications() {
     //     // TODO(Emarioo): "Meals" is used as name for channel but R.string.meal_channel_name might be better, so it can be
