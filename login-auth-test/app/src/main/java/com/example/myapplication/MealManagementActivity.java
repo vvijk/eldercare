@@ -273,7 +273,7 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
             public void onClick(View view) {
                 String caretakerFromInput = String.valueOf(addCaretakerInputText.getText());
                 if (TextUtils.isEmpty(caretakerFromInput) || !android.util.Patterns.EMAIL_ADDRESS.matcher(caretakerFromInput).matches()) {
-                    Toast.makeText(MealManagementActivity.this, "Ange epost i rätt format: test@test.com", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MealManagementActivity.this, getResources().getString(R.string.str_invalid_email), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 dbLibrary db = new dbLibrary(MealManagementActivity.this);
@@ -283,11 +283,11 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
                         db.addCaretakerToGiver(db.getUserID(), uid, new dbLibrary.CaretakerAddCallback() {
                             @Override
                             public void onCaretakerAdded(String message) {
-                                Toast.makeText(MealManagementActivity.this, "Användare: " + caretakerFromInput + " har lagts till i din recipientlista!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MealManagementActivity.this, getResources().getString(R.string.fmt_added_recipient, caretakerFromInput), Toast.LENGTH_SHORT).show();
                             }
                             @Override
                             public void onCaretakerAddError(String errorMessage) {
-                                Toast.makeText(MealManagementActivity.this, "Användare: " + caretakerFromInput + " finns redan i din recipientlista!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MealManagementActivity.this, getResources().getString(R.string.fmt_exists_recipient, caretakerFromInput), Toast.LENGTH_SHORT).show();
                             }
                         });
                         addCaretakerInputText.setText("");
@@ -295,11 +295,11 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
                     @Override
                     public void onUserUidNotFound() {
                         // Handle the case where no user with the specified email was found
-                        Toast.makeText(MealManagementActivity.this, "Användare: " + caretakerFromInput + " hittades inte bland vårdtagare!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MealManagementActivity.this, getResources().getString(R.string.fmt_unknown_recipient, caretakerFromInput), Toast.LENGTH_SHORT).show();
                     }
                     @Override
                     public void onUserUidError(String errorMessage) {
-                        Toast.makeText(MealManagementActivity.this, "ERROR, kolla onUserUidError()..", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MealManagementActivity.this, "ERROR, onUserUidError()", Toast.LENGTH_SHORT).show();
                         // Handle the error
                     }
                 });

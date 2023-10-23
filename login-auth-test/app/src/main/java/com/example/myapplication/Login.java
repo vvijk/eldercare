@@ -41,10 +41,11 @@ public class Login extends AppCompatActivity {
                     // Sign in success, update UI with the signed-in user's information
                     Intent intent;
                     if(isCaregiver){
-                        Toast.makeText(getApplicationContext(), "Successful pre.login as: caregiver!", Toast.LENGTH_SHORT).show();
+                        // NOTE(Emarioo): I commented this out because I assume it's for debug purposes. If not, then we can't use hardcoded strings like this. It must be translated!
+                        // Toast.makeText(getApplicationContext(), "Successful pre.login as: caregiver!", Toast.LENGTH_SHORT).show();
                         intent = new Intent(getApplicationContext(), home_caregiver.class);
                     }else{
-                        Toast.makeText(getApplicationContext(), "Successful pre-login as: caretaker!", Toast.LENGTH_SHORT).show();
+                        // Toast.makeText(getApplicationContext(), "Successful pre-login as: caretaker!", Toast.LENGTH_SHORT).show();
                         intent = new Intent(getApplicationContext(), RecipientHome.class);
                     }
                     startActivity(intent);
@@ -94,11 +95,11 @@ public class Login extends AppCompatActivity {
                 password = String.valueOf(editTextPassword.getText());
 
                 if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(Login.this, "Enter Email", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Login.this, getResources().getString(R.string.provide_email), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (TextUtils.isEmpty(password)) {
-                    Toast.makeText(Login.this, "Enter Password", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Login.this, getResources().getString(R.string.provide_password), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 mAuth.signInWithEmailAndPassword(email, password)
@@ -118,17 +119,17 @@ public class Login extends AppCompatActivity {
                                                 // Sign in success, update UI with the signed-in user's information
                                                 Intent intent;
                                                 if (isCaregiver) {
-                                                    Toast.makeText(getApplicationContext(), "Successful login as: caregiver!", Toast.LENGTH_SHORT).show();
+                                                    // Toast.makeText(getApplicationContext(), "Successful login as: caregiver!", Toast.LENGTH_SHORT).show();
                                                     intent = new Intent(getApplicationContext(), home_caregiver.class);
                                                 } else {
-                                                    Toast.makeText(getApplicationContext(), "Successful login as: caretaker!", Toast.LENGTH_SHORT).show();
+                                                    // Toast.makeText(getApplicationContext(), "Successful login as: caretaker!", Toast.LENGTH_SHORT).show();
                                                     intent = new Intent(getApplicationContext(), RecipientHome.class);
                                                 }
                                                 startActivity(intent);
                                                 finish();
                                             } else {
                                                 // If sign-in fails, display a message to the user.
-                                                Toast.makeText(Login.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(Login.this, getResources().getString(R.string.auth_failed), Toast.LENGTH_SHORT).show();
                                             }
                                         }
 

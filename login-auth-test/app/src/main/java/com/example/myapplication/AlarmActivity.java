@@ -27,17 +27,37 @@ public class AlarmActivity extends AppCompatActivity {
     DatabaseReference caretakersRef;
     String recipientUID;
 
+    boolean isAlarmActive;
+
+    CountDownTimer countDownTimer;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm);
 
         recipientUID = getIntent().getStringExtra("recipientUID");
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        caretakersRef = database.getReference("users/caretakers");
 
         TextView countDownTextView = findViewById(R.id.CountDown);
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        caretakersRef = database.getReference("users/caretakers");
+        caretakersRef.child(recipientUID).child("larm").addValueEventListener(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                boolean isActive = false;
+                if(snapshot.getValue() != null)
+                    isActive = (Boolean)snapshot.getValue();
+                isAlarmActive = isActive;
+                refreshUI(isActive);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         Button buttonGoBack = findViewById(R.id.ButtonGoBack);
         buttonGoBack.setOnClickListener(new View.OnClickListener() {
@@ -54,31 +74,55 @@ public class AlarmActivity extends AppCompatActivity {
         startCountDownTimer(countDownTextView);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(countDownTimer != null) {
+            countDownTimer.cancel();
+        }
+    }
+
     private void startCountDownTimer(TextView countDownTextView) {
         TextView TextViewTimeLeft = findViewById(R.id.TextViewTimeLeft);
         Button ButtonGoBack = findViewById(R.id.ButtonGoBack);
 
-        CountDownTimer countDownTimer = new CountDownTimer(5000, 1000) {
+        if(countDownTimer != null)
+            countDownTimer.cancel();
+        countDownTimer = new CountDownTimer(5000, 1000) {
             @Override
             public void onTick(long l) {
-                countDownTextView.setText(String.valueOf(l / 1000));
+                if(!isAlarmActive) {
+                    countDownTextView.setText(String.valueOf(l / 1000));
+                }
             }
 
             @Override
             public void onFinish() {
-                countDownTextView.setText("Larmet har aktiverats");
-                TextViewTimeLeft.setText("");
-                ButtonGoBack.setText("Tillbaka");
+                refreshUI(true);
 
                 caretakersRef.child(recipientUID).child("larm").setValue(true).addOnCanceledListener(new OnCanceledListener() {
                     @Override
                     public void onCanceled() {
                         // TODO: Om en vårdtagare har larmat och databasen misslyckas här kan det gå riktigt illa för vårdtagaren.
-                        countDownTextView.setText("Databasen är nere!");
+                        countDownTextView.setText(getResources().getString(R.string.database_down));
                     }
                 });
             }
         }.start();
     }
+    void refreshUI(boolean alarmIsActive) {
+        TextView TextViewTimeLeft = findViewById(R.id.TextViewTimeLeft);
+        Button ButtonGoBack = findViewById(R.id.ButtonGoBack);
+        TextView countDownTextView = findViewById(R.id.CountDown);
 
+        if(alarmIsActive) {
+            countDownTextView.setText(getResources().getString(R.string.alarm_is_active));
+            TextViewTimeLeft.setText("");
+            ButtonGoBack.setText(getResources().getString(R.string.alarm_turn_off_go_back));
+        } else {
+            countDownTextView.setText("");
+            TextViewTimeLeft.setText(getResources().getString(R.string.alarm_time_until_active));
+            ButtonGoBack.setText(getResources().getString(R.string.alarm_regret_go_back));
+        }
+    }
 }
