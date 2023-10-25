@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,12 +23,14 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class Login extends AppCompatActivity {
 
-    TextInputEditText editTextEmail, editTextPassword;
+    TextInputEditText editTextEmail, editTextPassword, editTextPIN;
     Button buttonLogin;
     FirebaseAuth mAuth;
     ProgressBar progressBar;
     TextView textViewLogin, textViewReset;
     dbLibrary db;
+    RadioGroup radioGroup;
+    int checkedRadioButtonId;
 
     @Override
     public void onStart() {
@@ -71,12 +74,15 @@ public class Login extends AppCompatActivity {
         setContentView(R.layout.activity_login); // Set the content view to the login layout
         editTextEmail = findViewById(R.id.email);
         editTextPassword = findViewById(R.id.password);
+        editTextPIN = findViewById(R.id.editTextPin);
         buttonLogin = findViewById(R.id.loginButton);
         mAuth = FirebaseAuth.getInstance();
         progressBar = findViewById(R.id.progressBar);
         textViewLogin = findViewById(R.id.registerNow);
         textViewReset = findViewById(R.id.forgotPasswordBtn);
         db = new dbLibrary(Login.this);
+        radioGroup = findViewById(R.id.radioGroupLogin);
+        checkedRadioButtonId = radioGroup.getCheckedRadioButtonId();
         textViewLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -86,20 +92,35 @@ public class Login extends AppCompatActivity {
             }
         });
 
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (checkedId == R.id.radioButtonPin) {
+                    editTextPassword.setVisibility(View.GONE);
+                    editTextPIN.setVisibility(View.VISIBLE);
+                } else if (checkedId == R.id.radioButtonPassword) {
+                    editTextPassword.setVisibility(View.VISIBLE);
+                    editTextPIN.setVisibility(View.GONE);
+                }
+            }
+        });
+
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 progressBar.setVisibility(View.VISIBLE);
-                String email, password;
+                String email, password, pin;
                 email = String.valueOf(editTextEmail.getText());
                 password = String.valueOf(editTextPassword.getText());
-
+                pin = String.valueOf(editTextPIN.getText());
                 if (TextUtils.isEmpty(email)) {
                     Toast.makeText(Login.this, getResources().getString(R.string.provide_email), Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
                     return;
                 }
-                if (TextUtils.isEmpty(password)) {
-                    Toast.makeText(Login.this, getResources().getString(R.string.provide_password), Toast.LENGTH_SHORT).show();
+                if (TextUtils.isEmpty(password) && TextUtils.isEmpty(pin)) {
+                    Toast.makeText(Login.this, getResources().getString(R.string.provide_password_or_pin), Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
                     return;
                 }
                 mAuth.signInWithEmailAndPassword(email, password)

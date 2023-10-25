@@ -25,7 +25,7 @@
     <string name="dontMatch">Passwords dont match!</string>
     <string name="str_provide_email_to_restore_password">Provide your email address to restore password</string>
     <string name="provide_email">Provide email</string>
-    <string name="provide_password">Provide password</string>
+    <string name="provide_password_or_pin">Provide password or pinkod</string>
     <string name="unsafe_password">Password must have 6 digits</string>
     <string name="provide_first_name">Provide first name</string>
     <string name="provide_last_name">Provide last name</string>

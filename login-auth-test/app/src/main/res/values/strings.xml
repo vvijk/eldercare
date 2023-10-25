@@ -24,7 +24,7 @@
     <string name="dontMatch">Lösenorden matchar inte!</string>
     <string name="str_provide_email_to_restore_password">Ange din epostadress för att återställa ditt lösenord</string>
     <string name="provide_email">Ange epostadress</string>
-    <string name="provide_password">Ange lösenord</string>
+    <string name="provide_password_or_pin">Ange lösenord eller pinkod</string>
     <string name="unsafe_password">Lösenordet måste vara minst 6 siffror</string>
     <string name="provide_first_name">Ange förnamn</string>
     <string name="provide_last_name">Ange efternamn</string>
