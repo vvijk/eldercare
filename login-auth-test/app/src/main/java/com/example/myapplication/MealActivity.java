@@ -43,7 +43,7 @@ public class MealActivity extends AppCompatActivity implements View.OnClickListe
     };
 
     MealStorage getMealStorage() {
-        return ((MealApp) getApplicationContext()).mealStorage;
+        return ((MainApp) getApplicationContext()).mealStorage;
     }
 
     @Override

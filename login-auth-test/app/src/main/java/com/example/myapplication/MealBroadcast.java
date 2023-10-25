@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import com.example.myapplication.util.LogStorage;
 import com.example.myapplication.util.MealStorage;
 
 public class MealBroadcast extends BroadcastReceiver {
@@ -35,6 +36,9 @@ public class MealBroadcast extends BroadcastReceiver {
             manager.cancel(id);
         }
 
+        LogStorage logStorage = new LogStorage();
+        logStorage.initDBConnection();
+
         if(haveEaten) {
             // Stop reminder if you pressed "eaten", we don't need to ask caretaker anymore.
             Intent old_intent = new Intent(context, BroadcastReceiver.class);
@@ -43,6 +47,8 @@ public class MealBroadcast extends BroadcastReceiver {
                 AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
                 alarmManager.cancel(pendingIntent);
             }
+
+            logStorage.submitLog(LogStorage.Category.MEAL_CONFIRM, recipientUID, null, null);
         }
 
         // int caretakerId = storage.idFromCaretakerUID(recipientUID);

@@ -101,6 +101,7 @@
     <string name="recipient_meals_edit">Ändra</string>
     <string name="btn_replace_template_meal">Ersätt med grundmåltider</string>
     <string name="str_add_recipient">Lägg till vårdtagare</string>
+    <string name="str_remove_recipient">Ta bort vårdtagare</string>
     <string name="str_add_meal">Lägg till måltid</string>
     <string name="str_recipients">Vårdtagare</string>
     <string name="str_recipient">Vårdtagare</string>
@@ -124,10 +125,11 @@
     <string name="str_BackToMealPlan">Tillbaka till måltidsplan</string>
     <string name="str_missing_name">Namn saknas?</string>
     <string name="str_invalid_email">Epost har fel format (exempel@mail.com)</string>
-    <string name="fmt_added_recipient">Användare: %s har lagts till i din vårdtagarlista</string>
-    <string name="fmt_exists_recipient">Användare: %s finns redan i din vårdtagarlista</string>
-    <string name="fmt_unknown_recipient">"Användare: %s har lagts till i din vårdtagarlista</string>
-
+    <string name="fmt_added_recipient">%s har lagts till i din vårdtagarlista</string>
+    <string name="fmt_exists_recipient">%s finns redan i din vårdtagarlista</string>
+    <string name="fmt_removed_recipient">%s har tagits bort från din vårdtagarlista</string>
+    <string name="fmt_not_exist_recipient">%s finns inte i din vårdtagarlista</string>
+    <string name="fmt_unknown_recipient">%s hittades inte bland vårdtagare</string>
 
     <!--  Home for caretaker  -->
     <string name="str_emergency_alert">LARMA</string>

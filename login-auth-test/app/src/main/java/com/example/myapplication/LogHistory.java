@@ -16,6 +16,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.myapplication.util.LogStorage;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -66,6 +67,7 @@ public class LogHistory extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         dbRef = FirebaseDatabase.getInstance().getReference("users");
 
+        getLogStorage().initDBConnection();
 
         setContentView(R.layout.activity_log_history);
         categorySpinner = findViewById(R.id.logCategorySpinner);
@@ -80,15 +82,25 @@ public class LogHistory extends AppCompatActivity {
 
         populateCategorySpinner(categorySpinner);
 
+        getLogStorage().retrieveLogs(new LogStorage.FilterOptions(), (items) -> {
+            clearTextField();
+            for (int i = 0; i < items.size(); i++){
+                LogStorage.DisplayedItem item = items.get(i);
+                TextView text = new TextView(context);
+                text.setText(generateLogMessage(item));
+                text.setTextColor(getLogColor(item));
+                text.setPadding(10, 0, 10, 0);
 
-
-
-        setLogTextBox(logs);
-
-        refreshLog.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) { setLogTextBox(logs); Log.d("LOGHISTORY", patients.get(0).getFullName()); }
+                logTextBox.addView(text);
+            }
         });
+
+        
+        // setLogTextBox(logs);
+        // refreshLog.setOnClickListener(new View.OnClickListener() {
+        //     @Override
+        //     public void onClick(View view) { setLogTextBox(logs); Log.d("LOGHISTORY", patients.get(0).getFullName()); }
+        // });
     }
 
     private void initData(){
@@ -189,6 +201,7 @@ public class LogHistory extends AppCompatActivity {
                 CaretakerCallback ctcb = (cb2) -> {
                     this.patients.add(cb2);
                     populatePatientSpinner(patientSpinner);
+                    fetchLogs(); // NOTE(Emarioo): I added this here, maybe bad idea.
                 };
                 fetchCaretaker(caretakerIDs.get(i), ctcb);
             }
@@ -199,7 +212,8 @@ public class LogHistory extends AppCompatActivity {
         this.logs = new ArrayList<>();
         for (int i = 0; i < patients.size(); i++){
             ArrayList<LogItem> patientLogs = patients.get(i).getLogs();
-            this.logs.addAll(patientLogs);
+            if(patientLogs != null)
+                this.logs.addAll(patientLogs);
         }
     }
     private void sortLogsByTimestamp(){
@@ -242,13 +256,54 @@ public class LogHistory extends AppCompatActivity {
         out += ".";
         return out;
     }
+    private String generateLogMessage(LogStorage.DisplayedItem item) {
+        // TODO(Emarioo): This function is incomplete. Text is not formatted properly.
+        String out = item.timestamp + " ";
+        switch (item.category){
+            case PATIENT_ADD:{
+                out += item.caregiver + " ";
+                out += getString(R.string.LOG_ADD_PATIENT_S1) + " ";
+                out += item.caretaker;
+                break;
+            }
+            case EMERGENCY:{
+                out += item.caretaker + " ";
+                out += getString(R.string.LOG_EMERGENCY_S1);
+                break;
+            }
+            case MEAL_CONFIRM:{
+                out += item.caretaker + " ";
+                out += getString(R.string.LOG_MEAL_CONFIRM_S1) + " ";
+                out += item.extraData + " ";
+                out += getString(R.string.LOG_MEAL_CONFIRM_S2);
+                break;
+            }
+            case MEAL_SKIP:{
+                //TODO: [TimeStamp] [CareTaker] missade att bekräfta [första/andra] gången.
+                //TODO: väv in vilken måltid som missades
+                break;
+            }
+            case MEAL_MISS:{
+                //TODO: väv in vilken måltid som missades
+                out += item.caretaker + " ";
+                out += getString(R.string.LOG_MEAL_MISS_S1);
+                break;
+            }
+        }
+        out += ".";
+        return out;
+    }
 
     private ArrayList<LogItem> filterLogs(ArrayList<LogItem> logs){
 
         ArrayList<String> checkedCategories = mapCategoryCheckboxes();
         ArrayList<LogItem> out = new ArrayList<>();
-        for (int i = 0; i < logs.size(); i++){
-            if (isStringInArray(logs.get(i).getCategory(), checkedCategories)){ out.add(logs.get(i)); }
+        if(logs != null) {
+            for (int i = 0; i < logs.size(); i++) {
+                if (isStringInArray(logs.get(i).getCategory(), checkedCategories)) {
+                    out.add(logs.get(i));
+                }
+            }
         }
         return out;
     }
@@ -322,5 +377,27 @@ public class LogHistory extends AppCompatActivity {
         }
         return 0;
     }
+    private int getLogColor(LogStorage.DisplayedItem item){
+        //maps log color to resource file.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            switch (item.category) {
+                case PATIENT_ADD:
+                    return getColor(R.color.PATIENT_ADD);
+                case EMERGENCY:
+                    return getColor(R.color.EMERGENCY);
+                case MEAL_CONFIRM:
+                    return getColor(R.color.MEAL_CONFIRM);
+                case MEAL_SKIP:
+                    return getColor(R.color.MEAL_SKIP);
+                case MEAL_MISS:
+                    return getColor(R.color.MEAL_MISS);
+            }
+        }
+        return 0;
+    }
 
+
+    LogStorage getLogStorage() {
+        return ((MainApp)getApplicationContext()).logStorage;
+    }
 }

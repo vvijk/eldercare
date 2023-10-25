@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.myapplication.util.LogStorage;
 import com.example.myapplication.util.MealStorage;
 import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.firebase.database.DataSnapshot;
@@ -27,12 +28,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class AlarmActivity extends AppCompatActivity {
-
+    
+    LogStorage getLogStorage() {
+        return ((MainApp)getApplicationContext()).logStorage;
+    }
+    
 
     DatabaseReference caretakersRef;
     String recipientUID;
 
-    boolean isAlarmActive;
+    boolean isAlarmActive = false;
+    boolean useInternalAlarm = false;
     
     static final int SECONDS_UNTIL_ALARM=10;
 
@@ -42,10 +48,21 @@ public class AlarmActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm);
-
         
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        recipientUID = auth.getCurrentUser().getUid();
+        getLogStorage().initDBConnection();
+
+        String forcedCaretakerUID = getIntent().getStringExtra("recipientUID");
+        if(forcedCaretakerUID == null) {
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+            if(auth.getCurrentUser() != null) {
+                recipientUID = auth.getCurrentUser().getUid();
+            } else {
+                recipientUID = "";
+            }
+        } else {
+            recipientUID = forcedCaretakerUID;
+        }
+
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         caretakersRef = database.getReference("users/caretakers");
         TextView countDownTextView = findViewById(R.id.CountDown);
@@ -54,11 +71,15 @@ public class AlarmActivity extends AppCompatActivity {
 
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                boolean isActive = false;
-                if(snapshot.getValue() != null)
-                    isActive = (Boolean)snapshot.getValue();
-                isAlarmActive = isActive;
-                refreshUI(isActive);
+                if(!useInternalAlarm) {
+                    useInternalAlarm = true;
+
+                    boolean isActive = false;
+                    if(snapshot.getValue() != null)
+                        isActive = (Boolean)snapshot.getValue();
+                    isAlarmActive = isActive;
+                    refreshUI(isActive);
+                }
             }
 
             @Override
@@ -96,7 +117,7 @@ public class AlarmActivity extends AppCompatActivity {
 
         if(countDownTimer != null)
             countDownTimer.cancel();
-        countDownTimer = new CountDownTimer(SECONDS_UNTIL_ALARM, 1000) {
+        countDownTimer = new CountDownTimer(SECONDS_UNTIL_ALARM*1000, 1000) {
             @Override
             public void onTick(long l) {
                 if(!isAlarmActive) {
@@ -106,6 +127,9 @@ public class AlarmActivity extends AppCompatActivity {
 
             @Override
             public void onFinish() {
+                useInternalAlarm = true;
+                isAlarmActive = true;
+                getLogStorage().submitLog(LogStorage.Category.EMERGENCY, recipientUID, null, null);
                 refreshUI(true);
 
                 caretakersRef.child(recipientUID).child("larm").setValue(true).addOnCanceledListener(new OnCanceledListener() {

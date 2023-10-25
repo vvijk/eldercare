@@ -17,6 +17,8 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.widget.Toast;
 
+import com.example.myapplication.util.LogStorage;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
@@ -37,6 +39,9 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
         int weekDayIndex = intent.getIntExtra("dayIndex", 0);
         String recipientUID = intent.getStringExtra("recipientUID");
 
+        LogStorage logStorage = new LogStorage();
+        logStorage.initDBConnection();
+
         if(noticeCount < 2) { // 1 initial reminder, 2 reminders of the reminder
             // setup the next notification 45 minutes later
             long nextNotice = alarmAtMillis + 45 * 60 * 1000; // 45 minutes later
@@ -49,6 +54,11 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
 
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             alarmManager.set(AlarmManager.RTC_WAKEUP, nextNotice, pendingIntent);
+            if(noticeCount != 0) {
+                logStorage.submitLog(LogStorage.Category.MEAL_SKIP, recipientUID, null, null);
+            }
+        } else {
+            logStorage.submitLog(LogStorage.Category.MEAL_MISS, recipientUID, null, null);
         }
 
         // Toast.makeText(context, "Reminder broadcast yay " + meal, Toast.LENGTH_SHORT).show();

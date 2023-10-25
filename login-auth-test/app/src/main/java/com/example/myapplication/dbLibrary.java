@@ -201,6 +201,19 @@ public class dbLibrary {
 
         void onCaretakerAddError(String errorMessage);
     }
+    public interface GeneralCallback {
+        void onSuccess(String message);
+        void onFailure(String message);
+    }
+    public void removeCaretakerFromGiver(String caregiverUID, String caretakerUID, final GeneralCallback callback) {
+        //Log.d("dbtest", "caregiverUID: " + caregiverUID);
+        //Log.d("dbtest", "caretakerUID: " + caretakerUID);
+        DatabaseReference caregiversRef = dbRef.child("caregivers").child(caregiverUID);
+        DatabaseReference caretakersRef = dbRef.child("caretakers").child(caretakerUID);
+
+        caregiversRef.child("caretakers").child(caretakerUID).removeValue();
+        callback.onSuccess("Success");
+    }
 
     //Ta in UID, return true/false if caretaker or caregiver
     public void isCaregiver(String uid, final CaregiverCheckCallback callback) {

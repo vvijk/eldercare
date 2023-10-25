@@ -29,6 +29,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.example.myapplication.util.LogStorage;
 import com.example.myapplication.util.MealStorage;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -58,7 +59,8 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
     int weekDayIndex = 0;
     String recipientUID;
     int caretakerId;
-    MealStorage getMealStorage() { return ((MealApp)getApplicationContext()).mealStorage; }
+    MealStorage getMealStorage() { return ((MainApp)getApplicationContext()).mealStorage; }
+    LogStorage getLogStorage() { return ((MainApp)getApplicationContext()).logStorage; }
 
     private ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
@@ -81,8 +83,15 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
         rootLayout = findViewById(R.id.layout_recipient_home);
         logout_btn = findViewById(R.id.recipientLogOut);
 
-        dbLibrary lib = new dbLibrary(this);
-        recipientUID = lib.getUserID();
+        getLogStorage().initDBConnection();
+
+        String forcedCaretakerUID = getIntent().getStringExtra("recipientUID");
+        if(forcedCaretakerUID == null) {
+            dbLibrary lib = new dbLibrary(this);
+            recipientUID = lib.getUserID(); // TODO(Emarioo): Something bad happens if recipientUID becomes null
+        } else {
+            recipientUID = forcedCaretakerUID;
+        }
 
         // Intent intent = getIntent();
         // recipientUID = intent.getStringExtra("recipientUID");
@@ -144,7 +153,8 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
             public void onClick(View v) {
                 Intent intent = new Intent(RecipientHome.this, AlarmActivity.class);
                 intent.putExtra("recipientUID", recipientUID);
-                startActivityForResult(intent, 1);
+                startActivity(intent);
+                // startActivityForResult(intent, 1);
 
             }
         });
@@ -310,6 +320,8 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
             alarmManager.cancel(pendingIntent);
         }
         // mealAdapter is updated when database is written to, refresher is called and UI updates.
+
+        getLogStorage().submitLog(LogStorage.Category.MEAL_CONFIRM, recipientUID, null, null);
     }
 
     public void enableNoMealsText(boolean show) {
