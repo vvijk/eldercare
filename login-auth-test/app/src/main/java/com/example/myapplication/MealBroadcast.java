@@ -22,6 +22,8 @@ public class MealBroadcast extends BroadcastReceiver {
         int weekDayIndex = intent.getIntExtra("dayIndex", 0);
         String recipientUID = intent.getStringExtra("recipientUID");
         int id = intent.getIntExtra("notificationId",0);
+        int noticeCount = intent.getIntExtra("noticeCount", 0);
+        String logMealData = intent.getStringExtra("logMealData");
         int requestCode = intent.getIntExtra("nextAlarmsRequestCode",0);
 
         // System.out.println("MEAL BROADCAST " + mealKey);
@@ -48,17 +50,13 @@ public class MealBroadcast extends BroadcastReceiver {
                 alarmManager.cancel(pendingIntent);
             }
 
-            logStorage.submitLog(LogStorage.Category.MEAL_CONFIRM, recipientUID, null, null);
+            logStorage.submitLog(LogStorage.Category.MEAL_CONFIRM, recipientUID, null, logMealData);
+        } else {
+            if(noticeCount == 2) {
+                logStorage.submitLog(LogStorage.Category.MEAL_MISS, recipientUID, null, logMealData);
+            } else {
+                logStorage.submitLog(LogStorage.Category.MEAL_SKIP, recipientUID, null, logMealData);
+            }
         }
-
-        // int caretakerId = storage.idFromCaretakerUID(recipientUID);
-        // System.out.println("caretaker id  " + caretakerId);
-        // storage.pushRefresher_caretaker(caretakerId, new Runnable() {
-        //     @Override
-        //     public void run() {
-        //         System.out.println("SET EATEN " + haveEaten);
-        //         storage.caretaker_setEatenOfMeal(caretakerId, weekDayIndex, mealKey, haveEaten);
-        //     }
-        // });
     }
 }

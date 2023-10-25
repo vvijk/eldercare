@@ -3,20 +3,26 @@ package com.example.myapplication;
 import static com.example.myapplication.Helpers.isStringInArray;
 
 import android.content.Context;
+import android.database.DataSetObserver;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.myapplication.util.LogStorage;
+import com.example.myapplication.util.LogStorage.FilterOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -27,6 +33,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -46,12 +53,11 @@ public class LogHistory extends AppCompatActivity {
     DatabaseReference dbRef;
     FirebaseAuth mAuth;
 
-
     Context context;
     Spinner categorySpinner, patientSpinner;
     Button refreshLog;
     LinearLayout logTextBox;
-    ArrayList<DropdownItem> categoryDDIs, patientDDIs;
+    ArrayList<DropdownItem> categoryDDIs = new ArrayList<>(), patientDDIs = new ArrayList<>();
     ArrayList<LogItem> logs;
 
     CareGiver caregiver;
@@ -59,6 +65,11 @@ public class LogHistory extends AppCompatActivity {
 
     DropdownAdapter viewCategory;
     DropdownAdapter viewPatients;
+
+    ArrayList<StateVO> categoryBoxes =  new ArrayList<>();
+    ArrayList<StateVO> recipientBoxes = new ArrayList<>();
+    ArrayList<String> recipientUIDs =  new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,8 +77,6 @@ public class LogHistory extends AppCompatActivity {
         context = getApplicationContext();
         mAuth = FirebaseAuth.getInstance();
         dbRef = FirebaseDatabase.getInstance().getReference("users");
-
-        getLogStorage().initDBConnection();
 
         setContentView(R.layout.activity_log_history);
         categorySpinner = findViewById(R.id.logCategorySpinner);
@@ -77,30 +86,27 @@ public class LogHistory extends AppCompatActivity {
 
         logTextBox = findViewById(R.id.logItemBox);
 
-        initData();
-        initUI();
+        // initData();
+        // initUI();
+        // populateCategorySpinner(categorySpinner);
 
-        populateCategorySpinner(categorySpinner);
 
-        getLogStorage().retrieveLogs(new LogStorage.FilterOptions(), (items) -> {
-            clearTextField();
-            for (int i = 0; i < items.size(); i++){
-                LogStorage.DisplayedItem item = items.get(i);
-                TextView text = new TextView(context);
-                text.setText(generateLogMessage(item));
-                text.setTextColor(getLogColor(item));
-                text.setPadding(10, 0, 10, 0);
-
-                logTextBox.addView(text);
+        // setLogTextBox(logs);
+        refreshLog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getLogStorage().retrieveLogs(getFilterOptions(), (items) -> {
+                    refreshLogs(items);
+                });
+                // setLogTextBox(logs);
+                if(patients != null && patients.size() > 0)
+                    Log.d("LOGHISTORY", patients.get(0).getFullName());
             }
         });
 
-        
-        // setLogTextBox(logs);
-        // refreshLog.setOnClickListener(new View.OnClickListener() {
-        //     @Override
-        //     public void onClick(View view) { setLogTextBox(logs); Log.d("LOGHISTORY", patients.get(0).getFullName()); }
-        // });
+        getLogStorage().initDBConnection();
+        fixCategorySpinner();
+        fixRecipientSpinner();
     }
 
     private void initData(){
@@ -201,7 +207,7 @@ public class LogHistory extends AppCompatActivity {
                 CaretakerCallback ctcb = (cb2) -> {
                     this.patients.add(cb2);
                     populatePatientSpinner(patientSpinner);
-                    fetchLogs(); // NOTE(Emarioo): I added this here, maybe bad idea.
+                    // fetchLogs(); // NOTE(Emarioo): I added this here, maybe bad idea.
                 };
                 fetchCaretaker(caretakerIDs.get(i), ctcb);
             }
@@ -256,43 +262,6 @@ public class LogHistory extends AppCompatActivity {
         out += ".";
         return out;
     }
-    private String generateLogMessage(LogStorage.DisplayedItem item) {
-        // TODO(Emarioo): This function is incomplete. Text is not formatted properly.
-        String out = item.timestamp + " ";
-        switch (item.category){
-            case PATIENT_ADD:{
-                out += item.caregiver + " ";
-                out += getString(R.string.LOG_ADD_PATIENT_S1) + " ";
-                out += item.caretaker;
-                break;
-            }
-            case EMERGENCY:{
-                out += item.caretaker + " ";
-                out += getString(R.string.LOG_EMERGENCY_S1);
-                break;
-            }
-            case MEAL_CONFIRM:{
-                out += item.caretaker + " ";
-                out += getString(R.string.LOG_MEAL_CONFIRM_S1) + " ";
-                out += item.extraData + " ";
-                out += getString(R.string.LOG_MEAL_CONFIRM_S2);
-                break;
-            }
-            case MEAL_SKIP:{
-                //TODO: [TimeStamp] [CareTaker] missade att bekräfta [första/andra] gången.
-                //TODO: väv in vilken måltid som missades
-                break;
-            }
-            case MEAL_MISS:{
-                //TODO: väv in vilken måltid som missades
-                out += item.caretaker + " ";
-                out += getString(R.string.LOG_MEAL_MISS_S1);
-                break;
-            }
-        }
-        out += ".";
-        return out;
-    }
 
     private ArrayList<LogItem> filterLogs(ArrayList<LogItem> logs){
 
@@ -320,14 +289,13 @@ public class LogHistory extends AppCompatActivity {
                 case 2: out.add("ALL"); break;
                 case 3: out.add("PATIENT_ADD"); break;
                 case 4: out.add("MEAL_CONFIRM"); break;
-                case 5: out.add("MEAL_MISS"); out.add("MEAL_SKIP"); break;
-                case 6: out.add("EMERGENCY"); break;
+                case 5: out.add("MEAL_MISS"); break;
+                case 6: out.add("MEAL_SKIP"); break;
+                case 7: out.add("EMERGENCY"); break;
             }
         }
         return out;
     }
-
-
 
     private void setLogTextBox(ArrayList<LogItem> logItems){
         TextView log;
@@ -377,6 +345,182 @@ public class LogHistory extends AppCompatActivity {
         }
         return 0;
     }
+
+
+    private String generateLogMessage(LogStorage.DisplayedItem item) {
+        // TODO(Emarioo): This function is incomplete. Text is not formatted properly.
+        String out = item.getFormattedTime() + " ";
+        switch (item.category){
+            case PATIENT_ADD:{
+                out += item.caregiver + " ";
+                out += getString(R.string.LOG_ADD_PATIENT_S1) + " ";
+                out += item.caretaker;
+                break;
+            }
+            case EMERGENCY:{
+                out += item.caretaker + " ";
+                out += getString(R.string.LOG_EMERGENCY_S1);
+                break;
+            }
+            case MEAL_CONFIRM:{
+                out += item.caretaker + " ";
+                out += getString(R.string.LOG_MEAL_CONFIRM_S1) + " ";
+                out += item.extraData + " ";
+                out += getString(R.string.LOG_MEAL_CONFIRM_S2);
+                break;
+            }
+            case MEAL_SKIP:{
+                //TODO: [TimeStamp] [CareTaker] missade att bekräfta [första/andra] gången.
+                //TODO: väv in vilken måltid som missades
+                break;
+            }
+            case MEAL_MISS:{
+                //TODO: väv in vilken måltid som missades
+                out += item.caretaker + " ";
+                out += getString(R.string.LOG_MEAL_MISS_S1);
+                break;
+            }
+        }
+        out += ".";
+        return out;
+    }
+    public void fixCategorySpinner() {
+        final String[] anArray = getResources().getStringArray(R.array.log_category_array);
+        categorySpinner = (Spinner) findViewById(R.id.logCategorySpinner);
+
+        categoryBoxes = new ArrayList<>();
+
+        for (int i = 0; i < anArray.length; i++) {
+            StateVO stateVO = new StateVO();
+            stateVO.setTitle(anArray[i]);
+            stateVO.setSelected(false);
+            categoryBoxes.add(stateVO);
+        }
+        categoryBoxes.get(1).setSelected(true); // ALL category
+
+        CheckDropDownAdapter myAdapter = new CheckDropDownAdapter(LogHistory.this, 0, categoryBoxes);
+        categorySpinner.setAdapter(myAdapter);
+        myAdapter.setChangedCheckListener(new CheckDropDownAdapter.ChangedCheckListener() {
+            @Override
+            public void onChange(CheckDropDownAdapter adapter, int itemIndex) {
+                getLogStorage().retrieveLogs(getFilterOptions(), (items) -> {
+                    refreshLogs(items);
+                });
+            }
+        });
+    }
+    public void fixRecipientSpinner() {
+        patientSpinner = (Spinner) findViewById(R.id.logPatientSpinner);
+        recipientBoxes = new ArrayList<>();
+        recipientBoxes.add(new StateVO(getString(R.string.log_patient_array_title)));
+
+        recipientUIDs.clear();
+
+        CheckDropDownAdapter myAdapter = new CheckDropDownAdapter(LogHistory.this, 0, recipientBoxes);
+        patientSpinner.setAdapter(myAdapter);
+        myAdapter.setChangedCheckListener(new CheckDropDownAdapter.ChangedCheckListener() {
+            @Override
+            public void onChange(CheckDropDownAdapter adapter, int itemIndex) {
+                getLogStorage().retrieveLogs(getFilterOptions(), (items) -> {
+                    refreshLogs(items);
+                });
+            }
+        });
+
+        getLogStorage().refCaregivers.child(getUserID()).child("caretakers").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Iterator<DataSnapshot> iterator = snapshot.getChildren().iterator();
+                while(iterator.hasNext()) {
+                    DataSnapshot data = iterator.next();
+
+                    String recipientUID = data.getKey();
+                    recipientUIDs.add(recipientUID);
+
+                    getLogStorage().refCaretakers.child(recipientUID).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            String name = snapshot.child("fullName").getValue(String.class);
+                            if(name == null)
+                                name = snapshot.child("firstName").getValue(String.class) + " " + snapshot.child("lastName").getValue(String.class);
+                            recipientBoxes.add(new StateVO(name, true));
+
+                            if(recipientUIDs.size() == recipientBoxes.size() - 1) {
+                                // update logs when last recipient in recipient spinner has been added
+                                getLogStorage().retrieveLogs(getFilterOptions(), (items) -> {
+                                    refreshLogs(items);
+                                });
+                            }
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {}
+                    });
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        });
+
+    }
+    public LogStorage.FilterOptions getFilterOptions() {
+        LogStorage.FilterOptions options = new LogStorage.FilterOptions();
+
+        options.filterAllCategories = false;
+        for(int i=0;i<categoryBoxes.size();i++) {
+            StateVO v0 = categoryBoxes.get(i);
+            if (!v0.isSelected()) {
+                continue;
+            }
+            switch (i){
+                case 1: {
+                    options.filterAllCategories = true;
+                    break;
+                }
+                case 2: {
+                    options.add(LogStorage.Category.PATIENT_ADD);
+                    break;
+                }
+                case 3: {
+                    options.add(LogStorage.Category.MEAL_CONFIRM);
+                    break;
+                }
+                case 4: {
+                    options.add(LogStorage.Category.MEAL_SKIP);
+                    break;
+                }
+                case 5: {
+                    options.add(LogStorage.Category.MEAL_MISS);
+                    break;
+                }
+                case 6: {
+                    options.add(LogStorage.Category.EMERGENCY);
+                    break;
+                }
+            }
+        }
+        options.filterAllCaretakers = false;
+        for(int i=0;i<recipientBoxes.size();i++) {
+            StateVO v0 = recipientBoxes.get(i);
+            if (!v0.isSelected()) {
+                continue;
+            }
+            int uidIndex = i-1;
+            options.add(recipientUIDs.get(uidIndex));
+        }
+        return options;
+    }
+    private void refreshLogs(ArrayList<LogStorage.DisplayedItem> items) {
+        clearTextField();
+        for (int i = 0; i < items.size(); i++){
+            LogStorage.DisplayedItem item = items.get(i);
+            TextView text = new TextView(context);
+            text.setText(generateLogMessage(item));
+            text.setTextColor(getLogColor(item));
+            text.setPadding(10, 0, 10, 0);
+
+            logTextBox.addView(text);
+        }
+    }
     private int getLogColor(LogStorage.DisplayedItem item){
         //maps log color to resource file.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -395,8 +539,6 @@ public class LogHistory extends AppCompatActivity {
         }
         return 0;
     }
-
-
     LogStorage getLogStorage() {
         return ((MainApp)getApplicationContext()).logStorage;
     }

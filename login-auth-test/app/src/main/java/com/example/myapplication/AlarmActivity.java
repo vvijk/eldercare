@@ -120,9 +120,9 @@ public class AlarmActivity extends AppCompatActivity {
         countDownTimer = new CountDownTimer(SECONDS_UNTIL_ALARM*1000, 1000) {
             @Override
             public void onTick(long l) {
-                if(!isAlarmActive) {
+                // if(!isAlarmActive) {
                     countDownTextView.setText(String.valueOf(l / 1000));
-                }
+                // }
             }
 
             @Override
