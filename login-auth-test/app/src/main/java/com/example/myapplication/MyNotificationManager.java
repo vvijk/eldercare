@@ -62,7 +62,7 @@ public class MyNotificationManager{
 
         patients = getPatientFromGiver(careGiverTakerReference);
         checkPatientMealPatient(mealsRef, patients);
-        checkLarm(caretakersRef, patients);
+        //checkLarm(caretakersRef, patients);
 
 
     }
@@ -168,7 +168,8 @@ public class MyNotificationManager{
 
         // Format the date to display the first three letters of the day (e.g., "Mon")
         SimpleDateFormat sdf = new SimpleDateFormat("EEE", Locale.getDefault());
-        String todaysDay = sdf.format(currentDate);
+        String todaysDay = sdf.format(currentDate).toLowerCase();
+        Log.d("krok", todaysDay);
         String day = (todaysDay);
 
         DatabaseReference finalMealsRef = mealsRef.child(patientSnapshot).child(day);
@@ -233,7 +234,7 @@ public class MyNotificationManager{
                     if(currentTime.isAfter(targetTime)){
                         Log.d("larss","har inte ätit efter tiden: ");
                         // NOTE(Emarioo): Turning this off because it's annoying.
-                        // makeNotification(title, msg);
+                            makeNotification(title, msg);
 
                     } else{
 
