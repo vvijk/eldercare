@@ -73,7 +73,7 @@
     <string name="previous">Previous</string>
     <string name="settings">Inställningar</string>
     <string name="home">Hem</string>
-    <string name="patients">Patienter</string>
+    <string name="patients">Vårdtagare</string>
     <string name="profile">Profil</string>
     <string name="menu_drawer_open">Drawer Open</string>
     <string name="menu_drawer_closed">Drawer Closed</string>
@@ -89,6 +89,11 @@
     <string name="english">Engelska</string>
     <string name="msg_token_fmt" translatable="false">FCM registration Token: %s</string>
     <string name="notifications_are_disabled">Notifikationer är avstängda. Du kommer missa uppdateringar.</string>
+    <string name="notif_not_eaten_title">Har inte ätit</string>
+    <string name="notif_not_eaten_msg">%s har inte ätit %s %s</string>
+    <string name="notif_alarm_title">NÖDLARM</string>
+    <string name="notif_alarm_msg">%s larmar!</string>
+
 
     <string name="historylog">Historik</string>
 

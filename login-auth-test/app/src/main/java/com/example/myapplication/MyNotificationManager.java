@@ -33,8 +33,9 @@ import java.util.Locale;
 public class MyNotificationManager{
 
     private static MyNotificationManager instance;
-    private ValueEventListener valueEventListener;
-    private DatabaseReference databaseReference;
+    // private ValueEventListener valueEventListener;
+    // private DatabaseReference databaseReference;
+    DatabaseReference caretakersRef;
 
     private Context context;
 
@@ -56,7 +57,7 @@ public class MyNotificationManager{
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference careGiverTakerReference = database.getReference("users/caregivers/" + currentUser + "/caretakers");
         DatabaseReference mealsRef = database.getReference("meals");
-        DatabaseReference caretakersRef = database.getReference("users/caretakers");
+        caretakersRef = database.getReference("users/caretakers");
 
         ArrayList<String> patients = new ArrayList<>();
         ArrayList<String> patientsInMeal;
@@ -72,32 +73,21 @@ public class MyNotificationManager{
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     String caretakerUID = snapshot.getKey();  // Retrieve the caretaker UID
                     for(int i=0; i < caretakerUIDs.size(); i++){
-                        if(snapshot.getKey().equals(caretakerUIDs.get(i))){
-                            DatabaseReference finalCaretakersRef = caretakersRef.child(snapshot.getKey());
-                            finalCaretakersRef.addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    for(DataSnapshot larmSnapshot : snapshot.getChildren()) {
-                                        Log.d("lars", "hitta caretaker: " + larmSnapshot.getValue());
-                                        if (larmSnapshot.getKey().equals("larm") && larmSnapshot.getValue(boolean.class)){
+                        if(caretakerUID.equals(caretakerUIDs.get(i))){
+                            boolean larm = false;
+                            if(snapshot.child("larm").getValue() != null)
+                                larm = snapshot.child("larm").getValue(Boolean.class);
 
-                                                String msg =  "lasse larmar";
-                                                String title = "Larm";
-                                                finalCaretakersRef.child("larm").setValue(false);
-                                                makeNotification(title, msg);
-                                        }
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
-
-                                }
-                            });
+                            Log.d("lars", "hitta caretaker: " + caretakerUID);
+                            if (larm){
+                                String title = context.getString(R.string.notif_alarm_title);
+                                String msg = context.getString(R.string.notif_alarm_msg, snapshot.child("firstName").getValue(String.class) + " " + snapshot.child("lastName").getValue(String.class));
+                                caretakersRef.child(caretakerUID).child("larm").setValue(false);
+                                makeNotification(title, msg);
+                            }
                         }
                     }
                 }
@@ -162,15 +152,15 @@ public class MyNotificationManager{
         return patientsInMeal;
     }
 
-    private void checkDay(String patientSnapshot, DatabaseReference mealsRef){
+    private void checkDay(String patientUID, DatabaseReference mealsRef){
         Date currentDate = new Date();
 
         // Format the date to display the first three letters of the day (e.g., "Mon")
         SimpleDateFormat sdf = new SimpleDateFormat("EEE", Locale.getDefault());
-        String todaysDay = sdf.format(currentDate);
+        String todaysDay = sdf.format(currentDate).toLowerCase();
         String day = (todaysDay);
 
-        DatabaseReference finalMealsRef = mealsRef.child(patientSnapshot).child(day);
+        DatabaseReference finalMealsRef = mealsRef.child(patientUID).child(day);
 
         finalMealsRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -179,7 +169,7 @@ public class MyNotificationManager{
 
                     for(DataSnapshot mealSnapshot : dataSnapshot.getChildren()){   //går igenom alla Mål, frukost, lunch .....
                        // Log.d("larss", "här har vi: "+mealSnapshot.getKey());
-                        checkTime(finalMealsRef, mealSnapshot.getKey());
+                        checkTime(mealSnapshot, patientUID);
 
                     }
                 } else {
@@ -195,64 +185,68 @@ public class MyNotificationManager{
         });
     }
 
-    private void checkTime(DatabaseReference mealRef, String mealType){
-        final int[] hourInt = new int[1];
-        final int[] minuteInt = new int[1];
-        final boolean[] checkEaten = new boolean[1];
-        DatabaseReference mealTypeRef = mealRef.child(mealType);
-        String title ="Har inte ätit";
-        String msg = "lasse har inte ätit";
-
-        mealTypeRef.addValueEventListener(new ValueEventListener() {
-
-            @RequiresApi(api = Build.VERSION_CODES.O)
+    private void checkTime(DataSnapshot mealSnapshot, String patientUID){
+        caretakersRef.child(patientUID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot mealSnapshot : snapshot.getChildren()){   //går igenom desc, hour, minute, eaten
-                    if(mealSnapshot.getKey().equals("hour")){
-                        String hour = mealSnapshot.getValue().toString();
-                        Log.d("larss", "hour är:" + hour);
-                        hourInt[0] = Integer.parseInt(hour);
-                    }
-                    if(mealSnapshot.getKey().equals("minute")){
-                        String minute = mealSnapshot.getValue().toString();
-                        Log.d("larss", "min är:" + minute);
-                        minuteInt[0] = Integer.parseInt(minute);
-                    }
+                int hourInt = 0;
+                int minuteInt = 0;
+                boolean checkEaten = false;
+                // DatabaseReference mealTypeRef = mealRef.child(mealType);
 
-                   if(mealSnapshot.getKey().equals("eaten")){
-                       checkEaten[0] = mealSnapshot.getValue(Boolean.class);
-                   }
+                if(mealSnapshot.child("hour").getValue() != null){
+                    String hour = mealSnapshot.child("hour").getValue().toString();
+                    Log.d("larss", "hour är:" + hour);
+                    hourInt = Integer.parseInt(hour);
                 }
-                //om den inte har ätit
-                if(!checkEaten[0]){                                                                                       LocalTime currentTime = LocalTime.now();
-                    LocalTime targetTime = LocalTime.of(hourInt[0], minuteInt[0]).plusHours(1).plusMinutes(30);
-                    LocalTime currTime = LocalTime.now();
+                if(mealSnapshot.child("minute").getValue() != null){
+                    String minute = mealSnapshot.child("minute").getValue().toString();
+                    Log.d("larss", "min är:" + minute);
+                    minuteInt = Integer.parseInt(minute);
+                }
 
-                    if(currentTime.isAfter(targetTime)){
+                if(mealSnapshot.child("eaten").getValue() != null){
+                    checkEaten = mealSnapshot.child("eaten").getValue(Boolean.class);
+                }
+
+                String title = context.getString(R.string.notif_not_eaten_title);
+                String desc = "";
+                if(mealSnapshot.child("desc").getValue() != null)
+                    desc = ": " + mealSnapshot.child("desc").getValue(String.class);
+                String msg = context.getString(R.string.notif_not_eaten_msg,snapshot.child("firstName").getValue(String.class)+ " "+snapshot.child("lastName").getValue(String.class),
+                    Helpers.FormatTime(hourInt, minuteInt) + " " + mealSnapshot.child("name").getValue(String.class), desc);
+
+                //om recipient inte har ätit
+                if(!checkEaten){
+                    Calendar currentTime = Calendar.getInstance();
+                    Calendar targetTime = (Calendar)Calendar.getInstance().clone();
+                    targetTime.set(Calendar.HOUR_OF_DAY, hourInt);
+                    targetTime.set(Calendar.MINUTE, minuteInt);
+                    targetTime.add(Calendar.MINUTE, 2*45);
+
+                    // LocalTime currentTime = LocalTime.now();
+                    // LocalTime targetTime = LocalTime.of(hourInt[0], minuteInt[0]).plusHours(1).plusMinutes(30);
+
+                    if(currentTime.after(targetTime)) {
                         Log.d("larss","har inte ätit efter tiden: ");
-                        // NOTE(Emarioo): Turning this off because it's annoying.
-                        // makeNotification(title, msg);
-
+                        makeNotification(title, msg);
                     } else{
 
                     }
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
         });
-
     }
 
-    private boolean isNoon(long currentTimeMillis) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(currentTimeMillis);
-        return calendar.get(Calendar.HOUR_OF_DAY) == 12 && calendar.get(Calendar.MINUTE) == 0;
-    }
+    // private boolean isNoon(long currentTimeMillis) {
+    //     Calendar calendar = Calendar.getInstance();
+    //     calendar.setTimeInMillis(currentTimeMillis);
+    //     return calendar.get(Calendar.HOUR_OF_DAY) == 12 && calendar.get(Calendar.MINUTE) == 0;
+    // }
 
                                           
     public void makeNotification(String title, String msg) {
@@ -293,10 +287,10 @@ public class MyNotificationManager{
         notificationManager.notify(0, builder.build());
     }
 
-    public void cleanup() {
-        // Remove the ValueEventListener and clean up resources
-        if (databaseReference != null && valueEventListener != null) {
-            databaseReference.removeEventListener(valueEventListener);
-        }
-    }
+    // public void cleanup() {
+    //     // Remove the ValueEventListener and clean up resources
+    //     if (databaseReference != null && valueEventListener != null) {
+    //         databaseReference.removeEventListener(valueEventListener);
+    //     }
+    // }
 }

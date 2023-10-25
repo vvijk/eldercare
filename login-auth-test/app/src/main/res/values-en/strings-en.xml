@@ -21,7 +21,7 @@
     <string name="Ja">Yes</string>
     <string name="Nej">No</string>
     <string name="sureLogOut">Are you sure you want to log out?</string>
-    <string name="choose">You must choose caregiver or caretaker!</string>
+    <string name="choose">You must choose caregiver or recipient!</string>
     <string name="dontMatch">Passwords dont match!</string>
     <string name="str_provide_email_to_restore_password">Provide your email address to restore password</string>
     <string name="provide_email">Provide email</string>
@@ -35,7 +35,7 @@
     <string name="restoration_failed">Could not restore password</string>
     <string name="auth_failed">Authentication failed</string>
 
-    <string name="careTaker">Care Recipient</string>
+    <string name="careTaker">Recipient</string>
     <string name="careGiver">Caregiver</string>
 
     <!--STRINGS FOR CREATE PATIENT-->
@@ -72,7 +72,7 @@
     <string name="previous">Previous</string>
     <string name="settings">Settings</string>
     <string name="home">Home</string>
-    <string name="patients">Patients</string>
+    <string name="patients">Recipients</string>
     <string name="profile">Profile</string>
     <string name="menu_drawer_open">Drawer Open</string>
     <string name="menu_drawer_closed">Drawer Closed</string>
@@ -88,7 +88,10 @@
     <string name="english">English</string>
     <string name="msg_token_fmt" translatable="false">FCM registration Token: %s</string>
     <string name="notifications_are_disabled">Notifications are disabled. You won\'t receive updates.</string>
-
+    <string name="notif_not_eaten_title">Have not eaten</string>
+    <string name="notif_not_eaten_msg">%s have not eaten %s %s</string>
+    <string name="notif_alarm_title">EMERGENCY ALARM</string>
+    <string name="notif_alarm_msg">%s has activated the alarm!</string>
 
     <string name="historylog">History</string>
 

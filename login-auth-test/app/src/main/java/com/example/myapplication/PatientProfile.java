@@ -25,6 +25,7 @@ import java.util.Objects;
 
 public class PatientProfile extends AppCompatActivity {
     TextView txt_PatientName;
+    TextView txt_PatientEmail;
     TextView txt_PatientAddress;
     TextView txt_PatientPreferences;
     TextView txt_PatientAlerts;
@@ -44,13 +45,14 @@ public class PatientProfile extends AppCompatActivity {
         setContentView(R.layout.activity_patient_profile);
 
         txt_PatientName = findViewById(R.id.TextBoxPatientName);
+        txt_PatientEmail     = findViewById(R.id.TextBoxPatientEmail);
         txt_PatientAddress     = findViewById(R.id.TextBoxPatientAdress);
         txt_PatientPreferences = findViewById(R.id.TextBoxPatientPreferences);
         txt_PatientAlerts      = findViewById(R.id.TextBoxPatientAlerts);
         btn_BackToMealPlan     = findViewById(R.id.ButtonBackToMealPlan);
         img_PatientAvatar      = findViewById(R.id.ImageViewPatientAvatar);
 
-        /*Button to mealplan setup*/
+        /* Button to mealplan setup */
         btn_BackToMealPlan.setOnClickListener((View view) -> finish());
         btn_BackToMealPlan.setText(getString(R.string.str_BackToMealPlan));
 
@@ -66,6 +68,7 @@ public class PatientProfile extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 patient = snapshot.getValue(CareTaker.class);
                 txt_PatientPreferences.setText(patient.getPrefFood());
+                txt_PatientEmail.setText(patient.getEmail());
                 txt_PatientAddress.setText(patient.getPhoneNr());
                 txt_PatientName.setText(patient.getFullName());
             }
