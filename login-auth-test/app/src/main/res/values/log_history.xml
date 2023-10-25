@@ -21,15 +21,14 @@
     <string name="all">Alla</string>
 
     <!-- SEGMENTS FOR LOG MESSAGES -->
-    <string name="LOG_ADD_PATIENT_S1">lade till ny patient,</string>
-    <string name="LOG_MODIFY_PATIENT_S1">modifierade</string>
-    <string name="LOG_MODIFY_PATIENT_S2">\'s information</string>
-    <string name="LOG_EMERGENCY_S1">skickade en nödfallssignal</string>
-    <string name="LOG_MEAL_CONFIRM_S1">bekräftade att </string>
-    <string name="LOG_MEAL_CONFIRM_S2">ätits</string>
-    <string name="LOG_MEAL_SKIP_V1">missade att bekräfta första gången</string>
-    <string name="LOG_MEAL_SKIP_V2">missade att bekräfta andra gången</string>
-    <string name="LOG_MEAL_MISS_S1">missade att bekräfta sista gången, notis skickad till vårdgivare</string>
+    <string name="LOG_ADD_PATIENT">%s lade till %s i sin vårdtagarlista</string>
+<!--    <string name="LOG_MODIFY_PATIENT_S1">modifierade</string>-->
+<!--    <string name="LOG_MODIFY_PATIENT_S2">\'s information</string>-->
+    <string name="LOG_EMERGENCY">%s skickade en nödfallssignal</string>
+    <string name="LOG_MEAL_CONFIRM">%s bekräftade att %s ätits</string>
+    <string name="LOG_MEAL_SKIP">%s missade att bekräfta %s</string>
+    <string name="LOG_MEAL_MISS">%s missade att bekräfta %s sista gången, notis skickad till vårdgivare</string>
+    <string name="LOG_UNKNOWN">Okänd typ av loggmeddelande</string>
 
 
 

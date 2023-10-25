@@ -52,7 +52,7 @@ public class LogStorage {
     public static class FilterOptions {
         ArrayList<String> caretakers = new ArrayList<>();
         ArrayList<Category> categories = new ArrayList<>();
-        public boolean sortByAscendingTime = true; // false would be descending
+        public boolean sortByAscendingTime = false; // false is descending
         public boolean filterAllCategories = true;
         public boolean filterAllCaretakers = true;
 
@@ -95,6 +95,21 @@ public class LogStorage {
     public void submitLog(Category category, String caretakerUID, @Nullable String caregiverUID, @Nullable String extraData) {
         initDBConnection(); // just in case you forgot to init database connection
         DatabaseReference ref = refLogs.child(caretakerUID).push();
+
+        // TODO(Emarioo): You ensure that extraData isn't null when category is a meal type. This is not a high priority though.
+        // RuntimeException err = new RuntimeException("Not suppoed to be null");
+        // switch(category) {
+        //     case EMERGENCY: {
+        //         if(caretakerUID == null)
+        //             throw err;
+        //         break;
+        //     }
+        //     case PATIENT_ADD: {
+        //         if(caretakerUID == null)
+        //             throw err;
+        //         break;
+        //     }
+        // }
 
         ref.child("timestamp").setValue(System.currentTimeMillis());
         ref.child("category").setValue(category);

@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
+import com.example.myapplication.util.MealStorage;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -63,8 +64,6 @@ public class MyNotificationManager{
         patients = getPatientFromGiver(careGiverTakerReference);
         checkPatientMealPatient(mealsRef, patients);
         checkLarm(caretakersRef, patients);
-
-
     }
 
     public void checkLarm(DatabaseReference caretakersRef, ArrayList<String>caretakerUIDs){

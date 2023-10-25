@@ -110,10 +110,22 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
                 int weekDayIndex = getMealStorage().todaysDayIndex();
                 RecipientHome.this.weekDayIndex = weekDayIndex;
 
+                {
+                    // reset "eaten" of meals for tomorrow
+                    int next_weekDayIndex = (weekDayIndex+1) % 7;
+                    int[] sortedMealIndices = getMealStorage().caretaker_sortedMealIndices(caretakerId, next_weekDayIndex);
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.add(Calendar.DAY_OF_YEAR,1);
+                    for (int mealIndex : sortedMealIndices) {
+                        if (!getMealStorage().caretaker_isMealIndexValid(caretakerId, next_weekDayIndex, mealIndex))
+                            continue;
+
+                        getMealStorage().caretaker_setEatenOfMeal(caretakerId, next_weekDayIndex, mealIndex, false);
+                    }
+                }
+
                 int[] sortedMealIndices = getMealStorage().caretaker_sortedMealIndices(caretakerId, weekDayIndex);
-
                 Calendar calendar = Calendar.getInstance();
-
                 meals.clear();
                 for(int mealIndex : sortedMealIndices) {
                     if(!getMealStorage().caretaker_isMealIndexValid(caretakerId, weekDayIndex, mealIndex))
@@ -236,7 +248,7 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
 
                         alarmManager.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
                     } else {
-                        // meal time has already passsed
+                        // meal time has already passed
                     }
                 }
             } else {
@@ -276,7 +288,7 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
 
                         alarmManager.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
                     } else {
-                        // meal time has already passsed
+                        // meal time has already passed
                     }
                 }
             }
@@ -320,8 +332,9 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
             alarmManager.cancel(pendingIntent);
         }
         // mealAdapter is updated when database is written to, refresher is called and UI updates.
+        String logMealData = Helpers.FormatTime(meal.hour, meal.minute) + " "+meal.name + ": "+meal.desc;
 
-        getLogStorage().submitLog(LogStorage.Category.MEAL_CONFIRM, recipientUID, null, null);
+        getLogStorage().submitLog(LogStorage.Category.MEAL_CONFIRM, recipientUID, null, logMealData);
     }
 
     public void enableNoMealsText(boolean show) {
