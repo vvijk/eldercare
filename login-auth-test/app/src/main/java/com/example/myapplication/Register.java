@@ -45,7 +45,7 @@ public class Register extends AppCompatActivity {
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
-            Intent intent =  new Intent(getApplicationContext(), MainActivity.class);
+            Intent intent =  new Intent(getApplicationContext(), home_caregiver.class);
             startActivity(intent);
             finish();
         }
@@ -115,12 +115,12 @@ public class Register extends AppCompatActivity {
                 prefFood = String.valueOf(editTextPrefFood.getText());
 
                 if (checkedRadioButtonId == -1) {
-                    Toast.makeText(Register.this, "Du måste välja vårdtagare eller vårdgivare!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Register.this, R.string.choose, Toast.LENGTH_SHORT).show();
                     progressBar.setVisibility(View.GONE);
                     return;
                 }
                 if (!password.equals(password2)) {
-                    Toast.makeText(Register.this, "Lösenorden matchar inte!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Register.this, R.string.dontMatch, Toast.LENGTH_SHORT).show();
                     progressBar.setVisibility(View.GONE);
                     return;
                 }
@@ -131,8 +131,8 @@ public class Register extends AppCompatActivity {
                         public void onSuccess(String message) {
                             progressBar.setVisibility(View.GONE);
                             Toast.makeText(Register.this, message, Toast.LENGTH_SHORT).show();
-                            // Skicka användaren till MainAcitivity sidan.
-                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                            // Skicka användaren till home_caregiver sidan.
+                            Intent intent = new Intent(getApplicationContext(), home_caregiver.class);
                             startActivity(intent);
                             finish();
                         }

@@ -19,20 +19,20 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import com.example.myapplication.util.FocusOnNewLine;
-import com.example.myapplication.util.PatientMealStorage;
+import com.example.myapplication.util.MealStorage;
 import com.example.myapplication.util.TimeFixer;
 
-public class PatientMealActivity extends AppCompatActivity implements View.OnClickListener {
+public class MealActivity extends AppCompatActivity implements View.OnClickListener {
     LinearLayout scrolledLayout=null;
     TextView text_name=null;
     Button btn_back=null;
     Button btn_info=null;
 
-    Button btn_patient=null; // temporary
+    Button btn_recipient=null; // temporary
 
-    String curCaretakerUUID = null;
-    String curCaregiverUUID = null;
-    int curCaretakerId = 0;
+    String curRecipientUID = null;
+    String curCaregiverUID = null;
+    int curRecipientId = 0;
     int curCaregiverId = 0;
 
     Runnable saveCallback = new Runnable() {
@@ -42,41 +42,41 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
         }
     };
 
-    PatientMealStorage getMealStorage() {
+    MealStorage getMealStorage() {
         return ((MealApp) getApplicationContext()).mealStorage;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_patient_meals);
+        setContentView(R.layout.activity_recipient_meals);
         scrolledLayout = findViewById(R.id.week_scroll);
-        text_name = findViewById(R.id.text_patient_name);
-        btn_back = findViewById(R.id.manage_patient_back);
-        btn_info = findViewById(R.id.btn_patient_info);
+        text_name = findViewById(R.id.text_recipient_name);
+        btn_back = findViewById(R.id.manage_recipient_back);
+        btn_info = findViewById(R.id.btn_recipient_info);
         btn_back.setOnClickListener(this);
         btn_info.setOnClickListener(this);
 
-        btn_patient = findViewById(R.id.btn_home_patient); // temporary
-        btn_patient.setOnClickListener(this);// temporary
+        btn_recipient = findViewById(R.id.btn_home_recipient); // temporary
+        btn_recipient.setOnClickListener(this);// temporary
 
         Intent intent = getIntent();
 
-        curCaregiverUUID = intent.getStringExtra("caregiverUUID");
-        if(curCaregiverUUID != null) {
-            curCaregiverId = getMealStorage().idFromCaregiverUUID(curCaregiverUUID);
+        curCaregiverUID = intent.getStringExtra("caregiverUID");
+        if(curCaregiverUID != null) {
+            curCaregiverId = getMealStorage().idFromCaregiverUID(curCaregiverUID);
         } else {
             // bad, throw error?
         }
-        curCaretakerUUID = intent.getStringExtra("caretakerUUID");
-        if(curCaretakerUUID != null) {
-            curCaretakerId = getMealStorage().idFromCaretakerUUID(curCaretakerUUID);
-            String name = getMealStorage().nameOfCaretaker(curCaretakerId);
+        curRecipientUID = intent.getStringExtra("recipientUID");
+        if(curRecipientUID != null) {
+            curRecipientId = getMealStorage().idFromCaretakerUID(curRecipientUID);
+            String name = getMealStorage().nameOfCaretaker(curRecipientId);
             if (name != null) {
                 text_name.setText(name);
             } else {
                 // TODO(Emarioo): This may happen if the name of caretaker isn't cached.
-                //  PatientMealStorage will not fetch caretaker's name. If the name was fetched by
+                //  MealStorage will not fetch caretaker's name. If the name was fetched by
                 //  MealManagementActivity before you got to this activity things will be fine.
                 //  If not, you end up here.
                 // error?
@@ -85,7 +85,7 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
         } else {
             // error?
         }
-        getMealStorage().pushRefresher_caretaker(curCaretakerId, new Runnable() {
+        getMealStorage().pushRefresher_caretaker(curRecipientId, new Runnable() {
             @Override
             public void run() {
                 refreshDays();
@@ -107,11 +107,11 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
         Integer replaceMeal_dayIndex = (Integer)view.getTag(R.id.tag_replace_template_meal);
 
         // temporary
-        if(view == btn_patient) {
+        if(view == btn_recipient) {
             saveAllMeals();
-            Intent intent = new Intent(getApplicationContext(), Home_caretaker.class);
-            intent.putExtra("caretakerUUID", curCaretakerUUID);
-            intent.putExtra("caregiverUUID", curCaregiverUUID);
+            Intent intent = new Intent(getApplicationContext(), RecipientHome.class);
+            intent.putExtra("recipientUID", curRecipientUID);
+            intent.putExtra("caregiverUID", curCaregiverUID);
             startActivity(intent);
         }
 
@@ -121,18 +121,18 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
             finish();
         } else if(add_meal_at_dayIndex != null) {
             saveAllMeals();
-            getMealStorage().caretaker_addMeal(curCaretakerId, add_meal_at_dayIndex, getResources().getString(R.string.default_meal_name));
+            getMealStorage().caretaker_addMeal(curRecipientId, add_meal_at_dayIndex, getResources().getString(R.string.default_meal_name));
         } else if(deleteMeal != null) {
             saveAllMeals();
-            getMealStorage().caretaker_deleteMeal(curCaretakerId, dayIndex, deleteMeal);
+            getMealStorage().caretaker_deleteMeal(curRecipientId, dayIndex, deleteMeal);
         } else if(replaceMeal_dayIndex != null) {
             saveAllMeals();
-            getMealStorage().caretaker_replaceMealsWithTemplate(curCaretakerId, replaceMeal_dayIndex, curCaregiverId);
+            getMealStorage().caretaker_replaceMealsWithTemplate(curRecipientId, replaceMeal_dayIndex, curCaregiverId);
         } else if(view == btn_info) {
             saveAllMeals();
             Intent intent = new Intent(getApplicationContext(), PatientProfile.class);
-            intent.putExtra("caretakerUUID", curCaretakerUUID);
-            intent.putExtra("caregiverUUID", curCaregiverUUID);
+            intent.putExtra("recipientUID", curRecipientUID);
+            intent.putExtra("caregiverUID", curCaregiverUID);
             startActivity(intent);
         }
     }
@@ -218,9 +218,9 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
 
     }
     void refreshMeals(LinearLayout mealLayout, int weekDayIndex) {
-        // int mealCount = getMealStorage().caretaker_countOfMeals(curCaretakerId, weekDayIndex);
+        // int mealCount = getMealStorage().caretaker_countOfMeals(curRecipientId, weekDayIndex);
 
-        int[] sortedMeals_index = getMealStorage().caretaker_sortedMealIndices(curCaretakerId, weekDayIndex);
+        int[] sortedMeals_index = getMealStorage().caretaker_sortedMealIndices(curRecipientId, weekDayIndex);
         if(sortedMeals_index.length == 0){
             TextView textView = new TextView(this);
             textView.setText(getResources().getString(R.string.str_no_meals));
@@ -233,13 +233,13 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
         } else {
             for(int i=0;i<sortedMeals_index.length;i++) {
                 int mealIndex = sortedMeals_index[i];
-                if(!getMealStorage().caretaker_isMealIndexValid(curCaretakerId, weekDayIndex, mealIndex))
+                if(!getMealStorage().caretaker_isMealIndexValid(curRecipientId, weekDayIndex, mealIndex))
                     continue;
 
-                String name = getMealStorage().caretaker_nameOfMeal(curCaretakerId, weekDayIndex, mealIndex);
-                int hour = getMealStorage().caretaker_hourOfMeal(curCaretakerId, weekDayIndex, mealIndex);
-                int minute = getMealStorage().caretaker_minuteOfMeal(curCaretakerId, weekDayIndex, mealIndex);
-                String description = getMealStorage().caretaker_descriptionOfMeal(curCaretakerId, weekDayIndex, mealIndex);
+                String name = getMealStorage().caretaker_nameOfMeal(curRecipientId, weekDayIndex, mealIndex);
+                int hour = getMealStorage().caretaker_hourOfMeal(curRecipientId, weekDayIndex, mealIndex);
+                int minute = getMealStorage().caretaker_minuteOfMeal(curRecipientId, weekDayIndex, mealIndex);
+                String description = getMealStorage().caretaker_descriptionOfMeal(curRecipientId, weekDayIndex, mealIndex);
 
                 LinearLayout itemLayout = new LinearLayout(this);
                 itemLayout.setLayoutParams(new ViewGroup.LayoutParams(
@@ -271,12 +271,12 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
                         ViewGroup.LayoutParams.WRAP_CONTENT));
                 itemLayout.addView(subLayout);
 
-                // NOTE(Emarioo): Disabling editing of description when you click in on a patient.
+                // NOTE(Emarioo): Disabling editing of description when you click in on a recipient.
                 //  This is because you would modify the meal plan and thus changing the meals
-                //  for other patients too. We could allow you to edit description if each
-                //  patient has some kind of individual plan which wouldn't affect other patients.
+                //  for other recipients too. We could allow you to edit description if each
+                //  recipient has some kind of individual plan which wouldn't affect other recipients.
                 TextView editText = null;
-                // if(curPatientId!=0){
+                // if(currecipientId!=0){
                 //     editText = new TextView(itemLayout.getContext());
                 // } else {
                 editText = new EditText(itemLayout.getContext());
@@ -358,30 +358,6 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
             replaceButton.setTextColor(getResources().getColor(R.color.black));
             footLayout.addView(replaceButton);
         }
-//        LinearLayout bottomLayout = new LinearLayout(scrolledLayout.getContext());
-//        bottomLayout.setOrientation(LinearLayout.HORIZONTAL);
-//        bottomLayout.setGravity(Gravity.CENTER);
-//        bottomLayout.setLayoutParams(new ViewGroup.LayoutParams(
-//                ViewGroup.LayoutParams.MATCH_PARENT,
-//                ViewGroup.LayoutParams.WRAP_CONTENT));
-//        scrolledLayout.addView(bottomLayout);
-//
-//        Button replaceButton = new Button(bottomLayout.getContext());
-//        replaceButton.setAllCaps(false);
-//        replaceButton.setText(getResources().getString(R.string.btn));
-//        replaceButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18); // TODO(Emarioo): Don't hardcode text size
-//        replaceButton.setLayoutParams(new ViewGroup.LayoutParams(
-//                ViewGroup.LayoutParams.WRAP_CONTENT,
-//                ViewGroup.LayoutParams.WRAP_CONTENT));
-//        GradientDrawable shape = new GradientDrawable();
-//        shape.setCornerRadius(16);
-//        shape.setColor(getResources().getColor(R.color.purple));
-//        replaceButton.setBackground(shape);
-//        replaceButton.setOnClickListener(this);
-//        replaceButton.setTextColor(getResources().getColor(R.color.white));
-//        bottomLayout.addView(replaceButton);
-
-
     }
 
     void refreshMealHeader(LinearLayout headLayout, boolean editable, String mealName, String mealTime) {
@@ -453,15 +429,15 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
                 LinearLayout headLayout = (LinearLayout) itemLayout.getChildAt(0);
                 TextView view_time = (TextView)headLayout.getChildAt(0);
                 TextView view_name = (TextView)headLayout.getChildAt(1);
-                getMealStorage().caretaker_setNameOfMeal(curCaretakerId, weekDayIndex, mealIndex, view_name.getText().toString());
+                getMealStorage().caretaker_setNameOfMeal(curRecipientId, weekDayIndex, mealIndex, view_name.getText().toString());
 
                 String[] split = view_time.getText().toString().split(":");
                 if(split.length>1) {
                     try {
                         int hour = Integer.parseInt(split[0]);
                         int minute = Integer.parseInt(split[1]);
-                        getMealStorage().caretaker_setHourOfMeal(curCaretakerId, weekDayIndex, mealIndex, hour);
-                        getMealStorage().caretaker_setMinuteOfMeal(curCaretakerId, weekDayIndex, mealIndex, minute);
+                        getMealStorage().caretaker_setHourOfMeal(curRecipientId, weekDayIndex, mealIndex, hour);
+                        getMealStorage().caretaker_setMinuteOfMeal(curRecipientId, weekDayIndex, mealIndex, minute);
                     } catch (Exception e) {
                         // TODO(Emarioo): Handle parse exception. Toast the user?
                         //   Tell the user which meal was bad. We shouldn't tell the user that here because this function
@@ -476,7 +452,7 @@ public class PatientMealActivity extends AppCompatActivity implements View.OnCli
                 LinearLayout subLayout = (LinearLayout) itemLayout.getChildAt(1);
                 TextView view_desc = (TextView)subLayout.getChildAt(0);
 
-                getMealStorage().caretaker_setDescriptionOfMeal(curCaretakerId, weekDayIndex, mealIndex, view_desc.getText().toString());
+                getMealStorage().caretaker_setDescriptionOfMeal(curRecipientId, weekDayIndex, mealIndex, view_desc.getText().toString());
             }
         }
     }

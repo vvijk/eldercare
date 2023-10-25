@@ -9,7 +9,7 @@
     android:gravity="center"
     android:orientation="vertical"
     android:padding="10dp"
-    tools:context=".PatientMealActivity">
+    tools:context=".MealActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,7 +18,7 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/manage_patient_back"
+            android:id="@+id/manage_recipient_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -28,10 +28,10 @@
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="23sp"
-            app:cornerRadius="2dp"/>
+            app:cornerRadius="4dp"/>
 
         <TextView
-            android:id="@+id/text_patient_name"
+            android:id="@+id/text_recipient_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/almost_black"
@@ -44,7 +44,7 @@
     </LinearLayout>
 
 <!--    <LinearLayout-->
-<!--        android:id="@+id/meal_patient_description"-->
+<!--        android:id="@+id/meal_recipient_description"-->
 <!--        android:layout_width="match_parent"-->
 <!--        android:layout_height="wrap_content"-->
 <!--        android:background = "@color/purple"-->
@@ -83,29 +83,36 @@
         android:orientation="horizontal">
         >
         <Button
-            android:id="@+id/btn_patient_info"
+            android:id="@+id/btn_recipient_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:backgroundTint="@color/purple_dark"
             android:padding="0dp"
-            android:text="@string/str_patient_info"
-            android:textAlignment="center"
+            android:text="@string/str_recipient_info"
             android:textColor="@color/white"
             android:textSize="23sp"
-            app:cornerRadius="2dp"/>
-        <Button
-            android:id="@+id/btn_home_patient"
-            android:layout_width="wrap_content"
+            app:cornerRadius="4dp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:backgroundTint="@color/purple_dark"
-            android:padding="0dp"
-            android:text="home patient"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textSize="23sp"
-            app:cornerRadius="2dp"/>
+            android:layout_weight="1"
+            android:gravity="right"
+            android:orientation="horizontal">
+            >
+            <!-- Temporary button for recipient home screen -->
+            <Button
+                android:id="@+id/btn_home_recipient"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#00000000"
+                android:padding="0dp"
+                android:text="@string/str_recipient"
+                android:textAlignment="center"
+                android:alpha="0.04"
+                android:textColor="#FFF"
+                android:textSize="23sp"
+                app:cornerRadius="2dp"/>
+        </LinearLayout>
         <!-- SAVE BUTTON? stuff is currently auto-saved so maybe not needed? -->
     </LinearLayout>
 

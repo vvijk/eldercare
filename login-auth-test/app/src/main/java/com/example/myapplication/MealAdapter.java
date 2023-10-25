@@ -34,7 +34,11 @@ public class MealAdapter extends ArrayAdapter<MealEntry> {
         TextView view_time = rowView.findViewById(R.id.item_time);
         TextView view_desc = rowView.findViewById(R.id.item_desc);
 
-        view_name.setText(values.get(position).name);
+        if(values.get(position).name == null || values.get(position).name.isEmpty()) {
+            view_name.setText(context.getResources().getString(R.string.default_meal_name));
+        } else {
+            view_name.setText(values.get(position).name);
+        }
         view_time.setText(Helpers.FormatTime(values.get(position).hour,values.get(position).minute));
         view_desc.setText(values.get(position).desc);
 

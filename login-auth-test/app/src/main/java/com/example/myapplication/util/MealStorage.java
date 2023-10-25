@@ -34,9 +34,9 @@ import java.util.Locale;
     The class caches results from the database and has listeners which automatically update the cached results.
     You can pass a callback (Runnable) to the functions called pushRefresher which will run the callback when the cached results change.
 */
-public class PatientMealStorage {
+public class MealStorage {
     public class Caregiver {
-        String uuid;
+        String UID;
         ArrayList<Integer> caretakers = new ArrayList<>(); // in the form of ids/indexes
         MealDay templateMeal = new MealDay();
 
@@ -66,7 +66,7 @@ public class PatientMealStorage {
             this.minute = minute;
         }
         public Meal() {} // default
-        String key;
+        public String key;
         public String name=""; // lunch, breakfast...
         public int hour=12;
         public int minute=0;
@@ -117,7 +117,7 @@ public class PatientMealStorage {
     }
     public class Caretaker {
         String name = "";
-        String uuid;
+        String UID;
 
         private MealDay[] days = new MealDay[7];
 
@@ -134,7 +134,7 @@ public class PatientMealStorage {
         }
     }
 
-    public PatientMealStorage() {
+    public MealStorage() {
     }
 
     private boolean useDatabase = true;
@@ -143,7 +143,7 @@ public class PatientMealStorage {
         if(initialized)
             return;
         initialized = true;
-        // TODO(Emarioo): Should the API to the database exist in one class (dbLibrary) or multiple (dbLibrary and PatientMealStorage)?
+        // TODO(Emarioo): Should the API to the database exist in one class (dbLibrary) or multiple (dbLibrary and MealStorage)?
         //  Firebase database has some listeners and what not so perhaps we should use Firebase directly without an API.
         //  In some cases, like meal management, it is nice to have an API which handles the database stuff. It depends if you
         //  want listeners on the text views to automatically update the UI (which I think you can do?).
@@ -157,19 +157,19 @@ public class PatientMealStorage {
     public DatabaseReference db_caretakers;
 
     private ArrayList<Caregiver> caregivers = new ArrayList<>();
-    private HashMap<String, Caregiver> caregivers_by_uuid = new HashMap<>();
-    private int addCaregiver(String uuid) {
+    private HashMap<String, Caregiver> caregivers_by_UID = new HashMap<>();
+    private int addCaregiver(String UID) {
         Caregiver caregiver = new Caregiver();
         caregiver.templateMeal = new MealDay();
-        caregiver.uuid = uuid;
+        caregiver.UID = UID;
         int index = caregivers.indexOf(null);
         if(index != -1) {
             caregivers.set(index, caregiver);
-            caregivers_by_uuid.put(uuid, caregiver);
+            caregivers_by_UID.put(UID, caregiver);
             return index;
         }
         caregivers.add(caregiver);
-        caregivers_by_uuid.put(uuid, caregiver);
+        caregivers_by_UID.put(UID, caregiver);
         return caregivers.size()-1;
     }
     private Caregiver getCaregiver(int caregiverId) {
@@ -177,20 +177,20 @@ public class PatientMealStorage {
             return null;
         return caregivers.get(caregiverId);
     }
-    private Caregiver getCaregiver(String uuid) {
-        return caregivers_by_uuid.get(uuid);
+    private Caregiver getCaregiver(String UID) {
+        return caregivers_by_UID.get(UID);
     }
-    private int addCaretaker(String uuid) {
+    private int addCaretaker(String UID) {
         Caretaker caretaker = new Caretaker();
-        caretaker.uuid = uuid;
+        caretaker.UID = UID;
         int index = caretakers.indexOf(null);
         if(index != -1) {
             caretakers.set(index, caretaker);
-            caretakers_by_uuid.put(uuid, caretaker);
+            caretakers_by_UID.put(UID, caretaker);
             return index;
         }
         caretakers.add(caretaker);
-        caretakers_by_uuid.put(uuid, caretaker);
+        caretakers_by_UID.put(UID, caretaker);
         return caretakers.size()-1;
     }
     private Caretaker getCaretaker(int caretakerId) {
@@ -198,15 +198,15 @@ public class PatientMealStorage {
             return null;
         return caretakers.get(caretakerId);
     }
-    private Caretaker getCaretaker(String uuid) {
-        return caretakers_by_uuid.get(uuid);
+    private Caretaker getCaretaker(String UID) {
+        return caretakers_by_UID.get(UID);
     }
     private int idFromCaretaker(Caretaker caretaker) {
         return caretakers.indexOf(caretaker);
     }
 
     private ArrayList<Caretaker> caretakers = new ArrayList<Caretaker>();
-    private HashMap<String, Caretaker> caretakers_by_uuid = new HashMap<>();
+    private HashMap<String, Caretaker> caretakers_by_UID = new HashMap<>();
 
     class Refresher {
         Runnable runnable;
@@ -231,19 +231,35 @@ public class PatientMealStorage {
         }
         ArrayList<Refresher> refreshers = new ArrayList<>();
         refresher_stack.add(refreshers);
+
         {
             Refresher refresher = new Refresher();
             refreshers.add(refresher);
             refresher.runnable = runnable;
-            refresher.ref = db_meals.child(caregiver.uuid).child("templateMeal");
+            refresher.ref = db_meals.child(caregiver.UID).child("templateMeal");
+            // other listeners won't execute if there are zero meals. That's why we add this one.
+            refresher.ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    long count = snapshot.getChildrenCount();
+                    if(count == 0) {
+                        if (refreshers.size() != 0)
+                            refreshers.get(refreshers.size() - 1).runnable.run();
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
             refresher.listener_child = refresher.ref.addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                     String mealKey = snapshot.getKey();
-                    String uuid = snapshot.getRef().getParent().getParent().getKey();
-                    Caregiver caregiver = getCaregiver(uuid);
+                    String UID = snapshot.getRef().getParent().getParent().getKey();
+                    Caregiver caregiver = getCaregiver(UID);
                     if (caregiver == null) {
-                        int id = addCaregiver(uuid);
+                        int id = addCaregiver(UID);
                         caregiver = getCaregiver(id);
                     }
 
@@ -278,10 +294,10 @@ public class PatientMealStorage {
                 @Override
                 public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                     String mealKey = snapshot.getKey();
-                    String uuid = snapshot.getRef().getParent().getParent().getKey();
-                    Caregiver caregiver = getCaregiver(uuid);
+                    String UID = snapshot.getRef().getParent().getParent().getKey();
+                    Caregiver caregiver = getCaregiver(UID);
                     if (caregiver == null) {
-                        int id = addCaregiver(uuid);
+                        int id = addCaregiver(UID);
                         caregiver = getCaregiver(id);
                     }
 
@@ -313,10 +329,10 @@ public class PatientMealStorage {
                 @Override
                 public void onChildRemoved(@NonNull DataSnapshot snapshot) {
                     String mealKey = snapshot.getKey();
-                    String uuid = snapshot.getRef().getParent().getParent().getKey();
-                    Caregiver caregiver = getCaregiver(uuid);
+                    String UID = snapshot.getRef().getParent().getParent().getKey();
+                    Caregiver caregiver = getCaregiver(UID);
                     if (caregiver == null) {
-                        int id = addCaregiver(uuid);
+                        int id = addCaregiver(UID);
                         caregiver = getCaregiver(id);
                     }
                     caregiver.templateMeal.removeMeal(mealKey);
@@ -341,7 +357,7 @@ public class PatientMealStorage {
             Refresher refresher = new Refresher();
             refreshers.add(refresher);
             refresher.runnable = runnable;
-            refresher.ref = db_caregivers.child(caregiver.uuid).child("caretakers");
+            refresher.ref = db_caregivers.child(caregiver.UID).child("caretakers");
             refresher.listener_child = refresher.ref.addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
@@ -350,27 +366,27 @@ public class PatientMealStorage {
 
                 @Override
                 public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                    String caregiver_uuid = snapshot.getRef().getParent().getParent().getKey();
-                    if(caregiver_uuid == null) return;
-                    String caretaker_uuid = snapshot.getKey();
-                    // NOTE(Emarioo): isValid refers to the boolean in caregivers/<uuid>/caretakers/<uuid>:boolean
-                    //  true means that the caregiver can see caretaker, false means the opposite. UUID not being in
+                    String caregiver_UID = snapshot.getRef().getParent().getParent().getKey();
+                    if(caregiver_UID == null) return;
+                    String caretaker_UID = snapshot.getKey();
+                    // NOTE(Emarioo): isValid refers to the boolean in caregivers/<UID>/caretakers/<UID>:boolean
+                    //  true means that the caregiver can see caretaker, false means the opposite. UID not being in
                     //  the list also means that caregiver can't see the caretaker.
                     Boolean isValid = snapshot.getValue(Boolean.class);
-                    if(caretaker_uuid == null) return;
-                    Caregiver caregiver = getCaregiver(caregiver_uuid);
+                    if(caretaker_UID == null) return;
+                    Caregiver caregiver = getCaregiver(caregiver_UID);
                     if (caregiver == null) {
-                        int id = addCaregiver(caregiver_uuid);
+                        int id = addCaregiver(caregiver_UID);
                         caregiver = getCaregiver(id);
                     }
 
-                    Caretaker caretaker = getCaretaker(caretaker_uuid);
+                    Caretaker caretaker = getCaretaker(caretaker_UID);
                     int caretaker_id = 0;
                     if (caretaker == null && isValid) {
-                        caretaker_id = addCaretaker(caretaker_uuid);
+                        caretaker_id = addCaretaker(caretaker_UID);
                         caretaker = getCaretaker(caretaker_id);
                         caregiver.addCaretaker(caretaker_id);
-                        db_caretakers.child(caretaker_uuid).addListenerForSingleValueEvent(new ValueListener(caretaker) {
+                        db_caretakers.child(caretaker_UID).addListenerForSingleValueEvent(new ValueListener(caretaker) {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 String firstname = snapshot.child("firstName").getValue(String.class);
@@ -403,18 +419,18 @@ public class PatientMealStorage {
 
                 @Override
                 public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-                    String caregiver_uuid = snapshot.getRef().getParent().getParent().getKey();
-                    if(caregiver_uuid == null) return;
-                    String caretaker_uuid = snapshot.getKey();
+                    String caregiver_UID = snapshot.getRef().getParent().getParent().getKey();
+                    if(caregiver_UID == null) return;
+                    String caretaker_UID = snapshot.getKey();
                     Boolean isValid = snapshot.getValue(Boolean.class);
-                    if(caretaker_uuid == null) return;
-                    Caregiver caregiver = getCaregiver(caregiver_uuid);
+                    if(caretaker_UID == null) return;
+                    Caregiver caregiver = getCaregiver(caregiver_UID);
                     if (caregiver == null) {
-                        int id = addCaregiver(caregiver_uuid);
+                        int id = addCaregiver(caregiver_UID);
                         caregiver = getCaregiver(id);
                     }
 
-                    Caretaker caretaker = getCaretaker(caretaker_uuid);
+                    Caretaker caretaker = getCaretaker(caretaker_UID);
                     int caretaker_id = 0;
                     if (caretaker != null) {
                         caretaker_id = idFromCaretaker(caretaker);
@@ -453,7 +469,7 @@ public class PatientMealStorage {
             Refresher refresher = new Refresher();
             refreshers.add(refresher);
             refresher.runnable = runnable;
-            refresher.ref = db_meals.child(caretaker.uuid);
+            refresher.ref = db_meals.child(caretaker.UID);
             refresher.ref.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -471,8 +487,8 @@ public class PatientMealStorage {
             refresher.listener_value = refresher.ref.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    String caretaker_uuid = snapshot.getKey();
-                    Caretaker caretaker = getCaretaker(caretaker_uuid);
+                    String caretaker_UID = snapshot.getKey();
+                    Caretaker caretaker = getCaretaker(caretaker_UID);
                     if (caretaker == null) {
                         throw new RuntimeException("Caretaker was null, should be impossible.");
                         // pushRefresher takes caretakerId as argument which means that the caretaker exists and getCaretaker shouldn't return null.
@@ -563,19 +579,19 @@ public class PatientMealStorage {
         }
         refresher_stack.remove(refresher_stack.size()-1);
     }
-    // adds a new caregiver if uuid isn't cached
-    public int idFromCaregiverUUID(String uuid) {
-        Caregiver caregiver = caregivers_by_uuid.get(uuid);
+    // adds a new caregiver if UID isn't cached
+    public int idFromCaregiverUID(String UID) {
+        Caregiver caregiver = caregivers_by_UID.get(UID);
         if(caregiver == null) {
-            return addCaregiver(uuid);
+            return addCaregiver(UID);
         } else {
             return caregivers.indexOf(caregiver);
         }
     }
-    public int idFromCaretakerUUID(String uuid) {
-        Caretaker caretaker = caretakers_by_uuid.get(uuid);
+    public int idFromCaretakerUID(String UID) {
+        Caretaker caretaker = caretakers_by_UID.get(UID);
         if(caretaker == null) {
-            return addCaretaker(uuid);
+            return addCaretaker(UID);
         } else {
             return caretakers.indexOf(caretaker);
         }
@@ -593,19 +609,19 @@ public class PatientMealStorage {
             return 0;
         return caregiver.getCaretakerByIndex(caretakerIndex);
     }
-    public String uuidOfCaretaker(int caretakerId) {
+    public String UIDOfCaretaker(int caretakerId) {
         Caretaker caretaker = caretakers.get(caretakerId);
         if(caretaker == null)
             return "";
-        return caretaker.uuid;
+        return caretaker.UID;
     }
-    public String uuidOfCaregiver(int caregiverId) {
+    public String UIDOfCaregiver(int caregiverId) {
         Caregiver caregiver = caregivers.get(caregiverId);
         if(caregiver == null)
             return "";
-        return caregiver.uuid;
+        return caregiver.UID;
     }
-    // returns null if patientId was invalid
+    // returns null if recipientId was invalid
     public String nameOfCaretaker(int caretakerId) {
         Caretaker caretaker = caretakers.get(caretakerId);
         if(caretaker == null)
@@ -672,7 +688,7 @@ public class PatientMealStorage {
             Caregiver caregiver = getCaregiver(caregiverId);
             if(caregiver == null)
                 return;
-            DatabaseReference mealReference = db_meals.child(caregiver.uuid).child("templateMeal").push();
+            DatabaseReference mealReference = db_meals.child(caregiver.UID).child("templateMeal").push();
             mealReference.child("name").setValue(name);
             mealReference.child("hour").setValue(12);
             mealReference.child("minute").setValue(0);
@@ -690,7 +706,7 @@ public class PatientMealStorage {
             Meal meal = caregiver.templateMeal.getMeal(mealIndex);
             if(meal == null)
                 return;
-            db_meals.child(caregiver.uuid).child("templateMeal").child(meal.key).removeValue();
+            db_meals.child(caregiver.UID).child("templateMeal").child(meal.key).removeValue();
         }
     }
     public int todaysDayIndex() {
@@ -703,13 +719,13 @@ public class PatientMealStorage {
         Caregiver caregiver = getCaregiver(caregiverId);
         Caretaker caretaker = getCaretaker(caretakerId);
 
-        // db_meals.child(caretaker.uuid).child(dayref(dayIndex)).removeValue();
-        db_meals.child(caregiver.uuid).child("templateMeal").addListenerForSingleValueEvent(new ValueEventListener(){
+        // db_meals.child(caretaker.UID).child(dayref(dayIndex)).removeValue();
+        db_meals.child(caregiver.UID).child("templateMeal").addListenerForSingleValueEvent(new ValueEventListener(){
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                db_meals.child(caretaker.uuid).child(dayref(dayIndex)).setValue(snapshot.getValue());
+                db_meals.child(caretaker.UID).child(dayref(dayIndex)).setValue(snapshot.getValue());
                 for(DataSnapshot snap : snapshot.getChildren()) {
-                    db_meals.child(caretaker.uuid).child(dayref(dayIndex)).child(snap.getKey()).child("eaten").setValue(false);
+                    db_meals.child(caretaker.UID).child(dayref(dayIndex)).child(snap.getKey()).child("eaten").setValue(false);
                 }
             }
             @Override
@@ -726,7 +742,7 @@ public class PatientMealStorage {
             Meal meal = caregiver.templateMeal.getMeal(mealIndex);
             if(meal == null)
                 return;
-            db_meals.child(caregiver.uuid).child("templateMeal").child(meal.key).child("name").setValue(name);
+            db_meals.child(caregiver.UID).child("templateMeal").child(meal.key).child("name").setValue(name);
         }
     }
     public void caregiver_template_setHourOfMeal(int caregiverId, int mealIndex, int hour) {
@@ -737,7 +753,7 @@ public class PatientMealStorage {
             Meal meal = caregiver.templateMeal.getMeal(mealIndex);
             if(meal == null)
                 return;
-            db_meals.child(caregiver.uuid).child("templateMeal").child(meal.key).child("hour").setValue(hour);
+            db_meals.child(caregiver.UID).child("templateMeal").child(meal.key).child("hour").setValue(hour);
         }
     }
     public void caregiver_template_setMinuteOfMeal(int caregiverId, int mealIndex, int minute){
@@ -748,7 +764,7 @@ public class PatientMealStorage {
             Meal meal = caregiver.templateMeal.getMeal(mealIndex);
             if(meal == null)
                 return;
-            db_meals.child(caregiver.uuid).child("templateMeal").child(meal.key).child("minute").setValue(minute);
+            db_meals.child(caregiver.UID).child("templateMeal").child(meal.key).child("minute").setValue(minute);
         }
     }
     public void caregiver_template_setDescriptionOfMeal(int caregiverId, int mealIndex, String description){
@@ -759,7 +775,7 @@ public class PatientMealStorage {
             Meal meal = caregiver.templateMeal.getMeal(mealIndex);
             if(meal == null)
                 return;
-            db_meals.child(caregiver.uuid).child("templateMeal").child(meal.key).child("desc").setValue(description);
+            db_meals.child(caregiver.UID).child("templateMeal").child(meal.key).child("desc").setValue(description);
         }
     }
     public int caretaker_countOfMeals(int caretakerId, int weekDay) {
@@ -829,6 +845,15 @@ public class PatientMealStorage {
         if(day == null)
             return new int[0];
         return getSortedMealIndexList(day);
+    }
+    public Meal caretaker_getMeal(int caretakerId, int weekDay, int mealIndex) {
+        Caretaker caretaker = getCaretaker(caretakerId);
+        if(caretaker == null)
+            return null;
+        MealDay day = caretaker.days[weekDay];
+        if(day == null)
+            return null;
+        return day.meals.get(mealIndex);
     }
     public boolean caretaker_isMealIndexValid(int caretakerId, int weekDay, int mealIndex) {
         Caretaker caretaker = getCaretaker(caretakerId);
@@ -931,7 +956,7 @@ public class PatientMealStorage {
             Caretaker caretaker = getCaretaker(caretakerId);
             if(caretaker == null)
                 return;
-            DatabaseReference mealReference = db_meals.child(caretaker.uuid).child(dayref(weekDay)).push();
+            DatabaseReference mealReference = db_meals.child(caretaker.UID).child(dayref(weekDay)).push();
             mealReference.child("name").setValue(name);
             mealReference.child("hour").setValue(12);
             mealReference.child("minute").setValue(0);
@@ -950,7 +975,7 @@ public class PatientMealStorage {
             Meal meal = day.getMeal(mealIndex);
             if(meal == null)
                 return;
-            db_meals.child(caretaker.uuid).child(dayref(weekDay)).child(meal.key).removeValue();
+            db_meals.child(caretaker.UID).child(dayref(weekDay)).child(meal.key).removeValue();
         }
     }
     public void caretaker_setNameOfMeal(int caretakerId, int weekDay, int mealIndex, String name) {
@@ -964,7 +989,7 @@ public class PatientMealStorage {
             Meal meal = day.getMeal(mealIndex);
             if(meal == null)
                 return;
-            db_meals.child(caretaker.uuid).child(dayref(weekDay)).child(meal.key).child("name").setValue(name);
+            db_meals.child(caretaker.UID).child(dayref(weekDay)).child(meal.key).child("name").setValue(name);
         }
     }
     public void caretaker_setEatenOfMeal(int caretakerId, int weekDay, int mealIndex, boolean eaten) {
@@ -978,7 +1003,7 @@ public class PatientMealStorage {
             Meal meal = day.getMeal(mealIndex);
             if(meal == null)
                 return;
-            db_meals.child(caretaker.uuid).child(dayref(weekDay)).child(meal.key).child("eaten").setValue(eaten);
+            db_meals.child(caretaker.UID).child(dayref(weekDay)).child(meal.key).child("eaten").setValue(eaten);
         }
     }
     public void caretaker_setEatenOfMeal(int caretakerId, int weekDay, String mealKey, boolean eaten) {
@@ -992,7 +1017,7 @@ public class PatientMealStorage {
             Meal meal = day.getMeal(mealKey);
             if(meal == null)
                 return;
-            db_meals.child(caretaker.uuid).child(dayref(weekDay)).child(meal.key).child("eaten").setValue(eaten);
+            db_meals.child(caretaker.UID).child(dayref(weekDay)).child(meal.key).child("eaten").setValue(eaten);
         }
     }
     public void caretaker_setHourOfMeal(int caretakerId, int weekDay, int mealIndex, int hour) {
@@ -1006,7 +1031,7 @@ public class PatientMealStorage {
             Meal meal = day.getMeal(mealIndex);
             if(meal == null)
                 return;
-            db_meals.child(caretaker.uuid).child(dayref(weekDay)).child(meal.key).child("hour").setValue(hour);
+            db_meals.child(caretaker.UID).child(dayref(weekDay)).child(meal.key).child("hour").setValue(hour);
         }
     }
     public void caretaker_setMinuteOfMeal(int caretakerId, int weekDay, int mealIndex, int minute){
@@ -1020,7 +1045,7 @@ public class PatientMealStorage {
             Meal meal = day.getMeal(mealIndex);
             if(meal == null)
                 return;
-            db_meals.child(caretaker.uuid).child(dayref(weekDay)).child(meal.key).child("minute").setValue(minute);
+            db_meals.child(caretaker.UID).child(dayref(weekDay)).child(meal.key).child("minute").setValue(minute);
         }
     }
     public void caretaker_setDescriptionOfMeal(int caretakerId, int weekDay, int mealIndex, String description){
@@ -1034,7 +1059,7 @@ public class PatientMealStorage {
             Meal meal = day.getMeal(mealIndex);
             if(meal == null)
                 return;
-            db_meals.child(caretaker.uuid).child(dayref(weekDay)).child(meal.key).child("desc").setValue(description);
+            db_meals.child(caretaker.UID).child(dayref(weekDay)).child(meal.key).child("desc").setValue(description);
         }
     }
 }

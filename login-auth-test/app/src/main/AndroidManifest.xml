@@ -19,8 +19,9 @@
         android:theme="@style/Theme.Material3.Dark"
         tools:targetApi="31" >
         <activity
-            android:name=".Home_caretaker"
-            android:exported="true" />
+            android:name=".RecipientHome"
+            android:exported="true"
+            android:theme="@style/Theme.Material3.Dark.NoActionBar"/>
         <activity
             android:name=".PatientProfile"
             android:exported="true" />
@@ -73,9 +74,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
-            android:exported="true" />
-        <activity
             android:name=".MealManagementActivity"
             android:exported="true"
             android:theme="@style/Theme.Material3.Dark.NoActionBar" />
@@ -88,7 +86,7 @@
             android:exported="true"
             android:theme="@style/Theme.Material3.Dark.NoActionBar" />
         <activity
-            android:name=".PatientMealActivity"
+            android:name=".MealActivity"
             android:exported="true"
             android:theme="@style/Theme.Material3.Dark.NoActionBar" />
         <activity android:name=".AlarmActivity" />
