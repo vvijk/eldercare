@@ -29,6 +29,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.example.myapplication.util.LogStorage;
 import com.example.myapplication.util.MealStorage;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -58,7 +59,8 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
     int weekDayIndex = 0;
     String recipientUID;
     int caretakerId;
-    MealStorage getMealStorage() { return ((MealApp)getApplicationContext()).mealStorage; }
+    MealStorage getMealStorage() { return ((MainApp)getApplicationContext()).mealStorage; }
+    LogStorage getLogStorage() { return ((MainApp)getApplicationContext()).logStorage; }
 
     private ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
@@ -81,8 +83,18 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
         rootLayout = findViewById(R.id.layout_recipient_home);
         logout_btn = findViewById(R.id.recipientLogOut);
 
-        Intent intent = getIntent();
-        recipientUID = intent.getStringExtra("recipientUID");
+        getLogStorage().initDBConnection();
+
+        String forcedCaretakerUID = getIntent().getStringExtra("recipientUID");
+        if(forcedCaretakerUID == null) {
+            dbLibrary lib = new dbLibrary(this);
+            recipientUID = lib.getUserID(); // TODO(Emarioo): Something bad happens if recipientUID becomes null
+        } else {
+            recipientUID = forcedCaretakerUID;
+        }
+
+        // Intent intent = getIntent();
+        // recipientUID = intent.getStringExtra("recipientUID");
         if(recipientUID == null) {
             Toast.makeText(this, getResources().getString(R.string.str_recipientUID_was_null),Toast.LENGTH_LONG).show();
             recipientUID = "kVz12RGTK1W9kaBd7b5imbh3mWg2"; // TODO(Emarioo): Don't hardcode
@@ -98,10 +110,20 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
                 int weekDayIndex = getMealStorage().todaysDayIndex();
                 RecipientHome.this.weekDayIndex = weekDayIndex;
 
+                {
+                    // reset "eaten" of meals for tomorrow
+                    int next_weekDayIndex = (weekDayIndex+1) % 7;
+                    int[] sortedMealIndices = getMealStorage().caretaker_sortedMealIndices(caretakerId, next_weekDayIndex);
+                    for (int mealIndex : sortedMealIndices) {
+                        if (!getMealStorage().caretaker_isMealIndexValid(caretakerId, next_weekDayIndex, mealIndex))
+                            continue;
+
+                        getMealStorage().caretaker_setEatenOfMeal(caretakerId, next_weekDayIndex, mealIndex, false);
+                    }
+                }
+
                 int[] sortedMealIndices = getMealStorage().caretaker_sortedMealIndices(caretakerId, weekDayIndex);
-
                 Calendar calendar = Calendar.getInstance();
-
                 meals.clear();
                 for(int mealIndex : sortedMealIndices) {
                     if(!getMealStorage().caretaker_isMealIndexValid(caretakerId, weekDayIndex, mealIndex))
@@ -140,7 +162,9 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(RecipientHome.this, AlarmActivity.class);
-                startActivityForResult(intent, 1);
+                intent.putExtra("recipientUID", recipientUID);
+                startActivity(intent);
+                // startActivityForResult(intent, 1);
 
             }
         });
@@ -222,7 +246,7 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
 
                         alarmManager.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
                     } else {
-                        // meal time has already passsed
+                        // meal time has already passed
                     }
                 }
             } else {
@@ -262,7 +286,7 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
 
                         alarmManager.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
                     } else {
-                        // meal time has already passsed
+                        // meal time has already passed
                     }
                 }
             }
@@ -297,8 +321,8 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
             Toast.makeText(this,getResources().getString(R.string.meal_marked_too_early),Toast.LENGTH_LONG).show();
             return;
         }
-
-        getMealStorage().caretaker_setEatenOfMeal(caretakerId, weekDayIndex, position, !meals.get(position).eaten);
+        boolean newEaten = !meal.eaten;
+        getMealStorage().caretaker_setEatenOfMeal(caretakerId, weekDayIndex, meal.key, newEaten);
 
         Intent intent = new Intent(this, BroadcastReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent,PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_NO_CREATE);
@@ -306,6 +330,11 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
             alarmManager.cancel(pendingIntent);
         }
         // mealAdapter is updated when database is written to, refresher is called and UI updates.
+        String logMealData = Helpers.FormatTime(meal.hour, meal.minute) + " "+meal.name + ": "+meal.desc;
+
+        if(newEaten) {
+            getLogStorage().submitLog(LogStorage.Category.MEAL_CONFIRM, recipientUID, null, logMealData);
+        }
     }
 
     public void enableNoMealsText(boolean show) {

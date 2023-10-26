@@ -44,10 +44,11 @@ public class Login extends AppCompatActivity {
                     // Sign in success, update UI with the signed-in user's information
                     Intent intent;
                     if(isCaregiver){
-                        Toast.makeText(getApplicationContext(), "Successful pre.login as: caregiver!", Toast.LENGTH_SHORT).show();
+                        // NOTE(Emarioo): I commented this out because I assume it's for debug purposes. If not, then we can't use hardcoded strings like this. It must be translated!
+                        // Toast.makeText(getApplicationContext(), "Successful pre.login as: caregiver!", Toast.LENGTH_SHORT).show();
                         intent = new Intent(getApplicationContext(), home_caregiver.class);
                     }else{
-                        Toast.makeText(getApplicationContext(), "Successful pre-login as: caretaker!", Toast.LENGTH_SHORT).show();
+                        // Toast.makeText(getApplicationContext(), "Successful pre-login as: caretaker!", Toast.LENGTH_SHORT).show();
                         intent = new Intent(getApplicationContext(), RecipientHome.class);
                     }
                     startActivity(intent);
@@ -113,12 +114,12 @@ public class Login extends AppCompatActivity {
                 password = String.valueOf(editTextPassword.getText());
                 pin = String.valueOf(editTextPIN.getText());
                 if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(Login.this, "Enter Email", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Login.this, getResources().getString(R.string.provide_email), Toast.LENGTH_SHORT).show();
                     progressBar.setVisibility(View.GONE);
                     return;
                 }
                 if (TextUtils.isEmpty(password) && TextUtils.isEmpty(pin)) {
-                    Toast.makeText(Login.this, "Enter Password or Pin", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Login.this, getResources().getString(R.string.provide_password_or_pin), Toast.LENGTH_SHORT).show();
                     progressBar.setVisibility(View.GONE);
                     return;
                 }
@@ -139,17 +140,17 @@ public class Login extends AppCompatActivity {
                                                 // Sign in success, update UI with the signed-in user's information
                                                 Intent intent;
                                                 if (isCaregiver) {
-                                                    Toast.makeText(getApplicationContext(), "Successful login as: caregiver!", Toast.LENGTH_SHORT).show();
+                                                    // Toast.makeText(getApplicationContext(), "Successful login as: caregiver!", Toast.LENGTH_SHORT).show();
                                                     intent = new Intent(getApplicationContext(), home_caregiver.class);
                                                 } else {
-                                                    Toast.makeText(getApplicationContext(), "Successful login as: caretaker!", Toast.LENGTH_SHORT).show();
+                                                    // Toast.makeText(getApplicationContext(), "Successful login as: caretaker!", Toast.LENGTH_SHORT).show();
                                                     intent = new Intent(getApplicationContext(), RecipientHome.class);
                                                 }
                                                 startActivity(intent);
                                                 finish();
                                             } else {
                                                 // If sign-in fails, display a message to the user.
-                                                Toast.makeText(Login.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(Login.this, getResources().getString(R.string.auth_failed), Toast.LENGTH_SHORT).show();
                                             }
                                         }
 
@@ -176,7 +177,7 @@ public class Login extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), ForgotPassword.class);
                 startActivity(intent);
-                finish();
+                // finish();
             }
         });
     }

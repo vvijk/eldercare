@@ -3,60 +3,61 @@ package com.example.myapplication;
 import static com.example.myapplication.Helpers.isStringInArray;
 
 import android.content.Context;
+import android.database.DataSetObserver;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.myapplication.util.LogStorage;
+import com.example.myapplication.util.LogStorage.FilterOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.lang.reflect.Array;
 import java.util.ArrayList;
-
-
-/* TODO:
-*   Tie everything in with the database
-*       Add a fetchLogs(int amount){} function
-*           Fetches X amount of logs from each patient that the signed in caregiver has.
-*       Add a "log" field to each patient
-*         - Timestamp
-*         - Caregiver
-*         - Patient
-*         - Category
-*         - Meal
-*   Implement patient spinner, and filtering by patient.
-*   Polish checkbox behavior
-*       When all is checked, check all other checkboxes.
-*       When another checkbox is unchecked, uncheck all.
-*       Auto-refresh log when checkbox updates (Probably impossible to do without comprehensive refactor.)
-*   Add more log messages
-*       Consult with group for suggestions on these.
-*   Possibly add a sort by timestamp
-*
-*
-*   TODO: Thoroughly test when all is implemented.
-* */
-
+import java.util.Iterator;
+import java.util.List;
 
 public class LogHistory extends AppCompatActivity {
     //Page for viewing Logs.
+
+    FirebaseAuth mAuth;
+
     Context context;
     Spinner categorySpinner, patientSpinner;
     Button refreshLog;
     LinearLayout logTextBox;
-    ArrayList<DropdownItem> categoryDDIs, patientDDIs;
-    ArrayList<LogItem> logs;
 
-    DropdownAdapter viewCategory;
-    DropdownAdapter viewPatients;
+    ArrayList<StateVO> categoryBoxes =  new ArrayList<>();
+    ArrayList<StateVO> recipientBoxes = new ArrayList<>();
+    ArrayList<String> recipientUIDs =  new ArrayList<>();
+
+    ValueEventListener logRefreshListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         context = getApplicationContext();
+        mAuth = FirebaseAuth.getInstance();
 
         setContentView(R.layout.activity_log_history);
         categorySpinner = findViewById(R.id.logCategorySpinner);
@@ -64,204 +65,233 @@ public class LogHistory extends AppCompatActivity {
         patientSpinner = findViewById(R.id.logPatientSpinner);
         refreshLog = findViewById(R.id.refreshButton);
 
-        logs = generateDummyLogItems();
         logTextBox = findViewById(R.id.logItemBox);
-
-        populateCategorySpinner(categorySpinner);
-        //populatePatientSpinner(patientSpinner);
-
-        setLogTextBox(logs);
 
         refreshLog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setLogTextBox(logs);
+                getLogStorage().retrieveLogs(getFilterOptions(), (items) -> {
+                    refreshLogs(items);
+                });
             }
         });
+
+        getLogStorage().refLogs.addValueEventListener(logRefreshListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                getLogStorage().retrieveLogs(getFilterOptions(), (items) -> {
+                    refreshLogs(items);
+                });
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+
+        getLogStorage().initDBConnection();
+        fixCategorySpinner();
+        fixRecipientSpinner();
     }
 
-    /*TODO: PLACEHOLDER START
-       Denna borde bytas ut mot en funktion som hämtar X antal loggar från databasen. "generateLogItems()"
-       Här måste även filter implementeras
-    */
-    private ArrayList<LogItem> generateDummyLogItems(){
-        ArrayList<LogItem> dummies = new ArrayList<>();
-
-        CareGiver dummyGiverA = new CareGiver("Filip", "Andersson", "0718434687", "filip@andersson.se", "7878787878");
-        CareGiver dummyGiverB = new CareGiver("Ebba", "Lindgren", "04387642396", "ebba@lindgren.se", "8989898989");
-        CareTaker dummyTakerA = new CareTaker("Agda", "Eriksson", "0701234567", "agda@eriksson.se", "0123456789", "", "1234", "");
-        CareTaker dummyTakerB = new CareTaker("Gunnar", "Petersson", "0731894564", "gunnar@petersson.se", "1123", "", "1324", "");
-
-
-        LogItem temp;
-        temp = new LogItem(dummyGiverA, dummyTakerA, LogItem.PATIENT_ADD); dummies.add(temp);
-        temp = new LogItem(dummyGiverB, dummyTakerB, LogItem.PATIENT_ADD); dummies.add(temp);
-        temp = new LogItem(dummyGiverA, dummyTakerB, LogItem.MEAL_CONFIRM, new LogItem.Meal("Spaghetti och köttfärssås")); dummies.add(temp);
-        temp = new LogItem(dummyGiverA, dummyTakerB, LogItem.PATIENT_MODIFY); dummies.add(temp);
-        temp = new LogItem(dummyGiverA, dummyTakerA, LogItem.EMERGENCY); dummies.add(temp);
-        temp = new LogItem(dummyGiverA, dummyTakerA, LogItem.MEAL_CONFIRM, new LogItem.Meal("Schnitzel med klyftpotatis")); dummies.add(temp);
-        temp = new LogItem(dummyGiverA, dummyTakerB, LogItem.MEAL_MISS, new LogItem.Meal("Spenatsoppa")); dummies.add(temp);
-        return dummies;
-    }
-    //PLACEHOLDER END
-
-    private void populateCategorySpinner(Spinner toPopulate){
-
-        final String[] spinner_texts = getResources().getStringArray(R.array.log_category_array);
-
-        categoryDDIs = new ArrayList<>(); //overwrites the old dropdown items if called multiple times.
-
-        for (int i = 0; i < spinner_texts.length; i++){
-            DropdownItem DDI = new DropdownItem();
-            DDI.setText(spinner_texts[i]);
-            DDI.setSelected(true);
-            categoryDDIs.add(DDI);
-        }
-        DropdownAdapter viewCategory = new DropdownAdapter(getApplicationContext(), 0, categoryDDIs);
-        toPopulate.setAdapter(viewCategory);
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        getLogStorage().refLogs.removeEventListener(logRefreshListener);
     }
 
-    private void populatePatientSpinner(Spinner toPopulate){
-        ArrayList<String> patient_texts = new ArrayList<>();
-        patient_texts.add(getString(R.string.log_patient_array_title));
-        patient_texts.add(getString(R.string.all));
-        ArrayList<String> fetched = fetchPatients();
-        patient_texts.addAll(fetched);
+    public String getUserID(){
+        FirebaseUser user = mAuth.getCurrentUser();
+        return (user != null) ? user.getUid() : null;
     }
-
-    private ArrayList<String> fetchPatients(){
-        //fetches all patients that the signed in caregiver has. used for populating the patient spinner.
-        return null;
+    private void clearTextField(){
+        logTextBox.removeAllViews();
     }
-
-
-    private String generateLogMessage(LogItem logItem) {
-        String out = logItem.getFormattedTimestamp() + " ";
-        switch (logItem.getCategory()){
-            case LogItem.PATIENT_ADD:{
-                out += logItem.caregiver.getFullName() + " ";
-                out += getString(R.string.LOG_ADD_PATIENT_S1) + " ";
-                out += logItem.patient.getFullName();
+    private String generateLogMessage(LogStorage.DisplayedItem item) {
+        String out = item.getFormattedTime() + " ";
+        switch (item.category){
+            case PATIENT_ADD:{
+                out += getString(R.string.LOG_ADD_PATIENT, item.caregiver, item.caretaker);
                 break;
             }
-            case LogItem.PATIENT_MODIFY:{
-                out += logItem.caregiver.getFullName() + " ";
-                out += getString(R.string.LOG_MODIFY_PATIENT_S1) + " ";
-                out += logItem.patient.getFullName();
-                out += getString(R.string.LOG_MODIFY_PATIENT_S2);
+            case EMERGENCY:{
+                out += getString(R.string.LOG_EMERGENCY, item.caretaker);
                 break;
             }
-            case LogItem.EMERGENCY:{
-                out += logItem.caregiver.getFullName() + " ";
-                out += getString(R.string.LOG_EMERGENCY_S1);
+            case MEAL_CONFIRM:{
+                out += getString(R.string.LOG_MEAL_CONFIRM, item.caretaker, item.extraData);
                 break;
             }
-            case LogItem.MEAL_CONFIRM:{
-                out += logItem.patient.getFullName() + " ";
-                out += getString(R.string.LOG_MEAL_CONFIRM_S1) + " ";
-                out += logItem.getMeal().getName() + " ";
-                out += getString(R.string.LOG_MEAL_CONFIRM_S2);
+            case MEAL_SKIP:{
+                out += getString(R.string.LOG_MEAL_SKIP, item.caretaker, item.extraData);
                 break;
             }
-            case LogItem.MEAL_SKIP:{
-                //TODO: [TimeStamp] [CareTaker] missade att bekräfta [första/andra] gången.
-                //TODO: väv in vilken måltid som missades
+            case MEAL_MISS:{
+                out += getString(R.string.LOG_MEAL_MISS, item.caretaker, item.extraData);
                 break;
             }
-            case LogItem.MEAL_MISS:{
-                //TODO: väv in vilken måltid som missades
-                out += logItem.patient.getFullName() + " ";
-                out += getString(R.string.LOG_MEAL_MISS_S1);
+            default: {
+                out += getString(R.string.LOG_UNKNOWN);
                 break;
             }
         }
         out += ".";
         return out;
     }
+    public void fixCategorySpinner() {
+        final String[] anArray = getResources().getStringArray(R.array.log_category_array);
+        categorySpinner = (Spinner) findViewById(R.id.logCategorySpinner);
 
-    private ArrayList<LogItem> filterLogs(ArrayList<LogItem> logs){
+        categoryBoxes = new ArrayList<>();
 
-        ArrayList<String> checkedCategories = mapCategoryCheckboxes();
-        ArrayList<LogItem> out = new ArrayList<>();
-        for (int i = 0; i < logs.size(); i++){
-            if (isStringInArray(logs.get(i).getCategory(), checkedCategories)){ out.add(logs.get(i)); }
+        for (int i = 0; i < anArray.length; i++) {
+            StateVO stateVO = new StateVO();
+            stateVO.setTitle(anArray[i]);
+            stateVO.setSelected(false);
+            categoryBoxes.add(stateVO);
         }
-        return out;
+        categoryBoxes.get(1).setSelected(true); // ALL category
+
+        CheckDropDownAdapter myAdapter = new CheckDropDownAdapter(LogHistory.this, 0, categoryBoxes);
+        categorySpinner.setAdapter(myAdapter);
+        myAdapter.setChangedCheckListener(new CheckDropDownAdapter.ChangedCheckListener() {
+            @Override
+            public void onChange(CheckDropDownAdapter adapter, int itemIndex) {
+                getLogStorage().retrieveLogs(getFilterOptions(), (items) -> {
+                    refreshLogs(items);
+                });
+            }
+        });
     }
+    public void fixRecipientSpinner() {
+        patientSpinner = (Spinner) findViewById(R.id.logPatientSpinner);
+        recipientBoxes = new ArrayList<>();
+        recipientBoxes.add(new StateVO(getString(R.string.log_patient_array_title)));
 
-    private ArrayList<String> mapCategoryCheckboxes(){
-        //TODO: tacky implementation, refer to log_history.xml when updating switch statement.
-        //Returns the constant codes of checked checkboxes.
-        ArrayList<String> out = new ArrayList<>();
+        recipientUIDs.clear();
 
-        for (int i = 0; i < categoryDDIs.size(); i++){
-            if (!categoryDDIs.get(i).isSelected()){ continue; }
-            switch (i+1){
-                case 1: break;
-                case 2: out.add("ALL"); break;
-                case 3: out.add("PATIENT_ADD"); break;
-                case 4: out.add("PATIENT_MODIFY"); break;
-                case 5: out.add("MEAL_CONFIRM"); break;
-                case 6: out.add("MEAL_MISS"); out.add("MEAL_SKIP"); break;
-                case 7: out.add("EMERGENCY"); break;
+        CheckDropDownAdapter myAdapter = new CheckDropDownAdapter(LogHistory.this, 0, recipientBoxes);
+        patientSpinner.setAdapter(myAdapter);
+        myAdapter.setChangedCheckListener(new CheckDropDownAdapter.ChangedCheckListener() {
+            @Override
+            public void onChange(CheckDropDownAdapter adapter, int itemIndex) {
+                getLogStorage().retrieveLogs(getFilterOptions(), (items) -> {
+                    refreshLogs(items);
+                });
+            }
+        });
+
+        getLogStorage().refCaregivers.child(getUserID()).child("caretakers").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Iterator<DataSnapshot> iterator = snapshot.getChildren().iterator();
+                while(iterator.hasNext()) {
+                    DataSnapshot data = iterator.next();
+
+                    String recipientUID = data.getKey();
+                    recipientUIDs.add(recipientUID);
+
+                    getLogStorage().refCaretakers.child(recipientUID).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            String name = snapshot.child("fullName").getValue(String.class);
+                            if(name == null)
+                                name = snapshot.child("firstName").getValue(String.class) + " " + snapshot.child("lastName").getValue(String.class);
+                            recipientBoxes.add(new StateVO(name, true));
+
+                            if(recipientUIDs.size() == recipientBoxes.size() - 1) {
+                                // update logs when last recipient in recipient spinner has been added
+                                getLogStorage().retrieveLogs(getFilterOptions(), (items) -> {
+                                    refreshLogs(items);
+                                });
+                            }
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {}
+                    });
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        });
+
+    }
+    public LogStorage.FilterOptions getFilterOptions() {
+        LogStorage.FilterOptions options = new LogStorage.FilterOptions();
+
+        options.filterAllCategories = false;
+        for(int i=0;i<categoryBoxes.size();i++) {
+            StateVO v0 = categoryBoxes.get(i);
+            if (!v0.isSelected()) {
+                continue;
+            }
+            switch (i){
+                case 1: {
+                    options.filterAllCategories = true;
+                    break;
+                }
+                case 2: {
+                    options.add(LogStorage.Category.PATIENT_ADD);
+                    break;
+                }
+                case 3: {
+                    options.add(LogStorage.Category.MEAL_CONFIRM);
+                    break;
+                }
+                case 4: {
+                    options.add(LogStorage.Category.MEAL_SKIP);
+                    break;
+                }
+                case 5: {
+                    options.add(LogStorage.Category.MEAL_MISS);
+                    break;
+                }
+                case 6: {
+                    options.add(LogStorage.Category.EMERGENCY);
+                    break;
+                }
             }
         }
-        return out;
+        options.filterAllCaretakers = false;
+        for(int i=0;i<recipientBoxes.size();i++) {
+            StateVO v0 = recipientBoxes.get(i);
+            if (!v0.isSelected()) {
+                continue;
+            }
+            int uidIndex = i-1;
+            options.add(recipientUIDs.get(uidIndex));
+        }
+        return options;
     }
-
-
-
-    private void setLogTextBox(ArrayList<LogItem> logItems){
-        TextView log;
-        logItems = filterLogs(logItems);
+    private void refreshLogs(ArrayList<LogStorage.DisplayedItem> items) {
         clearTextField();
-        for (int i = 0; i < logItems.size(); i++){
-            log = createTextView(logItems.get(i));
-            logTextBox.addView(log);
+        for (int i = 0; i < items.size(); i++){
+            LogStorage.DisplayedItem item = items.get(i);
+            TextView text = new TextView(context);
+            text.setText(generateLogMessage(item));
+            text.setTextColor(getLogColor(item));
+            text.setPadding(10, 0, 10, 0);
+
+            logTextBox.addView(text);
         }
     }
-    private TextView createTextView(LogItem log){
-        TextView text = new TextView(context);
-        text.setText(generateLogMessage(log));
-        text.setTextColor(getLogColor(log));
-        text.setPadding(10, 0, 10, 0);
-        return text;
-    }
-
-    private void clearTextField(){
-        logTextBox.removeAllViews();
-    }
-
-    private int getLogColor(LogItem log){
+    private int getLogColor(LogStorage.DisplayedItem item){
         //maps log color to resource file.
-        switch (log.getCategory()){
-            case "PATIENT_ADD":
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            switch (item.category) {
+                case PATIENT_ADD:
                     return getColor(R.color.PATIENT_ADD);
-                }
-            case "PATIENT_MODIFY":
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    return getColor(R.color.PATIENT_MODIFY);
-                }
-            case "EMERGENCY":
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                case EMERGENCY:
                     return getColor(R.color.EMERGENCY);
-                }
-                break;
-            case "MEAL_CONFIRM":
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                case MEAL_CONFIRM:
                     return getColor(R.color.MEAL_CONFIRM);
-                }
-            case "MEAL_SKIP":
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                case MEAL_SKIP:
                     return getColor(R.color.MEAL_SKIP);
-                }
-            case "MEAL_MISS":
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                case MEAL_MISS:
                     return getColor(R.color.MEAL_MISS);
-                }
+            }
         }
         return 0;
     }
-
+    LogStorage getLogStorage() {
+        return ((MainApp)getApplicationContext()).logStorage;
+    }
 }

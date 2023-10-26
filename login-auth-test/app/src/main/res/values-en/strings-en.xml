@@ -21,10 +21,21 @@
     <string name="Ja">Yes</string>
     <string name="Nej">No</string>
     <string name="sureLogOut">Are you sure you want to log out?</string>
-    <string name="choose">You must choose caregiver or caretaker!</string>
+    <string name="choose">You must choose caregiver or recipient!</string>
     <string name="dontMatch">Passwords dont match!</string>
+    <string name="str_provide_email_to_restore_password">Provide your email address to restore password</string>
+    <string name="provide_email">Provide email</string>
+    <string name="provide_password_or_pin">Provide password or pinkod</string>
+    <string name="unsafe_password">Password must have 6 digits</string>
+    <string name="provide_first_name">Provide first name</string>
+    <string name="provide_last_name">Provide last name</string>
+    <string name="provide_phone_number">Provide phone number</string>
+    <string name="provide_personal_number">Provide personal number (12 digits)</string>
+    <string name="restoration_success">Password was restored</string>
+    <string name="restoration_failed">Could not restore password</string>
+    <string name="auth_failed">Authentication failed</string>
 
-    <string name="careTaker">Care Recipient</string>
+    <string name="careTaker">Recipient</string>
     <string name="careGiver">Caregiver</string>
 
     <!--STRINGS FOR CREATE PATIENT-->
@@ -61,7 +72,7 @@
     <string name="previous">Previous</string>
     <string name="settings">Settings</string>
     <string name="home">Home</string>
-    <string name="patients">Patients</string>
+    <string name="patients">Recipients</string>
     <string name="profile">Profile</string>
     <string name="menu_drawer_open">Drawer Open</string>
     <string name="menu_drawer_closed">Drawer Closed</string>
@@ -76,6 +87,11 @@
     <string name="swedish">Swedish</string>
     <string name="english">English</string>
     <string name="msg_token_fmt" translatable="false">FCM registration Token: %s</string>
+    <string name="notifications_are_disabled">Notifications are disabled. You won\'t receive updates.</string>
+    <string name="notif_not_eaten_title">Have not eaten</string>
+    <string name="notif_not_eaten_msg">%s have not eaten %s %s</string>
+    <string name="notif_alarm_title">EMERGENCY ALARM</string>
+    <string name="notif_alarm_msg">%s has activated the alarm!</string>
 
     <string name="historylog">History</string>
 
@@ -87,6 +103,7 @@
     <string name="recipient_meals_edit">Edit</string>
     <string name="btn_replace_template_meal">Replace with template</string>
     <string name="str_add_recipient">Add recipient</string>
+    <string name="str_remove_recipient">Remove recipient</string>
     <string name="str_add_meal">Add meal</string>
     <string name="str_recipients">Recipients</string>
     <string name="str_recipient">Recipient</string>
@@ -108,6 +125,14 @@
     <string name="str_recipientUID_was_null">Recipient UID is null</string>
     <string name="str_BackToMealPlan">Back to meal plan</string>
 
+    <string name="str_missing_name">Missing name?</string>
+    <string name="str_invalid_email">Email has incorrect format (exempel@mail.com)</string>
+    <string name="fmt_added_recipient">Added %s to your list of recipients</string>
+    <string name="fmt_exists_recipient">%s already exists in your list of recipients</string>
+    <string name="fmt_removed_recipient">%s has been removed from your list of recipients</string>
+    <string name="fmt_not_exist_recipient">%s does not exist in your list of recipients</string>
+    <string name="fmt_unknown_recipient">%s is not a recipient</string>
+
     <!-- Home for caretaker -->
     <string name="str_emergency_alert">EMERGENCY ALERT</string>
     <string name="missing_alarm_permission">Cannot set alarm due to unauthorized permission</string>
@@ -116,4 +141,11 @@
     <string name="meal_marked_too_early">Meal must have passed to mark it</string>
     <string name="notif_eaten">I have eaten</string>
     <string name="notif_not_eaten">I have not eaten yet</string>
+
+    <!-- Larm för vårdtagare -->
+    <string name="alarm_time_until_active">Time until alarm is activated: </string>
+    <string name="alarm_is_active">Alarm is active</string>
+    <string name="alarm_regret_go_back">Regret and go back</string>
+    <string name="alarm_turn_off_go_back">Turn off and go back</string>
+    <string name="database_down">Database is down!</string>
 </resources>

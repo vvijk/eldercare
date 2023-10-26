@@ -25,7 +25,7 @@
                 android:layout_weight="1"
                 android:textSize="28sp"
                 android:textColor="@color/black"
-                android:text="name of meal hi, yes, no"
+                android:text="?"
                 android:textStyle="bold"
                 android:gravity="center_vertical|start" />
             <TextView
@@ -44,7 +44,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="this is a really long text which may be rendered strangely"
+            android:text="?"
             android:textSize="24sp"
             android:textColor="@color/black"
             android:textStyle="bold"

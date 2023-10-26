@@ -17,12 +17,17 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.widget.Toast;
 
+import com.example.myapplication.util.LogStorage;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
 
 public class ReminderBroadcastReceiver extends BroadcastReceiver {
+
+    // public final int REMINDER_DELAY = 45 * 60; // seconds
+    public final int REMINDER_DELAY = 60; // debug
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -37,10 +42,12 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
         int weekDayIndex = intent.getIntExtra("dayIndex", 0);
         String recipientUID = intent.getStringExtra("recipientUID");
 
+        LogStorage logStorage = new LogStorage();
+        logStorage.initDBConnection();
+
         if(noticeCount < 2) { // 1 initial reminder, 2 reminders of the reminder
             // setup the next notification 45 minutes later
-            long nextNotice = alarmAtMillis + 45 * 60 * 1000; // 45 minutes later
-            // long nextNotice = alarmAtMillis + 30 * 1000; // debug
+            long nextNotice = alarmAtMillis + REMINDER_DELAY * 1000; // 45 minutes later
 
             // NOTE(Emarioo): Is it safe to reuse intent?
             intent.putExtra("noticeCount", noticeCount + 1); // 0 is for the initial notification, no buttons. 1+ will have eaten or not eaten
@@ -49,15 +56,17 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
 
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             alarmManager.set(AlarmManager.RTC_WAKEUP, nextNotice, pendingIntent);
+        } else {
+
         }
 
         // Toast.makeText(context, "Reminder broadcast yay " + meal, Toast.LENGTH_SHORT).show();
 
-        createNotification(context, name, time, desc, mealKey, weekDayIndex, recipientUID, noticeCount > 0, requestCode);
+        createNotification(context, name, time, desc, mealKey, weekDayIndex, recipientUID, noticeCount > 0, requestCode, noticeCount);
     }
 
     private void createNotification(Context context, String name, String time, String desc, String mealKey, int weekDayIndex,
-                                    String recipientUID, boolean withActions, int alarmRequestCode) {
+                                    String recipientUID, boolean withActions, int alarmRequestCode, int noticeCount) {
         final String CHANNEL_ID = "meals_channel";
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -66,22 +75,37 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
             if(channel == null)
                 channel = new NotificationChannel(CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_HIGH);
             channel.setDescription(context.getResources().getString(R.string.channel_meals_desc));
-            // if(!channel.getName().equals(channelName)) // does equal do what you expect or is there a mistake here?
-            //     channel.setName(channelName);
 
             manager.createNotificationChannel(channel);
         }
 
+        final int NOTIFICATION_ID = 9213;
+        final int REQUEST_CODE_EATEN = 31231;
+        final int REQUEST_CODE_NOT_EATEN = 31232;
+        final int REQUEST_CODE_DISMISS = 31233;
+        String logMealData = time + " "+name + ": "+desc;
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notifications)
                 .setContentTitle(name + " " + time)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                // .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
-        final int NOTIFICATION_ID = 9213;
+                .setPriority(NotificationCompat.PRIORITY_HIGH);
+
+        if(noticeCount != 0) {
+            Intent dismiss_intent = new Intent(context, MealBroadcast.class);
+            dismiss_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            dismiss_intent.putExtra("notificationId", NOTIFICATION_ID);
+            dismiss_intent.putExtra("nextAlarmsRequestCode", alarmRequestCode);
+            dismiss_intent.putExtra("haveEaten", false);
+            dismiss_intent.putExtra("recipientUID", recipientUID);
+            dismiss_intent.putExtra("dayIndex", weekDayIndex);
+            dismiss_intent.putExtra("mealKey", mealKey);
+            dismiss_intent.putExtra("noticeCount", noticeCount);
+            dismiss_intent.putExtra("logMealData", logMealData);
+            PendingIntent dismiss_pendingIntent = PendingIntent.getBroadcast(context, REQUEST_CODE_DISMISS, dismiss_intent, PendingIntent.FLAG_IMMUTABLE|PendingIntent.FLAG_UPDATE_CURRENT);
+            builder.setDeleteIntent(dismiss_pendingIntent);
+        }
+
         if(withActions) {
-            final int REQUEST_CODE_EATEN = 31231;
-            final int REQUEST_CODE_NOT_EATEN = 31232;
             Intent intent = new Intent(context, MealBroadcast.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             intent.putExtra("notificationId", NOTIFICATION_ID);
@@ -90,6 +114,8 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
             intent.putExtra("recipientUID", recipientUID);
             intent.putExtra("dayIndex", weekDayIndex);
             intent.putExtra("mealKey", mealKey);
+            intent.putExtra("noticeCount", noticeCount);
+            intent.putExtra("logMealData", logMealData);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context, REQUEST_CODE_EATEN, intent, PendingIntent.FLAG_IMMUTABLE|PendingIntent.FLAG_UPDATE_CURRENT);
 
             Intent intent_not = new Intent(context, MealBroadcast.class);
@@ -100,6 +126,8 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
             intent_not.putExtra("recipientUID", recipientUID);
             intent_not.putExtra("dayIndex", weekDayIndex);
             intent_not.putExtra("mealKey", mealKey);
+            intent_not.putExtra("noticeCount", noticeCount);
+            intent_not.putExtra("logMealData", logMealData);
             PendingIntent pendingIntent_not = PendingIntent.getBroadcast(context, REQUEST_CODE_NOT_EATEN, intent_not, PendingIntent.FLAG_IMMUTABLE|PendingIntent.FLAG_UPDATE_CURRENT);
 
             builder.addAction(new NotificationCompat.Action(0, context.getResources().getString(R.string.notif_eaten), pendingIntent));
