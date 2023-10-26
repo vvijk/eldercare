@@ -122,7 +122,7 @@ public class MealStorage {
         private MealDay[] days = new MealDay[7];
 
         public MealDay getDay(int dayIndex) {
-            if(days.length <= dayIndex)
+            if(days.length <= dayIndex || dayIndex < 0)
                 return null;
             if(days[dayIndex] == null) {
                 days[dayIndex] = new MealDay();
@@ -503,6 +503,8 @@ public class MealStorage {
                         DataSnapshot daySnapshot = day_iterator.next();
                         int weekDayIndex = refday(daySnapshot.getKey());
 
+                        if(weekDayIndex == -1)
+                            continue;
                         MealDay mealDay = caretaker.getDay(weekDayIndex);
                         if(mealDay == null) {
                             throw new RuntimeException("Meal day was null, day index: "+weekDayIndex);
@@ -541,7 +543,6 @@ public class MealStorage {
                             tmp = childSnapshot.child("eaten").getValue(Boolean.class);
                             if (tmp != null)
                                 meal.eaten = (Boolean) tmp;
-                            int stop_here_debugger;
                         }
 
                         for(Meal meal : meals_to_remove) {

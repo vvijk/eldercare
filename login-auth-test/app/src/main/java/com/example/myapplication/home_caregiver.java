@@ -42,7 +42,7 @@ public class home_caregiver extends AppCompatActivity{
                 if (isGranted) {
                     // FCM SDK (and your app) can post notifications.
                 } else {
-                    Toast.makeText(this, "Notifications are disabled. You won't receive updates.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getResources().getString(R.string.notifications_are_disabled), Toast.LENGTH_LONG).show();
                 }
             });
 
@@ -83,7 +83,7 @@ public class home_caregiver extends AppCompatActivity{
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), LogHistory.class);
                 startActivity(intent);
-                finish();
+                // finish();
             }
         });
 
@@ -93,7 +93,7 @@ public class home_caregiver extends AppCompatActivity{
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), Settings.class);
                 startActivity(intent);
-                finish();
+                // finish();
             }
         });
 

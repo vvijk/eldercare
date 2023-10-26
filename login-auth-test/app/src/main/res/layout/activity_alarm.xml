@@ -10,7 +10,7 @@
         android:id="@+id/TextViewTimeLeft"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tid kvar tills larmet aktiveras: "
+        android:text="@string/alarm_time_until_active"
         android:textSize="24sp"
         android:textStyle="bold"
         android:paddingBottom="16sp">
@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:textSize="36sp"
-        android:text="Tid"
+        android:text=""
         android:padding="16sp">
 
     </TextView>
@@ -31,7 +31,7 @@
         android:id="@+id/ButtonGoBack"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Ångra och gå tillbaka"
+        android:text="@string/alarm_regret_go_back"
         android:layout_marginTop="64sp"
         android:textSize="32dp">
     </Button>

@@ -89,24 +89,24 @@ public class Helpers {
     }
 
 
-    public boolean isValidUserInput(String email, String password, String firstname, String lastname, String phoneNr, String personNummer) {
+    public boolean isValidUserInput(String email, String password, String firstname, String lastname, String phoneNr, String personNummer, Context context) {
         if (TextUtils.isEmpty(email) || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            showToast("Ange epostadress");
+            showToast(context.getResources().getString(R.string.provide_email));
             return false;
         } else if (TextUtils.isEmpty(password) || password.length() < 6) {
-            showToast("Lösenordet måste vara minst 6 siffror");
+            showToast(context.getResources().getString(R.string.unsafe_password));
             return false;
         } else if (TextUtils.isEmpty(firstname)) {
-            showToast("Ange förnamn");
+            showToast(context.getResources().getString(R.string.provide_first_name));
             return false;
         } else if (TextUtils.isEmpty(lastname)) {
-            showToast("Ange efternamn");
+            showToast(context.getResources().getString(R.string.provide_last_name));
             return false;
         } else if (TextUtils.isEmpty(phoneNr) || !TextUtils.isDigitsOnly(phoneNr)) {
-            showToast("Ange telefonnummer");
+            showToast(context.getResources().getString(R.string.provide_phone_number));
             return false;
         } else if (TextUtils.isEmpty(personNummer) || personNummer.length() < 12) {
-            showToast("Ange personnummret i 12 siffror");
+            showToast(context.getResources().getString(R.string.provide_personal_number));
             return false;
         }
         return true;

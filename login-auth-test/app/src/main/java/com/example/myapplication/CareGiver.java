@@ -18,6 +18,7 @@ public class CareGiver extends User {
     public Map<String, Boolean> getCaretakers() {
         return caretakers;
     }
+
     public void setCaretakers(Map<String, Boolean> caretakers) {
         this.caretakers = caretakers;
     }

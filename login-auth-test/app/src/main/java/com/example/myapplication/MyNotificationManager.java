@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
+import com.example.myapplication.util.MealStorage;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -159,6 +160,7 @@ public class MyNotificationManager{
         String todaysDay = sdf.format(currentDate).toLowerCase();
         String day = ("fri");
 
+
         DatabaseReference finalMealsRef = mealsRef.child(patientUID).child(day);
 
         finalMealsRef.addValueEventListener(new ValueEventListener() {
@@ -167,7 +169,6 @@ public class MyNotificationManager{
                 if (dataSnapshot.exists()) {
 
                     for(DataSnapshot mealSnapshot : dataSnapshot.getChildren()){   //går igenom alla Mål, frukost, lunch .....
-                        // Log.d("larss", "här har vi: "+mealSnapshot.getKey());
                         checkTime(mealSnapshot, patientUID);
 
                     }
@@ -209,9 +210,11 @@ public class MyNotificationManager{
                     checkEaten = mealSnapshot.child("eaten").getValue(Boolean.class);
                 }
 
+
                 if(mealSnapshot.child("notified").getValue() != null){
                     notified = mealSnapshot.child("notified").getValue(Boolean.class);
                 }
+
 
                 String title = context.getString(R.string.notif_not_eaten_title);
                 String desc = "";
@@ -222,6 +225,7 @@ public class MyNotificationManager{
 
                 //om recipient inte har ätit
                 if(!checkEaten && !notified){
+
                     Calendar currentTime = Calendar.getInstance();
                     Calendar targetTime = (Calendar)Calendar.getInstance().clone();
                     targetTime.set(Calendar.HOUR_OF_DAY, hourInt);
@@ -254,7 +258,6 @@ public class MyNotificationManager{
     //     calendar.setTimeInMillis(currentTimeMillis);
     //     return calendar.get(Calendar.HOUR_OF_DAY) == 12 && calendar.get(Calendar.MINUTE) == 0;
     // }
-
 
     public void makeNotification(String title, String msg) {
 
@@ -300,4 +303,3 @@ public class MyNotificationManager{
     //         databaseReference.removeEventListener(valueEventListener);
     //     }
     // }
-}

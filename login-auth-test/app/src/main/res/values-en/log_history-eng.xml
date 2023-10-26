@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- LOG HISTORY -->
+    <string name="log_header">History</string>
+    <string name="log_category">Category:</string>
+    <string name="log_patient">Recipients:</string>
+    <string name="Refresh">Refresh history</string>
+
+    <string-array name="log_category_array">
+        <item>Filter category</item>
+        <item>All</item>
+        <item>Added recipient</item>
+        <!--        <item>Patient modifierad</item>-->
+        <item>Meal checked</item>
+        <item>Meal forgotten</item>
+        <item>Meal missed</item>
+        <item>Emergency alarm</item>
+    </string-array>
+
+    <string name="log_patient_array_title">Filter recipient</string>
+    <string name="all">All</string>
+
+    <!-- SEGMENTS FOR LOG MESSAGES -->
+    <string name="LOG_ADD_PATIENT">%s added %s to their recipient list</string>
+    <!--    <string name="LOG_MODIFY_PATIENT_S1">modifierade</string>-->
+    <!--    <string name="LOG_MODIFY_PATIENT_S2">\'s information</string>-->
+    <string name="LOG_EMERGENCY">%s ACTIVATED THEIR EMERGENCY ALARM</string>
+    <string name="LOG_MEAL_CONFIRM">%s confirmed that %s was eaten</string>
+    <string name="LOG_MEAL_SKIP">%s have not eaten %s yet</string>
+    <string name="LOG_MEAL_MISS">%s missed the meal %s for the last time</string>
+    <string name="LOG_UNKNOWN">Unknown type of log message</string>
+</resources>
