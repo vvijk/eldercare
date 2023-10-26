@@ -158,7 +158,7 @@ public class MyNotificationManager{
         // Format the date to display the first three letters of the day (e.g., "Mon")
         SimpleDateFormat sdf = new SimpleDateFormat("EEE", Locale.getDefault());
         String todaysDay = sdf.format(currentDate).toLowerCase();
-        String day = (todaysDay);
+        String day = ("fri");
 
         DatabaseReference finalMealsRef = mealsRef.child(patientUID).child(day);
 
@@ -192,6 +192,7 @@ public class MyNotificationManager{
                 int hourInt = 0;
                 int minuteInt = 0;
                 boolean checkEaten = false;
+                boolean notified = false;
                 // DatabaseReference mealTypeRef = mealRef.child(mealType);
 
                 if(mealSnapshot.child("hour").getValue() != null){
@@ -209,6 +210,10 @@ public class MyNotificationManager{
                     checkEaten = mealSnapshot.child("eaten").getValue(Boolean.class);
                 }
 
+                if(mealSnapshot.child("notified").getValue() != null){
+                    notified = mealSnapshot.child("notified").getValue(Boolean.class);
+                }
+
                 String title = context.getString(R.string.notif_not_eaten_title);
                 String desc = "";
                 if(mealSnapshot.child("desc").getValue() != null)
@@ -217,7 +222,7 @@ public class MyNotificationManager{
                     Helpers.FormatTime(hourInt, minuteInt) + " " + mealSnapshot.child("name").getValue(String.class), desc);
 
                 //om recipient inte har ätit
-                if(!checkEaten){
+                if(!checkEaten && !notified){
                     Calendar currentTime = Calendar.getInstance();
                     Calendar targetTime = (Calendar)Calendar.getInstance().clone();
                     targetTime.set(Calendar.HOUR_OF_DAY, hourInt);
@@ -230,6 +235,9 @@ public class MyNotificationManager{
                     if(currentTime.after(targetTime)) {
                         Log.d("larss","har inte ätit efter tiden: ");
                         makeNotification(title, msg);
+                        Log.d("krok", "hej:" + caretakersRef.child(patientUID).child("notified").toString());
+                        //caretakersRef.child(patientUID).child("notified").setValue(true);
+
                     } else{
 
                     }
