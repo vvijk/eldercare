@@ -114,8 +114,6 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
                     // reset "eaten" of meals for tomorrow
                     int next_weekDayIndex = (weekDayIndex+1) % 7;
                     int[] sortedMealIndices = getMealStorage().caretaker_sortedMealIndices(caretakerId, next_weekDayIndex);
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.add(Calendar.DAY_OF_YEAR,1);
                     for (int mealIndex : sortedMealIndices) {
                         if (!getMealStorage().caretaker_isMealIndexValid(caretakerId, next_weekDayIndex, mealIndex))
                             continue;
@@ -323,8 +321,8 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
             Toast.makeText(this,getResources().getString(R.string.meal_marked_too_early),Toast.LENGTH_LONG).show();
             return;
         }
-
-        getMealStorage().caretaker_setEatenOfMeal(caretakerId, weekDayIndex, position, !meals.get(position).eaten);
+        boolean newEaten = !meal.eaten;
+        getMealStorage().caretaker_setEatenOfMeal(caretakerId, weekDayIndex, meal.key, newEaten);
 
         Intent intent = new Intent(this, BroadcastReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent,PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_NO_CREATE);
@@ -334,7 +332,9 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
         // mealAdapter is updated when database is written to, refresher is called and UI updates.
         String logMealData = Helpers.FormatTime(meal.hour, meal.minute) + " "+meal.name + ": "+meal.desc;
 
-        getLogStorage().submitLog(LogStorage.Category.MEAL_CONFIRM, recipientUID, null, logMealData);
+        if(newEaten) {
+            getLogStorage().submitLog(LogStorage.Category.MEAL_CONFIRM, recipientUID, null, logMealData);
+        }
     }
 
     public void enableNoMealsText(boolean show) {

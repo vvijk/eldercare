@@ -50,6 +50,8 @@ public class LogHistory extends AppCompatActivity {
     ArrayList<StateVO> recipientBoxes = new ArrayList<>();
     ArrayList<String> recipientUIDs =  new ArrayList<>();
 
+    ValueEventListener logRefreshListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,9 +76,26 @@ public class LogHistory extends AppCompatActivity {
             }
         });
 
+        getLogStorage().refLogs.addValueEventListener(logRefreshListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                getLogStorage().retrieveLogs(getFilterOptions(), (items) -> {
+                    refreshLogs(items);
+                });
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+
         getLogStorage().initDBConnection();
         fixCategorySpinner();
         fixRecipientSpinner();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        getLogStorage().refLogs.removeEventListener(logRefreshListener);
     }
 
     public String getUserID(){

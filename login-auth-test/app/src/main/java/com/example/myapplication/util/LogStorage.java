@@ -23,7 +23,7 @@ import javax.annotation.Nullable;
 public class LogStorage {
 
     FirebaseAuth mAuth;
-    DatabaseReference refLogs;
+    public DatabaseReference refLogs;
     public DatabaseReference refCaretakers;
     public DatabaseReference refCaregivers;
 
