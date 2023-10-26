@@ -38,15 +38,35 @@
         android:layout_marginTop="32dp"
         android:text="@string/str_emergency_alert"
         android:textSize="32dp"
-        android:backgroundTint="@color/red">
+        android:backgroundTint="@color/red"
+        app:cornerRadius="15dp"
+        >
     </Button>
 
-    <Button
-        android:id="@+id/recipientLogOut"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/logout"
-        android:layout_marginTop="40dp"
-        android:layout_gravity="center">
-    </Button>
+        android:layout_gravity="center"
+        >
+        <Button
+            android:id="@+id/recipientLogOut"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/logout"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:layout_gravity="center"
+            app:cornerRadius="15dp"
+            >
+        </Button>
+        <Button
+            android:id="@+id/settings_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/settings"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            app:cornerRadius="15dp"
+            />
+    </LinearLayout>
 </LinearLayout>

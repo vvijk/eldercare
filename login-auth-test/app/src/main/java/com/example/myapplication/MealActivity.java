@@ -35,10 +35,11 @@ public class MealActivity extends AppCompatActivity implements View.OnClickListe
     int curRecipientId = 0;
     int curCaregiverId = 0;
 
-    Runnable saveCallback = new Runnable() {
+    FocusOnNewLine.ViewCallback saveCallback = new FocusOnNewLine.ViewCallback() {
         @Override
-        public void run() {
+        public void run(EditText view) {
             saveAllMeals();
+
         }
     };
 
@@ -258,7 +259,7 @@ public class MealActivity extends AppCompatActivity implements View.OnClickListe
                 headLayout.setGravity(Gravity.LEFT);
                 itemLayout.addView(headLayout);
 
-                refreshMealHeader(headLayout, true, name, Helpers.FormatTime(hour, minute));
+                refreshMealHeader(headLayout, true, name, Helpers.FormatTime(hour, minute), weekDayIndex, mealIndex);
 
                 itemLayout.setBackgroundColor(getResources().getColor(R.color.dry_green_brigher));
 
@@ -282,7 +283,7 @@ public class MealActivity extends AppCompatActivity implements View.OnClickListe
                 editText = new EditText(itemLayout.getContext());
                 editText.addTextChangedListener(new FocusOnNewLine((EditText)editText, saveCallback));
                 // }
-
+                setTags(editText, weekDayIndex, mealIndex);
                 editText.setText(description);
                 editText.setHint(R.string.str_no_description);
                 editText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 24); // TODO(Emarioo): Don't hardcode text size
@@ -359,8 +360,11 @@ public class MealActivity extends AppCompatActivity implements View.OnClickListe
             footLayout.addView(replaceButton);
         }
     }
-
-    void refreshMealHeader(LinearLayout headLayout, boolean editable, String mealName, String mealTime) {
+    void setTags(TextView view, int day, int mealIndex) {
+        view.setTag(R.id.tag_dayIndex, day);
+        view.setTag(R.id.tag_deleteMeal, mealIndex);
+    }
+    void refreshMealHeader(LinearLayout headLayout, boolean editable, String mealName, String mealTime, int weekDayIndex, int mealIndex) {
         // NOTE(Emarioo): view_mealName may be EditText or TextView. We can use TextView since EditText
         //   from it inherits.
         if (mealTime == null){
@@ -381,9 +385,11 @@ public class MealActivity extends AppCompatActivity implements View.OnClickListe
         if (editable) {
             view_mealName = new EditText(this);
             ((EditText)view_mealName).addTextChangedListener(new FocusOnNewLine((EditText)view_mealName, saveCallback));
+            setTags(view_mealName, weekDayIndex, mealIndex);
             view_mealTime = new EditText(this);
             ((EditText)view_mealTime).addTextChangedListener(new TimeFixer((EditText)view_mealTime));
             ((EditText)view_mealTime).addTextChangedListener(new FocusOnNewLine((EditText)view_mealTime, saveCallback));
+            setTags(view_mealTime, weekDayIndex, mealIndex);
         } else {
             view_mealName = new TextView(this);
             view_mealTime = new TextView(this);
@@ -436,8 +442,8 @@ public class MealActivity extends AppCompatActivity implements View.OnClickListe
                     try {
                         int hour = Integer.parseInt(split[0]);
                         int minute = Integer.parseInt(split[1]);
-                        getMealStorage().caretaker_setHourOfMeal(curRecipientId, weekDayIndex, mealIndex, hour);
-                        getMealStorage().caretaker_setMinuteOfMeal(curRecipientId, weekDayIndex, mealIndex, minute);
+                        getMealStorage().caretaker_setTimeOfMeal(curRecipientId, weekDayIndex, mealIndex, hour, minute);
+                        // getMealStorage().caretaker_setMinuteOfMeal(curRecipientId, weekDayIndex, mealIndex, minute);
                     } catch (Exception e) {
                         // TODO(Emarioo): Handle parse exception. Toast the user?
                         //   Tell the user which meal was bad. We shouldn't tell the user that here because this function

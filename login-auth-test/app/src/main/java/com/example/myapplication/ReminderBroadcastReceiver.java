@@ -26,8 +26,8 @@ import java.util.Set;
 
 public class ReminderBroadcastReceiver extends BroadcastReceiver {
 
-    // public final int REMINDER_DELAY = 45 * 60; // seconds
-    public final int REMINDER_DELAY = 60; // debug
+    // public final int REMINDER_DELAY_SECONDS = 45 * 60; // seconds
+    public static final int REMINDER_DELAY_SECONDS = 15; // debug
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -46,8 +46,8 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
         logStorage.initDBConnection();
 
         if(noticeCount < 2) { // 1 initial reminder, 2 reminders of the reminder
-            // setup the next notification 45 minutes later
-            long nextNotice = alarmAtMillis + REMINDER_DELAY * 1000; // 45 minutes later
+            // setup the next notification
+            long nextNotice = alarmAtMillis + REMINDER_DELAY_SECONDS * 1000;
 
             // NOTE(Emarioo): Is it safe to reuse intent?
             intent.putExtra("noticeCount", noticeCount + 1); // 0 is for the initial notification, no buttons. 1+ will have eaten or not eaten
@@ -55,7 +55,15 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            alarmManager.set(AlarmManager.RTC_WAKEUP, nextNotice, pendingIntent);
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (alarmManager.canScheduleExactAlarms()) {
+                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, nextNotice, pendingIntent);
+                } else {
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, nextNotice, pendingIntent);
+                }
+            } else {
+                alarmManager.set(AlarmManager.RTC_WAKEUP, nextNotice, pendingIntent);
+            }
         } else {
 
         }

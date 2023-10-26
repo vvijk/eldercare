@@ -105,7 +105,8 @@ public class Helpers {
         } else if (TextUtils.isEmpty(phoneNr) || !TextUtils.isDigitsOnly(phoneNr)) {
             showToast(context.getResources().getString(R.string.provide_phone_number));
             return false;
-        } else if (TextUtils.isEmpty(personNummer) || personNummer.length() < 12) {
+        } else if (TextUtils.isEmpty(personNummer)) {
+            // || personNummer.length() < 12) {
             showToast(context.getResources().getString(R.string.provide_personal_number));
             return false;
         }

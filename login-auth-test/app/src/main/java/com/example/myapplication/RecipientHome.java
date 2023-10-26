@@ -55,7 +55,7 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
     ArrayList<MealEntry> meals = new ArrayList<>();
     MealAdapter mealAdapter;
     AlarmManager alarmManager;
-    Button logout_btn;
+    Button logout_btn, settings_btn;
     int weekDayIndex = 0;
     String recipientUID;
     int caretakerId;
@@ -84,6 +84,18 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
         logout_btn = findViewById(R.id.recipientLogOut);
 
         getLogStorage().initDBConnection();
+        
+        settings_btn = findViewById(R.id.settings_btn);
+        settings_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), Settings.class);
+                intent.putExtra("previousActivityClass",RecipientHome.class.getName());
+                startActivity(intent);
+                // finish();
+            }
+        });
+
 
         String forcedCaretakerUID = getIntent().getStringExtra("recipientUID");
         if(forcedCaretakerUID == null) {
@@ -118,7 +130,9 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
                         if (!getMealStorage().caretaker_isMealIndexValid(caretakerId, next_weekDayIndex, mealIndex))
                             continue;
 
+                        String key = getMealStorage().caretaker_keyOfMeal(caretakerId, next_weekDayIndex, mealIndex);
                         getMealStorage().caretaker_setEatenOfMeal(caretakerId, next_weekDayIndex, mealIndex, false);
+                        getMealStorage().db_meals.child(recipientUID).child(getMealStorage().dayref(next_weekDayIndex)).child(key).child("notified").setValue(false);
                     }
                 }
 
@@ -244,7 +258,15 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
                         intent.putExtra("alarmAtMillis", time);
                         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
-                        alarmManager.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            if (alarmManager.canScheduleExactAlarms()) {
+                                alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+                            } else {
+                                alarmManager.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+                            }
+                        } else {
+                            alarmManager.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+                        }
                     } else {
                         // meal time has already passed
                     }
@@ -284,7 +306,15 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
                         intent.putExtra("alarmAtMillis", time);
                         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
-                        alarmManager.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            if (alarmManager.canScheduleExactAlarms()) {
+                                alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+                            } else {
+                                alarmManager.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+                            }
+                        } else {
+                            alarmManager.set(AlarmManager.RTC_WAKEUP, time, pendingIntent);
+                        }
                     } else {
                         // meal time has already passed
                     }

@@ -229,15 +229,15 @@ public class MyNotificationManager {
 
                 //om recipient inte har ätit
                 if (!checkEaten && !notified) {
-
                     Calendar currentTime = Calendar.getInstance();
                     Calendar targetTime = (Calendar) Calendar.getInstance().clone();
                     targetTime.set(Calendar.HOUR_OF_DAY, hourInt);
                     targetTime.set(Calendar.MINUTE, minuteInt);
-                    targetTime.add(Calendar.MINUTE, 2 * 45);
-
-                    // LocalTime currentTime = LocalTime.now();
-                    // LocalTime targetTime = LocalTime.of(hourInt[0], minuteInt[0]).plusHours(1).plusMinutes(30);
+                    // if(ReminderBroadcastReceiver.REMINDER_DELAY_SECONDS < 60) {
+                    targetTime.add(Calendar.SECOND, 2 * (ReminderBroadcastReceiver.REMINDER_DELAY_SECONDS));
+                    // } else {
+                    //     targetTime.add(Calendar.MINUTE, 2 * (ReminderBroadcastReceiver.REMINDER_DELAY_SECONDS / 60));
+                    // }
 
                     if (currentTime.after(targetTime)) {
                         makeNotification(title, msg);

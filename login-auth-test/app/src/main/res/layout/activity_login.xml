@@ -37,9 +37,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPassword"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            />
     </com.google.android.material.textfield.TextInputLayout>
-
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -49,8 +49,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="numberPassword"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            />
     </com.google.android.material.textfield.TextInputLayout>
+
     <RadioGroup
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -82,7 +84,7 @@
         android:gravity="right"
         android:text="@string/forgotPassword"
         android:textSize="17dp"
-        android:textStyle="italic"></TextView>
+        android:textStyle="italic"/>
 
     <ProgressBar
         android:layout_width="wrap_content"
@@ -96,18 +98,40 @@
         android:layout_height="wrap_content"
         android:id="@+id/loginButton"
         android:text="@string/login"
-        android:layout_marginTop="20dp">
+        android:textStyle="bold"
+        android:textSize="30sp"
+        android:layout_marginTop="20dp"
+        app:cornerRadius="15dp"
+        >
     </Button>
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/registerNow"
-        android:text="@string/click_to_register"
-        android:textStyle="bold|italic"
-        android:textSize="20sp"
-        android:gravity="center"
-        android:layout_marginTop="20dp">
-    </TextView>
+        android:layout_height="match_parent"
+        android:gravity="bottom|center"
+        android:orientation="vertical"
+        >
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/registerNow"
+            android:text="@string/click_to_register"
+            android:textStyle="bold"
+            android:textSize="22sp"
+            android:gravity="center"
+            android:layout_marginTop="20dp"
+            app:cornerRadius="15dp"
+            >
+        </Button>
+        <Button
+            android:id="@+id/settings_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/settings"
+            android:textStyle="bold"
+            android:textSize="22sp"
+            app:cornerRadius="15dp"
+            />
+    </LinearLayout>
 
 </LinearLayout>

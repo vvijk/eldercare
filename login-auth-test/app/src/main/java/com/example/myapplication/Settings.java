@@ -18,11 +18,15 @@ public class Settings extends AppCompatActivity {
 
     Button englishBtn, swedishBtn;
 
+    String previousActivityClass;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        previousActivityClass = getIntent().getStringExtra("previousActivityClass");
 
         englishBtn = findViewById(R.id.engBtn);
         swedishBtn = findViewById(R.id.sweBtn);
@@ -64,8 +68,17 @@ public class Settings extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                Intent intent = new Intent(getApplicationContext(), home_caregiver.class);
+                Intent intent = null;
+                try {
+                    intent = new Intent(getApplicationContext(), Class.forName(previousActivityClass));
+                } catch(ClassNotFoundException e) {
+
+                }
+                if(intent == null) {
+                    intent = new Intent(getApplicationContext(), home_caregiver.class);
+                }
                 startActivity(intent);
+                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

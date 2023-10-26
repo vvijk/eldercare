@@ -8,8 +8,11 @@ import android.widget.EditText;
 // will clear focus from the EditText.
 public class FocusOnNewLine implements TextWatcher {
     public EditText view = null;
-    public Runnable callback = null;
-    public FocusOnNewLine(EditText view, Runnable callback) {
+    public ViewCallback callback = null;
+    public interface ViewCallback {
+        void run(EditText view);
+    }
+    public FocusOnNewLine(EditText view, ViewCallback callback) {
         this.view = view;
         this.callback = callback;
     }
@@ -43,7 +46,7 @@ public class FocusOnNewLine implements TextWatcher {
             view.clearFocus();
             // System.out.println("DONE! "+view.getText());
             if(callback != null)
-                callback.run();
+                callback.run(view);
         }
     }
 

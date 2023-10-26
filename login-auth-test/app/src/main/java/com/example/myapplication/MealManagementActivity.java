@@ -39,9 +39,9 @@ public class MealManagementActivity extends AppCompatActivity implements View.On
         return ((MainApp) getApplicationContext()).logStorage;
     }
 
-    Runnable saveCallback = new Runnable() {
+    FocusOnNewLine.ViewCallback saveCallback = new FocusOnNewLine.ViewCallback() {
         @Override
-        public void run() {
+        public void run(EditText view) {
             saveAllMeals();
         }
     };

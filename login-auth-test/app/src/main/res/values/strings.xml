@@ -5,8 +5,7 @@
     <string name="email">Epostadress</string>
     <string name="password">Lösenord</string>
     <string name="click_to_login">Tryck här för att logga in</string>
-    <string name="click_to_register">Tryck här för att skapa ett konto</string>
-    <string name="user_details"></string>
+    <string name="click_to_register">Skapa nytt konto</string>
     <string name="logout">Logga ut</string>
     <string name="lastName">Efternamn</string>
     <string name="phoneNumber">Telefonnummer</string>
@@ -14,25 +13,28 @@
     <string name="password2">Bekräfta lösenord</string>
     <string name="idNumber">Personnummer (12 siffror)</string>
     <string name="forgotPassword">Glömt lösenord</string>
-    <string name="invalid_user_login">Fel användarnamn eller lösenord</string>
+    <string name="invalid_user_login">Fel användarnamn, lösenord eller pinkod</string>
     <string name="something_went_wrong">Något med databasen gick fel. Kontakta ansvarig eller försök igen.</string>
     <string name="write_recipient_name">Skriv vårdtagarens epost här</string>
     <string name="Ja">Ja</string>
     <string name="Nej">Nej</string>
     <string name="sureLogOut">Är du säker på att du vill logga ut?</string>
     <string name="choose">Du måste välja vårdtagare eller vårdgivare!</string>
-    <string name="dontMatch">Lösenorden matchar inte!</string>
+    <string name="mismatch_password">Lösenorden matchar inte!</string>
+    <string name="mismatch_pin_code">Pinkoder matchar inte</string>
     <string name="str_provide_email_to_restore_password">Ange din epostadress för att återställa ditt lösenord</string>
     <string name="provide_email">Ange epostadress</string>
-    <string name="provide_password_or_pin">Ange lösenord eller pinkod</string>
+    <string name="provide_password">Ange lösenord</string>
+    <string name="provide_pin">Ange pinkod</string>
     <string name="unsafe_password">Lösenordet måste vara minst 6 siffror</string>
     <string name="provide_first_name">Ange förnamn</string>
     <string name="provide_last_name">Ange efternamn</string>
     <string name="provide_phone_number">Ange telefonnummer</string>
-    <string name="provide_personal_number">Ange personnummret i 12 siffrors</string>
-    <string name="restoration_success">Återställning lyckades</string>
+    <string name="provide_personal_number">Ange personnummret</string>
+    <string name="restoration_success">Kolla din email för att få ett nytt lösenord</string>
     <string name="restoration_failed">Återställning misslyckades</string>
     <string name="auth_failed">Autentisering misslyckades</string>
+    <string name="invalid_pin">Fel pinkod, försök igen!</string>
     
 
     <string name="careTaker">Vårdtagare</string>

@@ -1,10 +1,10 @@
 package com.example.myapplication;
 
-
-
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -38,17 +38,15 @@ public class Register extends AppCompatActivity {
     int checkedRadioButtonId;
     dbLibrary db;
     Helpers help;
+    private static final String PREF_NAME = "MyAppPreferences";
+    private static final String PREF_EMAIL = "email";
+    private static final String PREF_PASSWORD = "password";
+    private static final String PREF_PIN = "pin";
 
     @Override
     public void onStart() {
         super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null){
-            Intent intent =  new Intent(getApplicationContext(), home_caregiver.class);
-            startActivity(intent);
-            finish();
-        }
+        // startHomeActivity();
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +101,7 @@ public class Register extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 progressBar.setVisibility(View.VISIBLE);
-                String email, password, password2, name, lastname, phoneNr, personNummer, prefFood, PIN;
+                String email, password, password2, name, lastname, phoneNr, personNummer, prefFood, pinCode, pinCode2;
                 email = String.valueOf(editTextEmail.getText());
                 password = String.valueOf(editTextPassword.getText());
                 password2 = String.valueOf(editTextPassword2.getText());
@@ -111,7 +109,8 @@ public class Register extends AppCompatActivity {
                 lastname = String.valueOf(editTextLastname.getText());
                 phoneNr = String.valueOf(editTextPhoneNr.getText());
                 personNummer = String.valueOf(editTextPersonNummer.getText());
-                PIN = String.valueOf(editTextPIN.getText());
+                pinCode = String.valueOf(editTextPIN.getText());
+                pinCode2 = String.valueOf(editTextPIN2.getText());
                 prefFood = String.valueOf(editTextPrefFood.getText());
 
                 if (checkedRadioButtonId == -1) {
@@ -120,21 +119,41 @@ public class Register extends AppCompatActivity {
                     return;
                 }
                 if (!password.equals(password2)) {
-                    Toast.makeText(Register.this, R.string.dontMatch, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Register.this, R.string.mismatch_password, Toast.LENGTH_SHORT).show();
                     progressBar.setVisibility(View.GONE);
                     return;
                 }
+                if(checkedRadioButtonId == R.id.careTakerID) {
+                    if (pinCode.isEmpty()) {
+                        Toast.makeText(Register.this, R.string.provide_pin, Toast.LENGTH_SHORT).show();
+                        progressBar.setVisibility(View.GONE);
+                        return;
+                    }
+                    if (!pinCode.equals(pinCode2)) {
+                        Toast.makeText(Register.this, R.string.mismatch_pin_code, Toast.LENGTH_SHORT).show();
+                        progressBar.setVisibility(View.GONE);
+                        return;
+                    }
+                }
 
                 if(help.isValidUserInput(email, password, name, lastname, phoneNr, personNummer, view.getContext())) {
-                    db.registerUser(email, password, name, lastname, phoneNr, personNummer, prefFood, PIN, isCareGiver, new dbLibrary.RegisterCallback() {
+                    db.registerUser(email, password, name, lastname, phoneNr, personNummer, prefFood, pinCode, isCareGiver, new dbLibrary.RegisterCallback() {
                         @Override
                         public void onSuccess(String message) {
+
+                            // Assuming the registration process is successful
+
+                            // Store the email and password in SharedPreferences
+                            SharedPreferences sharedPref = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPref.edit();
+                            editor.putString(PREF_EMAIL, email);
+                            editor.putString(PREF_PASSWORD, password);
+                            editor.putString(PREF_PIN, pinCode);
+                            editor.apply();
                             progressBar.setVisibility(View.GONE);
                             Toast.makeText(Register.this, message, Toast.LENGTH_SHORT).show();
                             // Skicka användaren till home_caregiver sidan.
-                            Intent intent = new Intent(getApplicationContext(), home_caregiver.class);
-                            startActivity(intent);
-                            finish();
+                            startHomeActivity();
                         }
                         @Override
                         public void onError(String errorMessage) {
@@ -142,9 +161,41 @@ public class Register extends AppCompatActivity {
                             Toast.makeText(Register.this, errorMessage, Toast.LENGTH_SHORT).show();
                         }
                     });
+                } else {
+                    progressBar.setVisibility(View.GONE);
                 }
             }
         });
 
+    }
+    void startHomeActivity() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser == null)
+            return;
+        db.isCaregiver(currentUser.getUid(), new dbLibrary.CaregiverCheckCallback() {
+            @Override
+            public void onFound(boolean isCaregiver) {
+                // Sign in success, update UI with the signed-in user's information
+                Intent intent;
+                if(isCaregiver){
+                    // NOTE(Emarioo): I commented this out because I assume it's for debug purposes. If not, then we can't use hardcoded strings like this. It must be translated!
+                    // Toast.makeText(getApplicationContext(), "Successful pre.login as: caregiver!", Toast.LENGTH_SHORT).show();
+                    intent = new Intent(getApplicationContext(), home_caregiver.class);
+                }else{
+                    // Toast.makeText(getApplicationContext(), "Successful pre-login as: caretaker!", Toast.LENGTH_SHORT).show();
+                    intent = new Intent(getApplicationContext(), RecipientHome.class);
+                }
+                startActivity(intent);
+                finish();
+            }
+            @Override
+            public void onNotFound() {
+                Log.d("dbtest", "Is neither a caretake nor caregiver");
+            }
+            @Override
+            public void onFoundError(String errorMessage) {
+                Log.d("dbtest", "Database ERROR!!");
+            }
+        });
     }
 }

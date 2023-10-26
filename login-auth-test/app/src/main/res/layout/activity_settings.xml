@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/languageText"
-        android:textSize="25sp"
+        android:textSize="45sp"
         android:textStyle="bold"
          />
 
@@ -21,14 +21,18 @@
         android:id="@+id/sweBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="30sp"
         android:text="@string/swedish"
         android:layout_marginTop="20dp"
+        app:cornerRadius="15dp"
          />
 
     <Button
         android:id="@+id/engBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="30sp"
         android:text="@string/english"
-         />
+        app:cornerRadius="15dp"
+     />
 </LinearLayout>

@@ -979,6 +979,9 @@ public class MealStorage {
             db_meals.child(caretaker.UID).child(dayref(weekDay)).child(meal.key).removeValue();
         }
     }
+    public void caretaker_resetNotified(String recipientUid, int weekDay, String mealKey) {
+        db_meals.child(recipientUid).child(dayref(weekDay)).child(mealKey).child("notified").setValue(false);
+    }
     public void caretaker_setNameOfMeal(int caretakerId, int weekDay, int mealIndex, String name) {
         if(useDatabase) {
             Caretaker caretaker = getCaretaker(caretakerId);
@@ -991,6 +994,8 @@ public class MealStorage {
             if(meal == null)
                 return;
             db_meals.child(caretaker.UID).child(dayref(weekDay)).child(meal.key).child("name").setValue(name);
+            if(!meal.name.equals(name))
+                caretaker_resetNotified(caretaker.UID, weekDay, meal.key);
         }
     }
     public void caretaker_setEatenOfMeal(int caretakerId, int weekDay, int mealIndex, boolean eaten) {
@@ -1005,6 +1010,8 @@ public class MealStorage {
             if(meal == null)
                 return;
             db_meals.child(caretaker.UID).child(dayref(weekDay)).child(meal.key).child("eaten").setValue(eaten);
+            if(meal.eaten != eaten)
+                caretaker_resetNotified(caretaker.UID, weekDay, meal.key);
         }
     }
     public void caretaker_setEatenOfMeal(int caretakerId, int weekDay, String mealKey, boolean eaten) {
@@ -1019,9 +1026,11 @@ public class MealStorage {
             if(meal == null)
                 return;
             db_meals.child(caretaker.UID).child(dayref(weekDay)).child(meal.key).child("eaten").setValue(eaten);
+            if(meal.eaten != eaten)
+                caretaker_resetNotified(caretaker.UID, weekDay, meal.key);
         }
     }
-    public void caretaker_setHourOfMeal(int caretakerId, int weekDay, int mealIndex, int hour) {
+    public void caretaker_setTimeOfMeal(int caretakerId, int weekDay, int mealIndex, int hour, int minute) {
         if(useDatabase) {
             Caretaker caretaker = getCaretaker(caretakerId);
             if(caretaker == null)
@@ -1033,22 +1042,27 @@ public class MealStorage {
             if(meal == null)
                 return;
             db_meals.child(caretaker.UID).child(dayref(weekDay)).child(meal.key).child("hour").setValue(hour);
-        }
-    }
-    public void caretaker_setMinuteOfMeal(int caretakerId, int weekDay, int mealIndex, int minute){
-        if(useDatabase) {
-            Caretaker caretaker = getCaretaker(caretakerId);
-            if(caretaker == null)
-                return;
-            MealDay day = caretaker.days[weekDay];
-            if(day == null)
-                return;
-            Meal meal = day.getMeal(mealIndex);
-            if(meal == null)
-                return;
             db_meals.child(caretaker.UID).child(dayref(weekDay)).child(meal.key).child("minute").setValue(minute);
+            if(meal.hour != hour || meal.minute != minute)
+                caretaker_resetNotified(caretaker.UID, weekDay, meal.key);
         }
     }
+    // public void caretaker_setMinuteOfMeal(int caretakerId, int weekDay, int mealIndex, int minute){
+    //     if(useDatabase) {
+    //         Caretaker caretaker = getCaretaker(caretakerId);
+    //         if(caretaker == null)
+    //             return;
+    //         MealDay day = caretaker.days[weekDay];
+    //         if(day == null)
+    //             return;
+    //         Meal meal = day.getMeal(mealIndex);
+    //         if(meal == null)
+    //             return;
+    //         db_meals.child(caretaker.UID).child(dayref(weekDay)).child(meal.key).child("minute").setValue(minute);
+    //         if(meal.minute != minute)
+    //             caretaker_resetNotified(caretaker.UID, weekDay, meal.key);
+    //     }
+    // }
     public void caretaker_setDescriptionOfMeal(int caretakerId, int weekDay, int mealIndex, String description){
         if(useDatabase) {
             Caretaker caretaker = getCaretaker(caretakerId);
@@ -1061,6 +1075,8 @@ public class MealStorage {
             if(meal == null)
                 return;
             db_meals.child(caretaker.UID).child(dayref(weekDay)).child(meal.key).child("desc").setValue(description);
+            if(!meal.desc.equals(description))
+                caretaker_resetNotified(caretaker.UID, weekDay, meal.key);
         }
     }
 }

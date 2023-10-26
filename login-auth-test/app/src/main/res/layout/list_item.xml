@@ -2,60 +2,74 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:gravity="center_vertical"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+<!--    android:background="#10000000"-->
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="100"
-        android:orientation="vertical">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp"
+        android:layout_marginTop="7dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        app:cornerRadius="30dp"
+        android:background="@drawable/shape"
+        >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="horizontal">
-            <TextView
-                android:id="@+id/item_name"
+            android:layout_weight="100"
+            android:orientation="vertical">
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textSize="28sp"
-                android:textColor="@color/black"
-                android:text="?"
-                android:textStyle="bold"
-                android:gravity="center_vertical|start" />
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/item_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="28sp"
+                    android:textColor="@color/black"
+                    android:text="?"
+                    android:textStyle="bold"
+                    android:gravity="center_vertical|start" />
+                <TextView
+                    android:id="@+id/item_time"
+                    android:text="12:00"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:textSize="28sp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:gravity="right" />
+            </LinearLayout>
             <TextView
-                android:id="@+id/item_time"
-                android:text="12:00"
+                android:id="@+id/item_desc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:textSize="28sp"
+                android:layout_weight="1"
+                android:text="?"
+                android:textSize="24sp"
                 android:textColor="@color/black"
                 android:textStyle="bold"
-                android:gravity="right" />
+                android:gravity="left" />
         </LinearLayout>
-        <TextView
-            android:id="@+id/item_desc"
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/starImageView"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="?"
-            android:textSize="24sp"
-            android:textColor="@color/black"
-            android:textStyle="bold"
-            android:gravity="left" />
+            android:src="@drawable/star_selector"
+            android:minHeight="70dp"
+            android:minWidth="70dp"
+            />
     </LinearLayout>
-    <ImageView
-        android:id="@+id/starImageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/star_selector"
-        android:minHeight="70dp"
-        android:minWidth="70dp"
-        />
 </LinearLayout>

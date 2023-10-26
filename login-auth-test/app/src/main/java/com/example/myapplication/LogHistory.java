@@ -58,6 +58,7 @@ public class LogHistory extends AppCompatActivity {
 
         context = getApplicationContext();
         mAuth = FirebaseAuth.getInstance();
+        getLogStorage().initDBConnection();
 
         setContentView(R.layout.activity_log_history);
         categorySpinner = findViewById(R.id.logCategorySpinner);
@@ -87,7 +88,6 @@ public class LogHistory extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {}
         });
 
-        getLogStorage().initDBConnection();
         fixCategorySpinner();
         fixRecipientSpinner();
     }

@@ -20,58 +20,40 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import android.content.SharedPreferences;
+import android.content.Context;
 
 public class Login extends AppCompatActivity {
 
     TextInputEditText editTextEmail, editTextPassword, editTextPIN;
-    Button buttonLogin;
+    Button buttonLogin, settings_btn;
     FirebaseAuth mAuth;
     ProgressBar progressBar;
     TextView textViewLogin, textViewReset;
     dbLibrary db;
     RadioGroup radioGroup;
-    int checkedRadioButtonId;
+    private static final String PREF_NAME = "MyAppPreferences";
+    private static final String PREF_EMAIL = "email";
+    private static final String PREF_PASSWORD = "password";
+    private static final String PREF_PIN = "pin";
 
     @Override
     public void onStart() {
         super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null){
-            db.isCaregiver(currentUser.getUid(), new dbLibrary.CaregiverCheckCallback() {
-                @Override
-                public void onFound(boolean isCaregiver) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Intent intent;
-                    if(isCaregiver){
-                        // NOTE(Emarioo): I commented this out because I assume it's for debug purposes. If not, then we can't use hardcoded strings like this. It must be translated!
-                        // Toast.makeText(getApplicationContext(), "Successful pre.login as: caregiver!", Toast.LENGTH_SHORT).show();
-                        intent = new Intent(getApplicationContext(), home_caregiver.class);
-                    }else{
-                        // Toast.makeText(getApplicationContext(), "Successful pre-login as: caretaker!", Toast.LENGTH_SHORT).show();
-                        intent = new Intent(getApplicationContext(), RecipientHome.class);
-                    }
-                    startActivity(intent);
-                    finish();
-                }
-
-                @Override
-                public void onNotFound() {
-                    Log.d("dbtest", "Is neither a caretake nor caregiver");
-                }
-
-                @Override
-                public void onFoundError(String errorMessage) {
-                    Log.d("dbtest", "Database ERROR!!");
-                }
-            });
-        }
+        // Check if the user is already signed in and update UI accordingly.
+        // switchActivity(); // uncomment to use automatic login
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login); // Set the content view to the login layout
+        setContentView(R.layout.activity_login);
+
         editTextEmail = findViewById(R.id.email);
         editTextPassword = findViewById(R.id.password);
         editTextPIN = findViewById(R.id.editTextPin);
@@ -82,7 +64,23 @@ public class Login extends AppCompatActivity {
         textViewReset = findViewById(R.id.forgotPasswordBtn);
         db = new dbLibrary(Login.this);
         radioGroup = findViewById(R.id.radioGroupLogin);
-        checkedRadioButtonId = radioGroup.getCheckedRadioButtonId();
+
+        settings_btn = findViewById(R.id.settings_btn);
+        settings_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), Settings.class);
+                intent.putExtra("previousActivityClass",Login.class.getName());
+                startActivity(intent);
+                // finish();
+            }
+        });
+
+        // default visibility
+        editTextPassword.setVisibility(View.GONE);
+        editTextPIN.setVisibility(View.VISIBLE);
+        radioGroup.check(R.id.radioButtonPin);
+
         textViewLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -113,62 +111,103 @@ public class Login extends AppCompatActivity {
                 email = String.valueOf(editTextEmail.getText());
                 password = String.valueOf(editTextPassword.getText());
                 pin = String.valueOf(editTextPIN.getText());
-                if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(Login.this, getResources().getString(R.string.provide_email), Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
-                    return;
-                }
-                if (TextUtils.isEmpty(password) && TextUtils.isEmpty(pin)) {
-                    Toast.makeText(Login.this, getResources().getString(R.string.provide_password_or_pin), Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
-                    return;
-                }
-                mAuth.signInWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                progressBar.setVisibility(View.GONE);
-                                FirebaseUser user = mAuth.getCurrentUser();
-                                if(user == null) {
-                                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.invalid_user_login),Toast.LENGTH_LONG).show();
-                                    Log.d("dbtest", "Is neither a caretake nor caregiver");
-                                } else {
-                                    db.isCaregiver(user.getUid(), new dbLibrary.CaregiverCheckCallback() {
-                                        @Override
-                                        public void onFound(boolean isCaregiver) {
-                                            if (task.isSuccessful()) {
-                                                // Sign in success, update UI with the signed-in user's information
-                                                Intent intent;
-                                                if (isCaregiver) {
-                                                    // Toast.makeText(getApplicationContext(), "Successful login as: caregiver!", Toast.LENGTH_SHORT).show();
-                                                    intent = new Intent(getApplicationContext(), home_caregiver.class);
-                                                } else {
-                                                    // Toast.makeText(getApplicationContext(), "Successful login as: caretaker!", Toast.LENGTH_SHORT).show();
-                                                    intent = new Intent(getApplicationContext(), RecipientHome.class);
-                                                }
-                                                startActivity(intent);
-                                                finish();
-                                            } else {
-                                                // If sign-in fails, display a message to the user.
-                                                Toast.makeText(Login.this, getResources().getString(R.string.auth_failed), Toast.LENGTH_SHORT).show();
+
+                // if (TextUtils.isEmpty(email)) {
+                //     Toast.makeText(Login.this, getResources().getString(R.string.provide_email), Toast.LENGTH_SHORT).show();
+                //     progressBar.setVisibility(View.GONE);
+                //     return;
+                // }
+
+                if (radioGroup.getCheckedRadioButtonId() == R.id.radioButtonPin) {
+                    if (TextUtils.isEmpty(pin)) {
+                        Toast.makeText(Login.this, getResources().getString(R.string.provide_pin), Toast.LENGTH_SHORT).show();
+                        progressBar.setVisibility(View.GONE);
+                        return;
+                    }
+
+                    // Retrieve the saved email and password from SharedPreferences
+                    SharedPreferences sharedPref = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+                    String savedEmail = sharedPref.getString(PREF_EMAIL, "");
+                    String savedPassword = sharedPref.getString(PREF_PASSWORD, "");
+                    String savedPin = sharedPref.getString(PREF_PIN, ""); // Retrieve the saved PIN
+
+                    Log.d("test", "savedPin: " + savedPin);
+                    Log.d("test", "savedEmail: " + savedEmail);
+                    Log.d("test", "savedPassword: " + savedPassword);
+                    if (pin.equals(savedPin)) {
+                        // PIN is correct, proceed with login
+                        mAuth.signInWithEmailAndPassword(savedEmail, savedPassword)
+                                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<AuthResult> task) {
+                                        progressBar.setVisibility(View.GONE);
+                                        if (task.isSuccessful()) {
+                                            // Successfully logged in
+                                            FirebaseUser user = mAuth.getCurrentUser();
+                                            if(user == null) {
+                                                Toast.makeText(getApplicationContext(),getString(R.string.invalid_user_login),Toast.LENGTH_LONG).show();
+                                                Log.d("dbtest", "Is neither a caretake nor caregiver");
                                             }
+                                            startHomeActivity();
+                                        } else {
+                                            Toast.makeText(Login.this, getString(R.string.auth_failed), Toast.LENGTH_SHORT).show();
                                         }
-
-                                    @Override
-                                    public void onNotFound() {
-                                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.something_went_wrong),Toast.LENGTH_LONG).show();
-                                        Log.d("dbtest", "Is neither a caretake nor caregiver");
-                                    }
-
-                                    @Override
-                                    public void onFoundError(String errorMessage) {
-                                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.something_went_wrong),Toast.LENGTH_LONG).show();
-                                        Log.d("dbtest", "Database ERROR!!");
                                     }
                                 });
-                            }
-                        }
-                    });
+                    } else {
+                        // Incorrect PIN
+                        Toast.makeText(Login.this, getString(R.string.invalid_pin), Toast.LENGTH_SHORT).show();
+                        progressBar.setVisibility(View.GONE);
+                    }
+                } else {
+                    if (TextUtils.isEmpty(email)) {
+                        Toast.makeText(Login.this, getResources().getString(R.string.provide_email), Toast.LENGTH_SHORT).show();
+                        progressBar.setVisibility(View.GONE);
+                        return;
+                    }
+                    if (TextUtils.isEmpty(password)) {
+                        Toast.makeText(Login.this, getResources().getString(R.string.provide_password), Toast.LENGTH_SHORT).show();
+                        progressBar.setVisibility(View.GONE);
+                        return;
+                    }
+                    // "Use Password" radio button is selected, proceed with email and password login
+                    mAuth.signInWithEmailAndPassword(email, password)
+                            .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    progressBar.setVisibility(View.GONE);
+                                    if (task.isSuccessful()) {
+                                        // Successfully logged in
+                                        FirebaseUser user = mAuth.getCurrentUser();
+                                        if(user == null) {
+                                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.invalid_user_login),Toast.LENGTH_LONG).show();
+                                            Log.d("dbtest", "Is neither a caretake nor caregiver");
+                                        } else {
+                                            // NOTE(Emarioo): The
+                                            FirebaseDatabase db = FirebaseDatabase.getInstance();
+                                            db.getReference().child("users/caretakers").child(user.getUid()).child("pin").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                    System.out.println("Changed!");
+                                                    Object pinString = snapshot.getValue();
+                                                    if(pinString instanceof String) {
+                                                        saveData(email, password, (String)pinString);
+                                                    }
+                                                }
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError error) {
+                                                    System.out.println("Cancelled oh no");
+                                                    saveData(email, password, null);
+                                                }
+                                            });
+                                        }
+                                        startHomeActivity();
+                                    } else {
+                                        Toast.makeText(Login.this, getString(R.string.auth_failed), Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                }
             }
         });
 
@@ -177,9 +216,48 @@ public class Login extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), ForgotPassword.class);
                 startActivity(intent);
-                // finish();
             }
         });
     }
-
+    void saveData(String email, String password, String pinCode) {
+        SharedPreferences sharedPref = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        if(email != null)
+            editor.putString(PREF_EMAIL, email);
+        if(password != null)
+            editor.putString(PREF_PASSWORD, password);
+        if(pinCode != null)
+            editor.putString(PREF_PIN, pinCode);
+        editor.apply();
+    }
+    void startHomeActivity() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser == null)
+            return;
+        db.isCaregiver(currentUser.getUid(), new dbLibrary.CaregiverCheckCallback() {
+            @Override
+            public void onFound(boolean isCaregiver) {
+                // Sign in success, update UI with the signed-in user's information
+                Intent intent;
+                if(isCaregiver){
+                    // NOTE(Emarioo): I commented this out because I assume it's for debug purposes. If not, then we can't use hardcoded strings like this. It must be translated!
+                    // Toast.makeText(getApplicationContext(), "Successful pre.login as: caregiver!", Toast.LENGTH_SHORT).show();
+                    intent = new Intent(getApplicationContext(), home_caregiver.class);
+                }else{
+                    // Toast.makeText(getApplicationContext(), "Successful pre-login as: caretaker!", Toast.LENGTH_SHORT).show();
+                    intent = new Intent(getApplicationContext(), RecipientHome.class);
+                }
+                startActivity(intent);
+                finish();
+            }
+            @Override
+            public void onNotFound() {
+                Log.d("dbtest", "Is neither a caretake nor caregiver");
+            }
+            @Override
+            public void onFoundError(String errorMessage) {
+                Log.d("dbtest", "Database ERROR!!");
+            }
+        });   
+    }
 }
