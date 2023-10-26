@@ -33,6 +33,7 @@
     <string name="restoration_success">Återställning lyckades</string>
     <string name="restoration_failed">Återställning misslyckades</string>
     <string name="auth_failed">Autentisering misslyckades</string>
+    <string name="invalid_pin">Fel pinkod, försök igen!</string>
     
 
     <string name="careTaker">Vårdtagare</string>

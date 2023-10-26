@@ -4,7 +4,9 @@ package com.example.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -38,6 +40,10 @@ public class Register extends AppCompatActivity {
     int checkedRadioButtonId;
     dbLibrary db;
     Helpers help;
+    private static final String PREF_NAME = "MyAppPreferences";
+    private static final String PREF_EMAIL = "email";
+    private static final String PREF_PASSWORD = "password";
+    private static final String PREF_PIN = "pin";
 
     @Override
     public void onStart() {
@@ -129,6 +135,16 @@ public class Register extends AppCompatActivity {
                     db.registerUser(email, password, name, lastname, phoneNr, personNummer, prefFood, PIN, isCareGiver, new dbLibrary.RegisterCallback() {
                         @Override
                         public void onSuccess(String message) {
+
+                            // Assuming the registration process is successful
+
+                            // Store the email and password in SharedPreferences
+                            SharedPreferences sharedPref = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPref.edit();
+                            editor.putString(PREF_EMAIL, email);
+                            editor.putString(PREF_PASSWORD, password);
+                            editor.putString(PREF_PIN, PIN);
+                            editor.apply();
                             progressBar.setVisibility(View.GONE);
                             Toast.makeText(Register.this, message, Toast.LENGTH_SHORT).show();
                             // Skicka användaren till home_caregiver sidan.
