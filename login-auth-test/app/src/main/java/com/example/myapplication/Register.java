@@ -125,7 +125,7 @@ public class Register extends AppCompatActivity {
                     return;
                 }
 
-                if(help.isValidUserInput(email, password, name, lastname, phoneNr, personNummer)) {
+                if(help.isValidUserInput(email, password, name, lastname, phoneNr, personNummer, view.getContext())) {
                     db.registerUser(email, password, name, lastname, phoneNr, personNummer, prefFood, PIN, isCareGiver, new dbLibrary.RegisterCallback() {
                         @Override
                         public void onSuccess(String message) {

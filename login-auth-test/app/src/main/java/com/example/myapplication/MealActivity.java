@@ -43,7 +43,7 @@ public class MealActivity extends AppCompatActivity implements View.OnClickListe
     };
 
     MealStorage getMealStorage() {
-        return ((MealApp) getApplicationContext()).mealStorage;
+        return ((MainApp) getApplicationContext()).mealStorage;
     }
 
     @Override
@@ -80,7 +80,7 @@ public class MealActivity extends AppCompatActivity implements View.OnClickListe
                 //  MealManagementActivity before you got to this activity things will be fine.
                 //  If not, you end up here.
                 // error?
-                text_name.setText("Missing name");
+                text_name.setText(getResources().getString(R.string.str_missing_name));
             }
         } else {
             // error?

@@ -6,7 +6,6 @@ import java.util.List;
 public class User {
     private String firstName, lastName, phoneNr, email, idNumber, prefFood, PIN;
     private boolean careGiver;
-    private List<String> caretakers;
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }

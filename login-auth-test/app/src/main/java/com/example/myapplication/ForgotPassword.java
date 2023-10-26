@@ -36,24 +36,23 @@ public class ForgotPassword extends AppCompatActivity {
             public void onClick(View view) {
                 String email = String.valueOf(editTextEmail.getText());
                 if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(ForgotPassword.this, "Ange epostadress", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ForgotPassword.this, getResources().getString(R.string.provide_email), Toast.LENGTH_SHORT).show();
                     return;
                 }else{
                     mAuth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if(task.isSuccessful()){
-                                Toast.makeText(getApplicationContext(), "Återställninged lyckades!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), getResources().getString(R.string.restoration_success), Toast.LENGTH_SHORT).show();
                                 finish();
                                 return;
                             }else{
-                                Toast.makeText(getApplicationContext(), "Återställninged lyckades EJ!!!!!!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), getResources().getString(R.string.restoration_failed), Toast.LENGTH_SHORT).show();
                                 return;
                             }
                         }
                     });
                 }
-
             }
         });
 

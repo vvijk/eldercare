@@ -22,6 +22,18 @@
     <string name="sureLogOut">Är du säker på att du vill logga ut?</string>
     <string name="choose">Du måste välja vårdtagare eller vårdgivare!</string>
     <string name="dontMatch">Lösenorden matchar inte!</string>
+    <string name="str_provide_email_to_restore_password">Ange din epostadress för att återställa ditt lösenord</string>
+    <string name="provide_email">Ange epostadress</string>
+    <string name="provide_password_or_pin">Ange lösenord eller pinkod</string>
+    <string name="unsafe_password">Lösenordet måste vara minst 6 siffror</string>
+    <string name="provide_first_name">Ange förnamn</string>
+    <string name="provide_last_name">Ange efternamn</string>
+    <string name="provide_phone_number">Ange telefonnummer</string>
+    <string name="provide_personal_number">Ange personnummret i 12 siffrors</string>
+    <string name="restoration_success">Återställning lyckades</string>
+    <string name="restoration_failed">Återställning misslyckades</string>
+    <string name="auth_failed">Autentisering misslyckades</string>
+    
 
     <string name="careTaker">Vårdtagare</string>
     <string name="careGiver">Vårdgivare</string>
@@ -61,7 +73,7 @@
     <string name="previous">Previous</string>
     <string name="settings">Inställningar</string>
     <string name="home">Hem</string>
-    <string name="patients">Patienter</string>
+    <string name="patients">Vårdtagare</string>
     <string name="profile">Profil</string>
     <string name="menu_drawer_open">Drawer Open</string>
     <string name="menu_drawer_closed">Drawer Closed</string>
@@ -76,6 +88,12 @@
     <string name="swedish">Svenska</string>
     <string name="english">Engelska</string>
     <string name="msg_token_fmt" translatable="false">FCM registration Token: %s</string>
+    <string name="notifications_are_disabled">Notifikationer är avstängda. Du kommer missa uppdateringar.</string>
+    <string name="notif_not_eaten_title">Har inte ätit</string>
+    <string name="notif_not_eaten_msg">%s har inte ätit %s %s</string>
+    <string name="notif_alarm_title">NÖDLARM</string>
+    <string name="notif_alarm_msg">%s larmar!</string>
+
 
     <string name="historylog">Historik</string>
 
@@ -88,6 +106,7 @@
     <string name="recipient_meals_edit">Ändra</string>
     <string name="btn_replace_template_meal">Ersätt med grundmåltider</string>
     <string name="str_add_recipient">Lägg till vårdtagare</string>
+    <string name="str_remove_recipient">Ta bort vårdtagare</string>
     <string name="str_add_meal">Lägg till måltid</string>
     <string name="str_recipients">Vårdtagare</string>
     <string name="str_recipient">Vårdtagare</string>
@@ -109,6 +128,13 @@
     <string name="str_saturday">Lördag</string>
     <string name="str_sunday">Söndag</string>
     <string name="str_BackToMealPlan">Tillbaka till måltidsplan</string>
+    <string name="str_missing_name">Namn saknas?</string>
+    <string name="str_invalid_email">Epost har fel format (exempel@mail.com)</string>
+    <string name="fmt_added_recipient">%s har lagts till i din vårdtagarlista</string>
+    <string name="fmt_exists_recipient">%s finns redan i din vårdtagarlista</string>
+    <string name="fmt_removed_recipient">%s har tagits bort från din vårdtagarlista</string>
+    <string name="fmt_not_exist_recipient">%s finns inte i din vårdtagarlista</string>
+    <string name="fmt_unknown_recipient">%s hittades inte bland vårdtagare</string>
 
     <!--  Home for caretaker  -->
     <string name="str_emergency_alert">LARMA</string>
@@ -118,5 +144,12 @@
     <string name="meal_marked_too_early">Måltiden måste ha passerat för att markera den</string>
     <string name="notif_eaten">Jag har ätit</string>
     <string name="notif_not_eaten">Jag har inte ätit än</string>
+    
+    <!-- Larm för vårdtagare -->
+    <string name="alarm_time_until_active">Tid kvar tills larmet aktiveras: </string>
+    <string name="alarm_is_active">Larmet har aktiverats</string>
+    <string name="alarm_regret_go_back">Ångra och gå tillbaka</string>
+    <string name="alarm_turn_off_go_back">Stäng av och gå tillbaka</string>
+    <string name="database_down">Databasen är nere!</string>
 
 </resources>
