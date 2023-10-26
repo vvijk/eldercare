@@ -68,6 +68,8 @@ public class MyNotificationManager{
 
     public void checkLarm(DatabaseReference caretakersRef, ArrayList<String>caretakerUIDs){
 
+
+
         caretakersRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -157,7 +159,7 @@ public class MyNotificationManager{
         // Format the date to display the first three letters of the day (e.g., "Mon")
         SimpleDateFormat sdf = new SimpleDateFormat("EEE", Locale.getDefault());
         String todaysDay = sdf.format(currentDate).toLowerCase();
-        String day = ("fri");
+        String day = (todaysDay);
 
         DatabaseReference finalMealsRef = mealsRef.child(patientUID).child(day);
 
@@ -168,7 +170,7 @@ public class MyNotificationManager{
 
                     for(DataSnapshot mealSnapshot : dataSnapshot.getChildren()){   //går igenom alla Mål, frukost, lunch .....
                         // Log.d("larss", "här har vi: "+mealSnapshot.getKey());
-                        checkTime(mealSnapshot, patientUID);
+                        checkTime(mealSnapshot, patientUID, finalMealsRef);
 
                     }
                 } else {
@@ -184,7 +186,9 @@ public class MyNotificationManager{
         });
     }
 
-    private void checkTime(DataSnapshot mealSnapshot, String patientUID){
+    private void checkTime(DataSnapshot mealSnapshot, String patientUID, DatabaseReference mealRef){
+
+
         caretakersRef.child(patientUID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -232,11 +236,8 @@ public class MyNotificationManager{
                     // LocalTime targetTime = LocalTime.of(hourInt[0], minuteInt[0]).plusHours(1).plusMinutes(30);
 
                     if(currentTime.after(targetTime)) {
-                        Log.d("larss","har inte ätit efter tiden: ");
                         makeNotification(title, msg);
-                        Log.d("krok", "hej:" + caretakersRef.child(patientUID).child("notified").toString());
-                        //caretakersRef.child(patientUID).child("notified").setValue(true);
-
+                        mealRef.child(mealSnapshot.getKey()).child("notified").setValue(true);
                     } else{
 
                     }
