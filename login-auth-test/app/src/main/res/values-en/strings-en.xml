@@ -34,6 +34,7 @@
     <string name="restoration_success">Password was restored</string>
     <string name="restoration_failed">Could not restore password</string>
     <string name="auth_failed">Authentication failed</string>
+    <string name="invalid_pin">Invalid PIN code, try again.</string>
 
     <string name="careTaker">Recipient</string>
     <string name="careGiver">Caregiver</string>

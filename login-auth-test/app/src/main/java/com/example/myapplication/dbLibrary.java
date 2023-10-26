@@ -267,4 +267,39 @@ public class dbLibrary {
         void onFoundError(String errorMessage);
     }
 
+    public void getPin(String caregiverUserId, final PinCallback callback) {
+        DatabaseReference caregiverRef = FirebaseDatabase.getInstance().getReference("caregivers").child(caregiverUserId);
+
+        caregiverRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    String pin = dataSnapshot.child("pin").getValue(String.class);
+                    if (pin != null) {
+                        // PIN retrieved successfully, pass it to the callback
+                        callback.onPinRetrieved(pin);
+                    } else {
+                        // PIN is not found in the database
+                        callback.onPinNotFound();
+                    }
+                } else {
+                    // Caregiver not found in the database
+                    callback.onCaregiverNotFound();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Error occurred while fetching the PIN
+                callback.onPinFetchError(databaseError.getMessage());
+            }
+        });
+    }
+    // Callback interface to handle the PIN retrieval result
+    public interface PinCallback {
+        void onPinRetrieved(String pin);
+        void onPinNotFound();
+        void onCaregiverNotFound();
+        void onPinFetchError(String errorMessage);
+    }
 }
