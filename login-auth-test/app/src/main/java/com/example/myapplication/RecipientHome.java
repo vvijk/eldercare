@@ -90,6 +90,7 @@ public class RecipientHome extends AppCompatActivity implements AdapterView.OnIt
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), Settings.class);
+                intent.putExtra("recipientUID",recipientUID);
                 intent.putExtra("previousActivityClass",RecipientHome.class.getName());
                 startActivity(intent);
                 // finish();

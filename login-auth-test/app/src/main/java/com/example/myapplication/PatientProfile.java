@@ -29,6 +29,7 @@ public class PatientProfile extends AppCompatActivity {
     TextView txt_PatientAddress;
     TextView txt_PatientPreferences;
     TextView txt_PatientAlerts;
+    TextView txt_PatientPin;
     Button btn_BackToMealPlan;
     ImageView img_PatientAvatar;
     FirebaseAuth firebase;
@@ -49,6 +50,7 @@ public class PatientProfile extends AppCompatActivity {
         txt_PatientAddress     = findViewById(R.id.TextBoxPatientAdress);
         txt_PatientPreferences = findViewById(R.id.TextBoxPatientPreferences);
         txt_PatientAlerts      = findViewById(R.id.TextBoxPatientAlerts);
+        txt_PatientPin      = findViewById(R.id.TextBoxPatientPinCode);
         btn_BackToMealPlan     = findViewById(R.id.ButtonBackToMealPlan);
         img_PatientAvatar      = findViewById(R.id.ImageViewPatientAvatar);
 
@@ -71,6 +73,7 @@ public class PatientProfile extends AppCompatActivity {
                 txt_PatientEmail.setText(patient.getEmail());
                 txt_PatientAddress.setText(patient.getPhoneNr());
                 txt_PatientName.setText(patient.getFullName());
+                txt_PatientPin.setText(patient.getPIN());
             }
 
             @Override

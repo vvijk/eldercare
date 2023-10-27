@@ -19,6 +19,7 @@ public class Settings extends AppCompatActivity {
     Button englishBtn, swedishBtn;
 
     String previousActivityClass;
+    String uid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +28,7 @@ public class Settings extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         previousActivityClass = getIntent().getStringExtra("previousActivityClass");
+        uid = getIntent().getStringExtra("recipientUID");
 
         englishBtn = findViewById(R.id.engBtn);
         swedishBtn = findViewById(R.id.sweBtn);
@@ -72,6 +74,9 @@ public class Settings extends AppCompatActivity {
                 try {
                     // NullPointerException here, not sure why or when. Something with Class.forName
                     intent = new Intent(getApplicationContext(), Class.forName(previousActivityClass));
+                    if(uid != null) {
+                        intent.putExtra("recipientUID",uid);
+                    }
                 } catch(ClassNotFoundException e) {
 
                 }

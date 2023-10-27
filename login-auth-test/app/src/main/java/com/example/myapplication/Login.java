@@ -192,6 +192,8 @@ public class Login extends AppCompatActivity {
                                                     Object pinString = snapshot.getValue();
                                                     if(pinString instanceof String) {
                                                         saveData(email, password, (String)pinString);
+                                                    } else {
+                                                        // User is old and doesn't have a pin code
                                                     }
                                                 }
                                                 @Override
