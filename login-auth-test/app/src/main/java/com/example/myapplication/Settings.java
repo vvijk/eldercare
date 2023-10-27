@@ -70,6 +70,7 @@ public class Settings extends AppCompatActivity {
             case android.R.id.home:
                 Intent intent = null;
                 try {
+                    // NullPointerException here, not sure why or when. Something with Class.forName
                     intent = new Intent(getApplicationContext(), Class.forName(previousActivityClass));
                 } catch(ClassNotFoundException e) {
 
