@@ -29,14 +29,14 @@
             android:name=".Settings"
             android:exported="false" />
 
-        <service
-            android:name=".Notifications.FirebaseMessageService"
-            android:enabled="true"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service> <!-- Skapar ett default channel id -->
+<!--        <service-->
+<!--            android:name=".Notifications.FirebaseMessageService"-->
+<!--            android:enabled="true"-->
+<!--            android:exported="true" >-->
+<!--            <intent-filter>-->
+<!--                <action android:name="com.google.firebase.MESSAGING_EVENT" />-->
+<!--            </intent-filter>-->
+<!--        </service> &lt;!&ndash; Skapar ett default channel id &ndash;&gt;-->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/default_channel_id" /> <!-- Set custom default icon. This is used when no icon is set for incoming notification messages. -->
